@@ -16,6 +16,7 @@ document records the mapping from MATLAB functions to Python modules.
 | `TMSfastCorr.m` | `stats/functional.py` | Implemented |
 | `TMSIdealFilter.m`, `TMSfilter.m` | `stats/functional.py` | Implemented |
 | `TMSregression.m` | `stats/regression.py` | Implemented |
+| `rest_regress_ss.m` | `preprocess/covariates.py`, `stats/regression.py` | Implemented with CLI and pipeline integration |
 | `TMSGFCClass.m` | `stats/classification.py` | Implemented |
 | `TMSFlipImageLR.m` | `preprocess/imaging.py` | Implemented |
 | `TMSfalff.m` | `wm/alff.py` | Implemented |

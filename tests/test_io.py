@@ -4,6 +4,7 @@ from pathlib import Path
 
 import nibabel as nib
 import numpy as np
+import pytest
 
 from neuroimaging_neuromodulation.io.nifti import load_4d_matrix, load_volume, save_volume
 
@@ -27,7 +28,7 @@ def test_save_roundtrip(tmp_path: Path, package_data_dir: Path) -> None:
 
 def test_load_4d_matrix(real_fmri_path: Path | None, real_fmri_available: bool) -> None:
     if not real_fmri_available:
-        return
+        pytest.skip("real fMRI data not available")
     img, matrix = load_4d_matrix(real_fmri_path)
     assert matrix.ndim == 2
     assert matrix.shape == (np.prod(img.shape[:3]), img.shape[3])

@@ -28,9 +28,9 @@ workspace. It is intended to make the production readiness claim auditable.
 
 ## Verification Evidence
 
-- `70` automated tests pass on the local macOS environment for Python 3.10
+- `74` automated tests pass on the local macOS environment for Python 3.10
   and 3.14.
-- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.17.0-py3-none-any.whl`.
+- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.18.0-py3-none-any.whl`.
 - GitHub Actions matrix passes on Ubuntu, macOS, and Windows for Python
   3.10, 3.11, and 3.12.
 - Real data used in tests includes:

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import nibabel as nib
+import pytest
 
 from neuroimaging_neuromodulation.reporting.html import render_target_report
 from neuroimaging_neuromodulation.reporting.manifest import write_target_manifest
@@ -21,7 +22,7 @@ def test_manifest_real_files(package_data_dir: Path, tmp_path: Path) -> None:
 
 def test_report_real_target(real_fmri_path: Path | None, real_fmri_available: bool, tmp_path: Path) -> None:
     if not real_fmri_available:
-        return
+        pytest.skip("real fMRI data not available")
     func_img = nib.load(real_fmri_path)
     _, _ = sphere_roi([0.0, 0.0, 0.0], 8.0, func_img, tmp_path / "seed.nii")
     _, _ = sphere_roi([0.0, 0.0, 0.0], 18.0, func_img, tmp_path / "mask.nii")

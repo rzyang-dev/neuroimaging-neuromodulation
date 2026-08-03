@@ -33,6 +33,8 @@ Tests are grouped by responsibility:
 - `test_external.py` verifies FSL/MRtrix command builders and missing-binary
   behavior.
 - `test_external.py` verifies external-tool availability reporting.
+- `test_regression_cli.py` verifies regression, nuisance regression, signal
+  extraction, and Friston-24 CLI commands.
 - `test_dicom.py` also verifies DICOM inspection and single-series validation.
 - `test_dicom.py` covers six real DICOM vendor series.
 - `test_dicom.py` covers compressed and enhanced multiframe DICOM variants.
@@ -43,13 +45,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-70 passed
+74 passed
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-70 passed in 10.14s
+74 passed in 13.59s
 ```
 
 The test command is:
@@ -77,7 +79,7 @@ The CLI was exercised end to end on the real downloaded fMRI subject:
 `pip wheel` builds successfully:
 
 ```text
-neuroimaging_neuromodulation-0.17.0-py3-none-any.whl
+neuroimaging_neuromodulation-0.18.0-py3-none-any.whl
 ```
 
 The wheel contains the package modules, bundled real template/mask data, CLI

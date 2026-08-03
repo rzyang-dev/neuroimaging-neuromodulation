@@ -25,6 +25,12 @@ Or:
 .venv/bin/nm-toolbox gui
 ```
 
+Developers and advanced users can open the more detailed tabbed interface with:
+
+```bash
+.venv/bin/nm-gui
+```
+
 ## What It Does
 
 The app builds a pipeline config and runs:

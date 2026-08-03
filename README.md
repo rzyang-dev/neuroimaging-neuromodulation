@@ -45,11 +45,14 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
   smoothing
 - ALFF, zALFF, mALFF, fALFF, zfALFF, and mfALFF
 - Nuisance regression and Friston-24 motion regressors
+- CLI commands for generic regression, nuisance regression, signal extraction,
+  and Friston-24 regressors
 - Sphere ROI creation, ROI dilation, and deep-target coordinates
 - Individual target mask construction from tissue segments
 - Correlation thresholding and largest-cluster target selection
 - CLI commands and an optional Tkinter desktop interface
 - Guided end-user desktop application via `nm-app`
+- Advanced desktop interface via `nm-gui`
 - Separate `nm-preprocess` program for deformation, slice timing, motion
   resampling, and smoothing
 - HTML target reports and SHA-256 output manifests for traceability
@@ -130,7 +133,7 @@ subject downloaded through Nilearn.
 .venv/bin/python -m pip wheel . --no-deps -w dist
 ```
 
-The verified wheel is `dist/neuroimaging_neuromodulation-0.17.0-py3-none-any.whl`.
+The verified wheel is `dist/neuroimaging_neuromodulation-0.18.0-py3-none-any.whl`.
 
 ## Documentation
 

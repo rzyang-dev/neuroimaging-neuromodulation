@@ -83,9 +83,9 @@ DARTEL clone.
 
 `nm-pipeline` reads a JSON config and executes the main data-oriented workflow:
 DICOM conversion (optional), slice timing (optional), motion estimation
-(optional), seed-based FC, target-site selection, and reporting. Output paths
-are recorded in the returned summary so the same workflow can be audited or
-re-run with changed parameters.
+(optional), nuisance regression (optional), seed-based FC, target-site
+selection, and reporting. Output paths are recorded in the returned summary so
+the same workflow can be audited or re-run with changed parameters.
 
 ## Validation
 

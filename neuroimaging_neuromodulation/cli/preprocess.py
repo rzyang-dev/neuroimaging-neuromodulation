@@ -11,6 +11,7 @@ import numpy as np
 from ..io.deformations import apply_deformation
 from ..io.nifti import load_4d_matrix, load_volume, save_volume
 from ..deformations.estimate import estimate_deformation
+from ..preprocess.covariates import design_matrix, extract_signal, friston24, regress_out_nuisance
 from ..preprocess.coregister import coregister_images
 from ..preprocess.imaging import flip_left_right
 from ..preprocess.motion import estimate_motion_parameters
@@ -19,6 +20,7 @@ from ..preprocess.temporal import apply_motion_parameters, slice_timing_correct_
 from ..segmentation.tissue import segment_tissue
 from ..validation.metrics import compare_volumes, validate_deformation
 from ..stats.functional import bandpass_filter
+from ..stats.regression import regress
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -123,6 +125,36 @@ def build_parser() -> argparse.ArgumentParser:
     vi.add_argument("--test", required=True)
     vi.add_argument("--output-json", required=True)
     vi.set_defaults(handler=run_validate_image)
+
+    reg = subparsers.add_parser("regress", help="Run generic linear regression on text matrices")
+    reg.add_argument("--y", required=True, help="Nx1 response matrix")
+    reg.add_argument("--x", required=True, help="NxK design matrix")
+    reg.add_argument("--beta-output", required=True)
+    reg.add_argument("--residual-output", required=True)
+    reg.set_defaults(handler=run_regress)
+
+    cov = subparsers.add_parser("regress-covariates", help="Regress nuisance signals from functional data")
+    cov.add_argument("--functional", required=True)
+    cov.add_argument("--output", required=True)
+    cov.add_argument("--rp", help="Six-column realignment parameters")
+    cov.add_argument("--wm-signal", help="White-matter signal text file")
+    cov.add_argument("--csf-signal", help="CSF signal text file")
+    cov.add_argument("--global-signal", help="Global signal text file")
+    cov.add_argument("--wm-mask", help="White-matter mask NIfTI")
+    cov.add_argument("--csf-mask", help="CSF mask NIfTI")
+    cov.add_argument("--global-mask", help="Global signal mask NIfTI")
+    cov.set_defaults(handler=run_regress_covariates)
+
+    sig = subparsers.add_parser("extract-signal", help="Extract mean signal from a mask")
+    sig.add_argument("--functional", required=True)
+    sig.add_argument("--mask", required=True)
+    sig.add_argument("--output", required=True)
+    sig.set_defaults(handler=run_extract_signal)
+
+    f24 = subparsers.add_parser("friston24", help="Build Friston-24 motion regressors")
+    f24.add_argument("--rp", required=True)
+    f24.add_argument("--output", required=True)
+    f24.set_defaults(handler=run_friston24)
 
     return parser
 
@@ -288,6 +320,72 @@ def run_validate_image(args: argparse.Namespace) -> int:
     metrics = compare_volumes(args.reference, args.test)
     Path(args.output_json).write_text(json.dumps(metrics, indent=2), encoding="utf-8")
     print(json.dumps(metrics, indent=2))
+    return 0
+
+
+def _read_signal(path: str | None) -> np.ndarray | None:
+    if not path:
+        return None
+    value = np.loadtxt(path).reshape(-1)
+    return value
+
+
+def run_regress(args: argparse.Namespace) -> int:
+    y = np.loadtxt(args.y).reshape(-1)
+    x = np.loadtxt(args.x)
+    beta, residual = regress(y, x)
+    np.savetxt(args.beta_output, beta)
+    np.savetxt(args.residual_output, residual)
+    print(args.beta_output)
+    print(args.residual_output)
+    return 0
+
+
+def run_regress_covariates(args: argparse.Namespace) -> int:
+    img, data = load_volume(args.functional)
+    if data.ndim != 4:
+        raise ValueError("regress-covariates expects 4D functional data")
+    matrix = data.reshape(-1, data.shape[3])
+    rp = np.loadtxt(args.rp) if args.rp else None
+    if rp is not None and (rp.ndim != 2 or rp.shape[1] != 6):
+        raise ValueError("RP file must have six columns")
+    signals = [None, None, None]
+    masks = [args.wm_mask, args.csf_mask, args.global_mask]
+    for index, signal_path in enumerate([args.wm_signal, args.csf_signal, args.global_signal]):
+        signals[index] = _read_signal(signal_path)
+    for index, mask_path in enumerate(masks):
+        if mask_path:
+            _, mask_data = load_volume(mask_path)
+            signals[index] = extract_signal(matrix, mask_data.reshape(-1) > 0)
+    design = design_matrix(
+        matrix.shape[1],
+        motion_parameters=rp,
+        wm_signal=signals[0],
+        csf_signal=signals[1],
+        global_signal=signals[2],
+    )
+    regressed = regress_out_nuisance(matrix, design)
+    save_volume(regressed.reshape(data.shape), img, args.output)
+    print(args.output)
+    return 0
+
+
+def run_extract_signal(args: argparse.Namespace) -> int:
+    img, data = load_volume(args.functional)
+    if data.ndim != 4:
+        raise ValueError("extract-signal expects 4D functional data")
+    _, mask_data = load_volume(args.mask)
+    signal = extract_signal(data.reshape(-1, data.shape[3]), mask_data.reshape(-1) > 0)
+    np.savetxt(args.output, signal, fmt="%.10f")
+    print(args.output)
+    return 0
+
+
+def run_friston24(args: argparse.Namespace) -> int:
+    rp = np.loadtxt(args.rp)
+    expanded = friston24(rp)
+    np.savetxt(args.output, expanded, fmt="%.10f")
+    print(args.output)
     return 0
 
 

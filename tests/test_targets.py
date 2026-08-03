@@ -4,6 +4,7 @@ from pathlib import Path
 
 import nibabel as nib
 import numpy as np
+import pytest
 
 from neuroimaging_neuromodulation.io.deformations import identity_deformation
 from neuroimaging_neuromodulation.targets.cluster import largest_cluster
@@ -74,7 +75,7 @@ def test_individual_target_mask_real_templates(package_data_dir: Path, tmp_path:
 
 def test_seed_fc_on_real_data(real_fmri_path: Path | None, real_fmri_available: bool, tmp_path: Path) -> None:
     if not real_fmri_available:
-        return
+        pytest.skip("real fMRI data not available")
     func_img = nib.load(real_fmri_path)
     _, seed = sphere_roi([0.0, 0.0, 0.0], 8.0, func_img, tmp_path / "seed.nii")
     _, mask = sphere_roi([0.0, 0.0, 0.0], 18.0, func_img, tmp_path / "mask.nii")
@@ -92,7 +93,7 @@ def test_seed_fc_on_real_data(real_fmri_path: Path | None, real_fmri_available: 
 
 def test_seed_fc_accepts_identity_deformation(real_fmri_path: Path | None, real_fmri_available: bool, tmp_path: Path) -> None:
     if not real_fmri_available:
-        return
+        pytest.skip("real fMRI data not available")
     func_img = nib.load(real_fmri_path)
     _, seed = sphere_roi([0.0, 0.0, 0.0], 8.0, func_img, tmp_path / "seed.nii")
     _, mask = sphere_roi([0.0, 0.0, 0.0], 18.0, func_img, tmp_path / "mask.nii")
@@ -112,7 +113,7 @@ def test_seed_fc_accepts_identity_deformation(real_fmri_path: Path | None, real_
 
 def test_target_site_on_real_fc(real_fmri_path: Path | None, real_fmri_available: bool, tmp_path: Path) -> None:
     if not real_fmri_available:
-        return
+        pytest.skip("real fMRI data not available")
     func_img = nib.load(real_fmri_path)
     _, seed = sphere_roi([0.0, 0.0, 0.0], 8.0, func_img, tmp_path / "seed.nii")
     _, mask = sphere_roi([0.0, 0.0, 0.0], 18.0, func_img, tmp_path / "mask.nii")
