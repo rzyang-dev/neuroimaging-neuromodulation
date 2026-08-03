@@ -10,6 +10,7 @@ import numpy as np
 
 from ..io.dicom import convert_dicom_directory
 from ..io.nifti import load_volume, save_volume
+from ..preprocess.covariates import design_matrix, extract_signal, regress_out_nuisance
 from ..preprocess.motion import estimate_motion_parameters
 from ..preprocess.temporal import slice_timing_correct_volume
 from ..reporting.html import render_target_report
@@ -85,6 +86,47 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
         rp_path = subject_dir / "rp.txt"
         np.savetxt(rp_path, rp, fmt="%.10f")
 
+    regressed_path = None
+    nuisance = config.get("nuisance") or {}
+    if config.get("regress_covariates", False) or nuisance:
+        rp = np.loadtxt(rp_path) if rp_path else None
+        wm_signal = None
+        csf_signal = None
+        global_signal = None
+        if nuisance.get("wm_signal"):
+            wm_signal = np.loadtxt(nuisance["wm_signal"]).reshape(-1)
+        if nuisance.get("csf_signal"):
+            csf_signal = np.loadtxt(nuisance["csf_signal"]).reshape(-1)
+        if nuisance.get("global_signal"):
+            global_signal = np.loadtxt(nuisance["global_signal"]).reshape(-1)
+        matrix = data.reshape(-1, data.shape[3])
+        for key, mask_path in (
+            ("wm_mask", nuisance.get("wm_mask")),
+            ("csf_mask", nuisance.get("csf_mask")),
+            ("global_mask", nuisance.get("global_mask")),
+        ):
+            if not mask_path:
+                continue
+            _, mask_data = load_volume(mask_path)
+            signal = extract_signal(matrix, mask_data.reshape(-1) > 0)
+            if key == "wm_mask":
+                wm_signal = signal
+            elif key == "csf_mask":
+                csf_signal = signal
+            else:
+                global_signal = signal
+        design = design_matrix(
+            matrix.shape[1],
+            motion_parameters=rp,
+            wm_signal=wm_signal,
+            csf_signal=csf_signal,
+            global_signal=global_signal,
+        )
+        regressed = regress_out_nuisance(matrix, design)
+        current_path = subject_dir / "regressed.nii"
+        save_volume(regressed.reshape(data.shape), img, current_path)
+        regressed_path = current_path
+
     tr = float(config["tr"]) if config.get("tr") is not None else None
     fc_result = seed_based_fc(
         current_path,
@@ -123,6 +165,7 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
         "functional": str(current_path),
         "t1": str(t1_path) if t1_path else None,
         "rp": str(rp_path) if rp_path else None,
+        "regressed": str(regressed_path) if regressed_path else None,
         "seed_fc": {key: str(value) for key, value in fc_result.items() if hasattr(value, "__fspath__")},
         "target": target_result,
         "report": str(report_path) if report_path else None,

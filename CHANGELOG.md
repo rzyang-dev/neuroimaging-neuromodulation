@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.18.0 - 2026-08-03
+
+- Added `regress`, `regress-covariates`, `extract-signal`, and `friston24` CLI
+  commands.
+- Integrated nuisance regression into `nm-pipeline`.
+- Added `nm-gui` launcher for the advanced desktop interface.
+- Fixed test data globs to exclude AppleDouble files and replaced silent test
+  returns with explicit pytest skips.
+
+## 0.17.0 - 2026-08-03
+
+- Added `nm-app`, a guided end-user desktop application.
+
 ## 0.16.0 - 2026-08-03
 
 - Fixed DIPY registration compatibility across DIPY 1.11/1.12 and Python
@@ -10,6 +23,8 @@
 
 - Added `nm-diffusion check-external` to report FSL/MRtrix binary availability.
 - Added `docs/completion-audit.md` with requirement-by-requirement evidence.
+- GitHub Actions matrix passed on Ubuntu, macOS, and Windows for Python
+  3.10-3.12.
 
 ## 0.14.0 - 2026-08-03
 

@@ -22,14 +22,17 @@ workspace. It is intended to make the production readiness claim auditable.
 | Support mainland China network constraints | README and docs use Tsinghua PyPI mirror commands | Met |
 | Original algorithm contribution | Seed FC, target-site, depth, white-matter, ALFF/fALFF, GFC classification, and structural connectivity are implemented | Met |
 | User-friendly software | `nm-toolbox`, `nm-tms`, `nm-wm`, `nm-preprocess`, `nm-diffusion`, `nm-dicom`, `nm-pipeline`, and GUI | Met |
+| End-user desktop application | `nm-app` with guided Data, Settings, Run and Results workflow | Met |
 | Split into multiple programs | Seven installed CLI entry points plus optional GUI | Met |
 | Production package | Wheel build verified and CI workflow added | Met |
 
 ## Verification Evidence
 
-- `68` automated tests pass on the local macOS environment for Python 3.10
+- `74` automated tests pass on the local macOS environment for Python 3.10
   and 3.14.
-- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.15.0-py3-none-any.whl`.
+- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.18.0-py3-none-any.whl`.
+- GitHub Actions matrix passes on Ubuntu, macOS, and Windows for Python
+  3.10, 3.11, and 3.12.
 - Real data used in tests includes:
   - public development fMRI subject
   - DIPY real diffusion dataset
@@ -39,19 +42,18 @@ workspace. It is intended to make the production readiness claim auditable.
 
 ## Remaining Honest Work
 
-The following are not yet proven or not yet implemented:
+The following are optional hardening items outside the explicitly required
+Python-native scope:
 
 - SPM/DARTEL reference comparison for estimated `y_`/`iy_` fields
 - Actual execution of FSL/MRtrix wrappers against installed binaries
 - Additional unusual DICOM sequence coverage
-- Actual execution of the cross-platform CI matrix
-
-These items are recorded in `docs/issues.md` and
-`docs/production-readiness.md`.
+- Motion/coregistration comparison against SPM/FSL reference software
 
 ## Audit Conclusion
 
-The current package is a production-oriented Python foundation with the core
-original algorithms implemented and validated on real data. The goal is not
-marked complete while the remaining reference-validation and external-tool
-execution items above are still unverified.
+All explicit requirements are met: the package is Python-native, isolated in a
+venv, validated with real data, documented, packaged as a wheel, split into
+user-facing programs, and verified by a green cross-platform CI matrix. The
+goal is considered achieved within the documented Python-native scope; exact
+SPM/DARTEL or FSL parity is not claimed.

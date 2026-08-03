@@ -28,7 +28,7 @@ def test_affine_to_rp_roundtrip() -> None:
 
 def test_estimate_motion_real_subset(real_fmri_path: Path | None, real_fmri_available: bool) -> None:
     if not real_fmri_available:
-        return
+        pytest.skip("real fMRI data not available")
     img = nib.load(real_fmri_path)
     data = np.asanyarray(img.dataobj)[..., :4]
     corrected, rp = estimate_motion_parameters(

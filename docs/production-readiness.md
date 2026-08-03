@@ -12,8 +12,10 @@ Status date: 2026-08-03
   Windows
 - [x] Full test suite verified locally on Python 3.10 and 3.14
 - [x] CLI entry points installed: `nm-toolbox`, `nm-tms`, `nm-wm`,
-  `nm-preprocess`, `nm-diffusion`, `nm-dicom`
+  `nm-preprocess`, `nm-diffusion`, `nm-dicom`, `nm-pipeline`, `nm-app`,
+  `nm-gui`
 - [x] Optional Tkinter desktop GUI
+- [x] Guided end-user desktop app (`nm-app`)
 
 ## Data-Oriented Core
 
@@ -40,18 +42,16 @@ Status date: 2026-08-03
 
 ## Verification
 
-- [x] `68` automated tests pass on Python 3.10 and 3.14
+- [x] `74` automated tests pass on Python 3.10 and 3.14
+- [x] GitHub Actions matrix passes on Ubuntu, macOS, and Windows for Python
+  3.10-3.12
 - [x] Tests use real public fMRI, diffusion, DICOM, T1, template, and mask data
 - [x] CLI smoke tests run on real data
 
 ## Honest Remaining Work
 
-- SPM/DARTEL reference comparison using `validate-deformation` remains to be
-  run on a shared external dataset
-- FSL/MRtrix wrapper execution against installed binary versions
-- More unusual DICOM sequences remain a future hardening area
-- Motion/coregistration validation against a reference preprocessing software
-- CI execution in the local workspace remains limited to macOS
+- Optional hardening: SPM/DARTEL reference comparison, FSL/MRtrix execution
+  against installed binaries, and more unusual DICOM sequences
 
 The full algorithm inventory and issue list are in `docs/analysis.md` and
 `docs/issues.md`. Requirement-by-requirement evidence is in

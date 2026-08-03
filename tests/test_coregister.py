@@ -14,7 +14,7 @@ from neuroimaging_neuromodulation.preprocess.temporal import apply_motion_parame
 
 def test_coregister_real_volume(real_fmri_path: Path | None, real_fmri_available: bool) -> None:
     if not real_fmri_available:
-        return
+        pytest.skip("real fMRI data not available")
     img = nib.load(real_fmri_path)
     static = np.asanyarray(img.dataobj)[..., 0]
     moving = apply_motion_parameters(

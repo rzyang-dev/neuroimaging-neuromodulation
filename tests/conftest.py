@@ -15,7 +15,12 @@ def package_data_dir() -> Path:
 
 @pytest.fixture
 def real_fmri_path() -> Path | None:
-    candidates = sorted((ROOT / "data" / "real_development_fmri").rglob("*.nii.gz"))
+    root = ROOT / "data" / "real_development_fmri"
+    candidates = sorted(
+        path
+        for path in root.rglob("*.nii.gz")
+        if not path.name.startswith("._") and "AppleDouble" not in str(path)
+    )
     return candidates[0] if candidates else None
 
 

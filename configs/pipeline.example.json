@@ -12,6 +12,12 @@
     "level_iters": [5, 2, 1],
     "maxiter": 10
   },
+  "regress_covariates": true,
+  "nuisance": {
+    "wm_mask": "path/to/white-matter-mask.nii",
+    "csf_mask": "path/to/csf-mask.nii",
+    "global_mask": "path/to/brain-mask.nii"
+  },
   "filter": false,
   "low_cutoff": 0.01,
   "high_cutoff": 0.1,

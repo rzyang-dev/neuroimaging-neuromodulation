@@ -88,6 +88,45 @@ Outputs:
   --high-cutoff 0.1
 ```
 
+### Generic linear regression
+
+```bash
+.venv/bin/nm-preprocess regress \
+  --y <response.txt> \
+  --x <design.txt> \
+  --beta-output <beta.txt> \
+  --residual-output <residual.txt>
+```
+
+### Nuisance regression
+
+```bash
+.venv/bin/nm-preprocess regress-covariates \
+  --functional <4D fMRI.nii> \
+  --rp <rp-file.txt> \
+  --wm-mask <white-matter-mask.nii> \
+  --csf-mask <csf-mask.nii> \
+  --global-mask <brain-mask.nii> \
+  --output <regressed.nii>
+```
+
+### Extract signal from a mask
+
+```bash
+.venv/bin/nm-preprocess extract-signal \
+  --functional <4D fMRI.nii> \
+  --mask <mask.nii> \
+  --output <signal.txt>
+```
+
+### Friston-24 regressors
+
+```bash
+.venv/bin/nm-preprocess friston24 \
+  --rp <rp-file.txt> \
+  --output <friston24.txt>
+```
+
 ### Flip left-right
 
 ```bash
@@ -375,7 +414,15 @@ Run:
 .venv/bin/nm-toolbox gui
 ```
 
-The GUI has three tabs:
+This launches the guided end-user app.
+
+For the advanced tabbed desktop interface, run:
+
+```bash
+.venv/bin/nm-gui
+```
+
+The advanced GUI has tabs:
 
 - TMS Target: choose functional, seed, mask, and output paths; run seed FC or
   generate target candidates.
@@ -385,6 +432,17 @@ The GUI has three tabs:
 - Utilities: create sphere ROIs or compute deep-target coordinates.
 
 The GUI requires Tkinter, which is included with many Python distributions.
+
+### End-user app
+
+For a simpler guided workflow, run:
+
+```bash
+.venv/bin/nm-app
+```
+
+The end-user app provides three steps: Data, Settings, and Run and Results.
+After analysis, it can open the HTML report and output folder directly.
 
 ## Input Data Expectations
 

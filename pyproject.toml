@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "neuroimaging-neuromodulation"
-version = "0.16.0"
+version = "0.18.0"
 description = "Python-native tools for TMS target selection and white-matter fMRI analysis"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -38,6 +38,8 @@ nm-preprocess = "neuroimaging_neuromodulation.cli.preprocess:main"
 nm-diffusion = "neuroimaging_neuromodulation.cli.diffusion:main"
 nm-dicom = "neuroimaging_neuromodulation.cli.dicom:main"
 nm-pipeline = "neuroimaging_neuromodulation.cli.pipeline:main"
+nm-app = "neuroimaging_neuromodulation.gui.enduser:main"
+nm-gui = "neuroimaging_neuromodulation.gui.app:launch_gui"
 
 [tool.setuptools]
 packages = [
