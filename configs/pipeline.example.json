@@ -1,0 +1,24 @@
+{
+  "subject": "subject",
+  "output_dir": "data/pipeline",
+  "functional": "path/to/preprocessed/4d_fmri.nii",
+  "seed": "path/to/seed.nii",
+  "mask": "path/to/mask.nii",
+  "tr": 2.0,
+  "slice_order": [1, 2, 3, 4, 5],
+  "ref_slice": 1,
+  "estimate_motion": true,
+  "motion": {
+    "level_iters": [5, 2, 1],
+    "maxiter": 10
+  },
+  "filter": false,
+  "low_cutoff": 0.01,
+  "high_cutoff": 0.1,
+  "target": {
+    "posneg": ["Positive", "Negative"],
+    "p_value": 0.05,
+    "n_samples": 212
+  },
+  "report": true
+}
