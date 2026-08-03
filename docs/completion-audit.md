@@ -22,14 +22,15 @@ workspace. It is intended to make the production readiness claim auditable.
 | Support mainland China network constraints | README and docs use Tsinghua PyPI mirror commands | Met |
 | Original algorithm contribution | Seed FC, target-site, depth, white-matter, ALFF/fALFF, GFC classification, and structural connectivity are implemented | Met |
 | User-friendly software | `nm-toolbox`, `nm-tms`, `nm-wm`, `nm-preprocess`, `nm-diffusion`, `nm-dicom`, `nm-pipeline`, and GUI | Met |
+| End-user desktop application | `nm-app` with guided Data, Settings, Run and Results workflow | Met |
 | Split into multiple programs | Seven installed CLI entry points plus optional GUI | Met |
 | Production package | Wheel build verified and CI workflow added | Met |
 
 ## Verification Evidence
 
-- `68` automated tests pass on the local macOS environment for Python 3.10
+- `70` automated tests pass on the local macOS environment for Python 3.10
   and 3.14.
-- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.16.0-py3-none-any.whl`.
+- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.17.0-py3-none-any.whl`.
 - GitHub Actions matrix passes on Ubuntu, macOS, and Windows for Python
   3.10, 3.11, and 3.12.
 - Real data used in tests includes:

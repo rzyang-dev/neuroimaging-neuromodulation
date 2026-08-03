@@ -55,7 +55,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _launch_gui() -> int:
     try:
-        from ..gui.app import launch_gui
+        from ..gui.enduser import main as launch_gui
     except ImportError:
         print("Tkinter is not available in this Python installation.")
         return 1

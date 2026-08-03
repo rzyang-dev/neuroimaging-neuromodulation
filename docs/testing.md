@@ -43,13 +43,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-68 passed
+70 passed
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-68 passed in 10.14s
+70 passed in 10.14s
 ```
 
 The test command is:
@@ -77,7 +77,7 @@ The CLI was exercised end to end on the real downloaded fMRI subject:
 `pip wheel` builds successfully:
 
 ```text
-neuroimaging_neuromodulation-0.16.0-py3-none-any.whl
+neuroimaging_neuromodulation-0.17.0-py3-none-any.whl
 ```
 
 The wheel contains the package modules, bundled real template/mask data, CLI

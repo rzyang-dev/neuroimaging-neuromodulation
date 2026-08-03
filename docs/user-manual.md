@@ -386,6 +386,17 @@ The GUI has three tabs:
 
 The GUI requires Tkinter, which is included with many Python distributions.
 
+### End-user app
+
+For a simpler guided workflow, run:
+
+```bash
+.venv/bin/nm-app
+```
+
+The end-user app provides three steps: Data, Settings, and Run and Results.
+After analysis, it can open the HTML report and output folder directly.
+
 ## Input Data Expectations
 
 - Functional images should be 3D or 4D NIfTI.

@@ -14,6 +14,7 @@ Status date: 2026-08-03
 - [x] CLI entry points installed: `nm-toolbox`, `nm-tms`, `nm-wm`,
   `nm-preprocess`, `nm-diffusion`, `nm-dicom`
 - [x] Optional Tkinter desktop GUI
+- [x] Guided end-user desktop app (`nm-app`)
 
 ## Data-Oriented Core
 
@@ -40,7 +41,7 @@ Status date: 2026-08-03
 
 ## Verification
 
-- [x] `68` automated tests pass on Python 3.10 and 3.14
+- [x] `70` automated tests pass on Python 3.10 and 3.14
 - [x] GitHub Actions matrix passes on Ubuntu, macOS, and Windows for Python
   3.10-3.12
 - [x] Tests use real public fMRI, diffusion, DICOM, T1, template, and mask data

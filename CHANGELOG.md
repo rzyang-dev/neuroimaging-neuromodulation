@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.17.0 - 2026-08-03
+
+- Added `nm-app`, a guided end-user desktop application.
+
 ## 0.16.0 - 2026-08-03
 
 - Fixed DIPY registration compatibility across DIPY 1.11/1.12 and Python
