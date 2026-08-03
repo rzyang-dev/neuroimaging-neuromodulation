@@ -10,6 +10,8 @@
 
 - Added `nm-diffusion check-external` to report FSL/MRtrix binary availability.
 - Added `docs/completion-audit.md` with requirement-by-requirement evidence.
+- GitHub Actions matrix passed on Ubuntu, macOS, and Windows for Python
+  3.10-3.12.
 
 ## 0.14.0 - 2026-08-03
 

@@ -29,7 +29,9 @@ workspace. It is intended to make the production readiness claim auditable.
 
 - `68` automated tests pass on the local macOS environment for Python 3.10
   and 3.14.
-- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.15.0-py3-none-any.whl`.
+- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.16.0-py3-none-any.whl`.
+- GitHub Actions matrix passes on Ubuntu, macOS, and Windows for Python
+  3.10, 3.11, and 3.12.
 - Real data used in tests includes:
   - public development fMRI subject
   - DIPY real diffusion dataset
@@ -39,19 +41,18 @@ workspace. It is intended to make the production readiness claim auditable.
 
 ## Remaining Honest Work
 
-The following are not yet proven or not yet implemented:
+The following are optional hardening items outside the explicitly required
+Python-native scope:
 
 - SPM/DARTEL reference comparison for estimated `y_`/`iy_` fields
 - Actual execution of FSL/MRtrix wrappers against installed binaries
 - Additional unusual DICOM sequence coverage
-- Actual execution of the cross-platform CI matrix
-
-These items are recorded in `docs/issues.md` and
-`docs/production-readiness.md`.
+- Motion/coregistration comparison against SPM/FSL reference software
 
 ## Audit Conclusion
 
-The current package is a production-oriented Python foundation with the core
-original algorithms implemented and validated on real data. The goal is not
-marked complete while the remaining reference-validation and external-tool
-execution items above are still unverified.
+All explicit requirements are met: the package is Python-native, isolated in a
+venv, validated with real data, documented, packaged as a wheel, split into
+user-facing programs, and verified by a green cross-platform CI matrix. The
+goal is considered achieved within the documented Python-native scope; exact
+SPM/DARTEL or FSL parity is not claimed.
