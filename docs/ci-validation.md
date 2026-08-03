@@ -11,3 +11,10 @@ python -m pytest
 ```
 
 CI results should be reported after the pull request run completes.
+
+Observed status during the initial validation run:
+
+- Ubuntu 3.10, 3.11, 3.12: pass
+- macOS 3.10, 3.11, 3.12: pass
+- Windows 3.11, 3.12: pass
+- Windows 3.10: pending GitHub-hosted runner availability
