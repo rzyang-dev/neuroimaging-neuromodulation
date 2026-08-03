@@ -137,6 +137,7 @@ The verified wheel is `dist/neuroimaging_neuromodulation-0.16.0-py3-none-any.whl
 - `docs/production-readiness.md` - production readiness checklist
 - `docs/completion-audit.md` - requirement-by-requirement audit
 - `docs/source-repository.md` - source repository and redistribution note
+- `docs/ci-validation.md` - CI validation branch notes
 - `configs/pipeline.example.json` - example end-to-end pipeline config
 - `.github/workflows/ci.yml` - CI matrix for Python 3.10-3.12 on Ubuntu,
   macOS, and Windows
