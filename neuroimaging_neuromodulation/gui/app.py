@@ -18,6 +18,7 @@ from ..preprocess.spatial import smooth_volume
 from ..preprocess.temporal import slice_timing_correct_volume
 from ..targets.pipeline import seed_based_fc, target_site
 from ..targets.roi import deep_target, sphere_roi
+from ..targets.t1 import generate_t1_target
 from ..wm.alff import compute_alff
 
 
@@ -113,6 +114,25 @@ class ToolboxApp(tk.Tk):
         button_frame.pack(fill="x", padx=8, pady=8)
         ttk.Button(button_frame, text="Compute Seed FC", command=self._run_fc).pack(side="left")
         ttk.Button(button_frame, text="Generate Target", command=self._run_target).pack(side="left", padx=8)
+
+        ttk.Label(self.tms_tab, text="T1-space target", font=("Helvetica", 11, "bold")).pack(anchor="w", padx=8, pady=(12, 0))
+        self.t1_image_var = tk.StringVar()
+        self.t1_target_var = tk.StringVar()
+        self.t1_deformation_var = tk.StringVar()
+        self.t1_output_var = tk.StringVar()
+
+        frame = self._row(self.tms_tab)
+        self._file_picker(frame, self.t1_image_var, "T1", (("NIfTI", "*.nii *.nii.gz"),))
+        frame = self._row(self.tms_tab)
+        self._file_picker(frame, self.t1_target_var, "Target ROI", (("NIfTI", "*.nii *.nii.gz"),))
+        frame = self._row(self.tms_tab)
+        self._file_picker(frame, self.t1_deformation_var, "Def Field", (("NIfTI", "*.nii *.nii.gz"),))
+        frame = self._row(self.tms_tab)
+        ttk.Label(frame, text="Output").pack(side="left", padx=(0, 4))
+        ttk.Entry(frame, textvariable=self.t1_output_var).pack(side="left", fill="x", expand=True, padx=4)
+        ttk.Button(frame, text="Browse", command=lambda: self._pick_file(self.t1_output_var, (("NIfTI", "*.nii"),))).pack(side="left")
+        frame = self._row(self.tms_tab)
+        ttk.Button(frame, text="Generate T1 Target", command=self._run_t1_target).pack(side="left")
 
     def _build_wm_tab(self) -> None:
         self.wm_func_var = tk.StringVar()
@@ -340,6 +360,18 @@ class ToolboxApp(tk.Tk):
                 subject=self.subject_var.get(),
             ),
         )
+
+    def _run_t1_target(self) -> None:
+        def task() -> str:
+            result = generate_t1_target(
+                self.t1_image_var.get(),
+                self.t1_target_var.get(),
+                self.t1_output_var.get(),
+                deformation_field=self.t1_deformation_var.get() or None,
+            )
+            return str(result["output_path"])
+
+        self._run_worker(task)
 
     def _run_alff(self) -> None:
         try:

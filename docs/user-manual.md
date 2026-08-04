@@ -510,8 +510,8 @@ For the advanced tabbed desktop interface, run:
 
 The advanced GUI has tabs:
 
-- TMS Target: choose functional, seed, mask, and output paths; run seed FC or
-  generate target candidates.
+- TMS Target: choose functional, seed, mask, and output paths; run seed FC,
+  generate target candidates, or generate a T1-space target image.
 - White Matter: choose functional and mask; run ALFF/fALFF.
 - Preprocess: estimate motion, coregister volumes, correct slice timing, apply
   deformation fields, or smooth images.
@@ -528,7 +528,11 @@ For a simpler guided workflow, run:
 ```
 
 The end-user app provides three steps: Data, Settings, and Run and Results.
-After analysis, it can open the HTML report and output folder directly.
+The Data page includes optional T1 and MNI target ROI fields; the Settings page
+can enable T1-space target image generation. If enabled, `nm-app` writes
+`IndiTarget_T1Sp.nii` and runs SPM25 segmentation when no deformation field is
+provided. After analysis, it can open the HTML report and output folder
+directly.
 
 ## Additional Ported Commands
 

@@ -81,8 +81,8 @@ noted limitations:
 
 ### T1 target workflows
 
-- Full `TMStargetT1` workflow inside the desktop apps, including interactive
-  SPM/DARTEL segmentation setup
+- Desktop apps expose T1 target generation, but interactive SPM/DARTEL
+  segmentation setup remains missing
 
 ### Diffusion preprocessing and full tractography workflow
 
@@ -105,7 +105,7 @@ noted limitations:
   warped tissue output (correlation > 0.99)
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 2/2 pass
-- Local test suite: `130 tests collected` and passing
+- Local test suite: `131 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently

@@ -42,7 +42,8 @@
    `docs/porting-status.md`.
 
 8. The individualized target-mask path is exposed through `nm-tms seed-fc` and
-   `nm-pipeline`, but not yet integrated into the desktop apps.
+   `nm-pipeline`, and T1-space target generation is now available in `nm-app`;
+   the seed-fc target-mask path is still not exposed in the desktop apps.
 
 9. Fixed: `bandpass_filter` now disambiguates orientation from the supplied
    mask length, with an explicit `voxel_major` override.

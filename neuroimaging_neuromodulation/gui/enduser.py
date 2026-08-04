@@ -29,6 +29,8 @@ def build_config(
     estimate_motion: bool = True,
     filter_data: bool = False,
     generate_target: bool = True,
+    generate_t1_target: bool = False,
+    target_image: str | Path | None = None,
     report: bool = True,
 ) -> dict[str, object]:
     """Build a pipeline config from end-user form values."""
@@ -54,6 +56,18 @@ def build_config(
         config["functional"] = str(functional)
         if t1:
             config["t1"] = str(t1)
+    if generate_t1_target:
+        if not t1:
+            raise ValueError("T1 image is required to generate a T1-space target")
+        if not target_image:
+            raise ValueError("Target image is required to generate a T1-space target")
+        config["t1_target"] = {
+            "target": str(target_image),
+            "deformation": None,
+            "output": str(Path(output_dir) / subject / "IndiTarget_T1Sp.nii"),
+            "spm_dir": None,
+            "timeout": 1800,
+        }
     return config
 
 
@@ -144,6 +158,7 @@ class EndUserApp(tk.Tk):
         self.seed_var = tk.StringVar()
         self.mask_var = tk.StringVar()
         self.t1_var = tk.StringVar()
+        self.target_image_var = tk.StringVar()
 
         frame = self._row(self.data_page)
         self._label_entry(frame, "Subject ID", self.subject_var)
@@ -170,6 +185,9 @@ class EndUserApp(tk.Tk):
 
         frame = self._row(self.data_page)
         self._file_picker(frame, "T1 image (optional)", self.t1_var, (("NIfTI", "*.nii *.nii.gz"),), directory=False)
+
+        frame = self._row(self.data_page)
+        self._file_picker(frame, "Target ROI (MNI)", self.target_image_var, (("NIfTI", "*.nii *.nii.gz"),), directory=False)
 
         ttk.Label(
             self.data_page,
@@ -200,6 +218,7 @@ class EndUserApp(tk.Tk):
         self.motion_var = tk.BooleanVar(value=True)
         self.filter_var = tk.BooleanVar(value=False)
         self.target_var = tk.BooleanVar(value=True)
+        self.t1_target_var = tk.BooleanVar(value=False)
         self.report_var = tk.BooleanVar(value=True)
 
         frame = self._row(self.settings_page)
@@ -224,6 +243,9 @@ class EndUserApp(tk.Tk):
 
         frame = self._row(self.settings_page)
         ttk.Checkbutton(frame, text="Generate TMS target candidates", variable=self.target_var).pack(anchor="w", padx=24)
+
+        frame = self._row(self.settings_page)
+        ttk.Checkbutton(frame, text="Generate T1-space target image", variable=self.t1_target_var).pack(anchor="w", padx=24)
 
         frame = self._row(self.settings_page)
         ttk.Checkbutton(frame, text="Create an HTML report", variable=self.report_var).pack(anchor="w", padx=24)
@@ -290,6 +312,14 @@ class EndUserApp(tk.Tk):
         if t1 and not Path(t1).exists():
             messagebox.showerror("T1 image missing", "The selected T1 image does not exist.")
             return None
+        target_image = self.target_image_var.get().strip() or None
+        if self.t1_target_var.get():
+            if not t1:
+                messagebox.showerror("T1 image missing", "Select a T1 image for T1-space target generation.")
+                return None
+            if not target_image or not Path(target_image).exists():
+                messagebox.showerror("Target image missing", "Select an MNI target ROI image.")
+                return None
         config = build_config(
             subject=subject,
             output_dir=self.output_var.get().strip() or str(Path.home() / "NeuroModulationResults"),
@@ -304,6 +334,8 @@ class EndUserApp(tk.Tk):
             estimate_motion=self.motion_var.get(),
             filter_data=self.filter_var.get(),
             generate_target=self.target_var.get(),
+            generate_t1_target=self.t1_target_var.get(),
+            target_image=target_image,
             report=self.report_var.get(),
         )
         return config

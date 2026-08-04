@@ -31,3 +31,21 @@ def test_build_config_dicom(tmp_path: Path) -> None:
         tr=2.0,
     )
     assert config["dicom"]["functional"] == str(tmp_path / "dicom")
+
+
+def test_build_config_t1_target(tmp_path: Path) -> None:
+    config = build_config(
+        subject="test",
+        output_dir=tmp_path,
+        functional=tmp_path / "func.nii",
+        seed=tmp_path / "seed.nii",
+        mask=tmp_path / "mask.nii",
+        t1=tmp_path / "t1.nii",
+        target_image=tmp_path / "target.nii",
+        generate_t1_target=True,
+        input_type="nifti",
+        tr=2.0,
+    )
+    assert config["t1_target"]["target"] == str(tmp_path / "target.nii")
+    assert config["t1_target"]["deformation"] is None
+    assert config["t1_target"]["output"].endswith("IndiTarget_T1Sp.nii")

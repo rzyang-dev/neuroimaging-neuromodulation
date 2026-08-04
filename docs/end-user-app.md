@@ -4,14 +4,13 @@
 package behind a simple workflow:
 
 **Status: alpha.** The app is not yet a production end-user tool. Known
-limitations are recorded in `docs/issues.md`, including the DICOM-folder
-browse path and missing individualized target-mask integration.
+limitations are recorded in `docs/issues.md`.
 
 1. Enter a subject ID.
 2. Choose functional data as a NIfTI file or DICOM folder.
 3. Choose a seed image and analysis mask.
-4. Optionally choose a T1 image.
-5. Review settings such as TR and frequency band.
+4. Optionally choose a T1 image and an MNI target ROI image.
+5. Review settings such as TR, frequency band, and T1-space target generation.
 6. Press Run Analysis.
 7. Open the generated HTML report or output folder.
 
@@ -43,6 +42,7 @@ The app builds a pipeline config and runs:
 - motion estimation, when enabled
 - seed-based FC
 - TMS target candidates, when enabled
+- T1-space target image generation, when enabled with a T1 and target ROI
 - HTML report and SHA-256 manifest
 
 Errors are shown in plain language instead of requiring users to inspect logs.
