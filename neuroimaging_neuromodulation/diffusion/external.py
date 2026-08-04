@@ -237,20 +237,23 @@ def build_fsl_fnirt_command(
     *,
     affine: str | Path | None = None,
     config: str | Path | None = None,
+    iout: str | Path | None = None,
+    fout: str | Path | None = None,
 ) -> list[str]:
     cmd = [
         "fnirt",
-        "--in",
-        str(input_image),
-        "--ref",
-        str(reference_image),
-        "--cout",
-        str(output_coeff),
+        f"--in={input_image}",
+        f"--ref={reference_image}",
+        f"--cout={output_coeff}",
     ]
     if affine is not None:
-        cmd += ["--aff", str(affine)]
+        cmd += [f"--aff={affine}"]
     if config is not None:
-        cmd += ["--config", str(config)]
+        cmd += [f"--config={config}"]
+    if iout is not None:
+        cmd += [f"--iout={iout}"]
+    if fout is not None:
+        cmd += [f"--fout={fout}"]
     return cmd
 
 

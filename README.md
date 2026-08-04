@@ -37,6 +37,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - SPM25-validated motion parameter reference comparison
 - SPM25-validated rigid coregistration reference comparison
 - SPM25-validated normalization deformation-field reference comparison
+- FSL FNIRT normalization execution comparison against DIPY warped output
 - DIPY-based volume coregistration
 - DTI fitting, deterministic tractography, and seed-target structural
   connectivity through `nm-diffusion`

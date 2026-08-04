@@ -54,6 +54,8 @@ Tests are grouped by responsibility:
   FSL is installed.
 - `test_spm_normalization_reference.py` compares SPM and DIPY normalization
   deformation fields on real templates.
+- `test_fsl_normalization_execution.py` runs FSL FNIRT on real templates when
+  FSL is installed.
 - `test_pipeline.py` verifies a config-driven real-data pipeline.
 - `test_validation.py` verifies image and deformation validation metrics.
 - `test_external.py` verifies FSL/MRtrix command builders and missing-binary
@@ -71,13 +73,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-147 tests collected and passing
+149 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-147 tests collected and passing
+149 tests collected and passing
 ```
 
 The test command is:
@@ -165,6 +167,8 @@ Verified against the installed binaries:
 - `tests/test_spm_normalization_reference.py` (Windows, `.venv-win`, SPM25
   standalone): **1/1 pass**. DIPY deformation fields agree with SPM on real
   templates with minimum correlation > 0.99.
+- `tests/test_fsl_normalization_execution.py` (WSL, FSL): **1/1 pass**. FSL
+  FNIRT and DIPY warped images agree on real templates.
 - `tests/test_external_execution.py` (WSL, `~/nm-dev-venv` on `~/nm-src`,
   with `fsl.sh` sourced): **3/3 pass**
   - `test_fsl_eddy_correct_execution`: pass.

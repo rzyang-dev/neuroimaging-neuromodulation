@@ -97,7 +97,6 @@ noted limitations:
 ### SPM/DARTEL-equivalent preprocessing
 
 - DARTEL-grade segmentation
-- FSL normalization reference comparisons
 
 ## Verification Evidence
 
@@ -119,10 +118,12 @@ noted limitations:
   2026-08-04 with a small 4D input and analysis mask
 - SPM normalization reference validation on 2026-08-04: DIPY deformation
   fields agree with SPM on real templates (minimum correlation > 0.99)
+- FSL FNIRT normalization execution validation passes in WSL on real templates,
+  comparing the FSL warped image with the DIPY warped image
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 3/3 pass, including a
   real-template registration/apply integration test
-- Local test suite: `147 tests collected` and passing
+- Local test suite: `149 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently
@@ -135,9 +136,9 @@ complete.
 
 As of 2026-08-04 the external runtimes below are installed and usable for
 reference/comparison work. The execution tests were run for the first time on
-2026-08-04; SPM `y_`/`iy_` convention, realignment, coregistration, and
-normalization reference comparisons are now implemented, while DARTEL-grade
-parity and FSL normalization comparisons are still not implemented:
+2026-08-04; SPM `y_`/`iy_` convention, realignment, coregistration,
+normalization, and FSL FNIRT execution comparisons are now implemented, while
+DARTEL-grade parity is still not implemented:
 
 - MATLAB R2015b and SPM standalone 25.01.02 are installed on Windows
   (`C:\Program Files\MATLAB\R2015b\bin`,
@@ -157,6 +158,7 @@ parity and FSL normalization comparisons are still not implemented:
     the `SeedTest` algorithm.
   - `test_randomise_execution`: pass with Python-generated two-group design
     files and FSL `randomise`.
+  - `test_fsl_normalization_execution`: pass with FSL FNIRT on real templates.
 - ANTs 2.6.5 is installed on Windows (`C:\Program Files\ants-2.6.5\bin`) and
   has been added to the user PATH (2026-08-04). `tests/test_ants_execution.py`
   was run on 2026-08-04 with `.venv-win` (`antsRegistration --version`,
@@ -166,7 +168,7 @@ parity and FSL normalization comparisons are still not implemented:
   in any WebGL-capable browser.
 
 The Python-native port is substantially implemented, and SPM `y_`/`iy_`
-world-coordinate convention, realignment, coregistration, and normalization
-reference validation now pass against SPM25. DARTEL-grade parity and FSL
-normalization comparisons remain unproven. ANTs execution tests pass (3/3);
-FSL/MRtrix execution smoke tests pass (3/3) as of 2026-08-04.
+world-coordinate convention, realignment, coregistration, normalization, and
+FSL FNIRT execution validation now pass. DARTEL-grade parity remains unproven.
+ANTs execution tests pass (3/3); FSL/MRtrix execution smoke tests pass (3/3)
+as of 2026-08-04.

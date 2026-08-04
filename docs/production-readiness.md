@@ -30,6 +30,7 @@ and what remains before the package can be called production-ready.
   smoothing, filtering, left-right flipping
 - [x] SPM motion and coregistration reference comparisons
 - [x] SPM normalization deformation-field reference comparison
+- [x] FSL FNIRT normalization execution reference comparison
 - [x] Seed-based FC, ALFF/fALFF, nuisance regression
 - [x] ROI, depth, target-site, largest-cluster target selection primitives
 - [x] Individualized target-mask workflow exposed through CLI and pipeline
@@ -48,7 +49,7 @@ and what remains before the package can be called production-ready.
 
 ## Verification
 
-- [x] `147` automated tests pass locally
+- [x] `149` automated tests pass locally
 - [ ] Tests prove numerical equivalence to original MATLAB/SPM/FSL workflows
 - [ ] Tests cover missing workflows listed in `docs/porting-status.md`
 - [x] Tests use real public fMRI, diffusion, DICOM, T1, template, and mask data

@@ -37,9 +37,8 @@
 
 7. The migration is partial, not a full port of the original MATLAB toolbox.
 
-   Missing workflows now include validated AFQ/ANTs integration and full
-   SPM/DARTEL-compatible segmentation/normalization. See
-   `docs/porting-status.md`.
+   Missing workflows now include validated AFQ/ANTs integration and
+   DARTEL-grade parity. See `docs/porting-status.md`.
 
 8. The individualized target-mask path is exposed through `nm-tms seed-fc` and
    `nm-pipeline`, and T1-space target generation is now available in `nm-app`;

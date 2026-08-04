@@ -120,6 +120,20 @@ def test_fsl_randomise_command_builders(tmp_path: Path) -> None:
     assert "-n" in randomise
 
 
+def test_fsl_fnirt_command_builder(tmp_path: Path) -> None:
+    cmd = external.build_fsl_fnirt_command(
+        tmp_path / "moving.nii",
+        tmp_path / "ref.nii",
+        tmp_path / "coeff",
+        iout=tmp_path / "warped.nii.gz",
+        fout=tmp_path / "field.nii.gz",
+    )
+    assert cmd[0] == "fnirt"
+    assert any(arg.startswith("--in=") for arg in cmd)
+    assert any(arg.startswith("--iout=") for arg in cmd)
+    assert any(arg.startswith("--fout=") for arg in cmd)
+
+
 def test_missing_binary_raises(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setattr(external.shutil, "which", lambda _name: None)
     with pytest.raises(RuntimeError, match="not found"):
