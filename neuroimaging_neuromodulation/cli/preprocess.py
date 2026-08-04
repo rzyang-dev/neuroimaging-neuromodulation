@@ -164,6 +164,15 @@ def build_parser() -> argparse.ArgumentParser:
     dartel.add_argument("--timeout", type=int, default=7200)
     dartel.set_defaults(handler=run_dartel_template)
 
+    dartel_mni = subparsers.add_parser("dartel-mni-norm", help="Run SPM DARTEL Normalise-to-MNI")
+    dartel_mni.add_argument("--template", required=True)
+    dartel_mni.add_argument("--flowfields", nargs="+", required=True)
+    dartel_mni.add_argument("--images", nargs="+", required=True)
+    dartel_mni.add_argument("--output-dir", required=True)
+    dartel_mni.add_argument("--spm-exe")
+    dartel_mni.add_argument("--timeout", type=int, default=7200)
+    dartel_mni.set_defaults(handler=run_dartel_mni_norm)
+
     ants = subparsers.add_parser("ants-register", help="Run ANTs registration (requires ANTs)")
     ants.add_argument("--moving", required=True)
     ants.add_argument("--fixed", required=True)
@@ -465,6 +474,34 @@ def run_dartel_template(args: argparse.Namespace) -> int:
         print(template)
     for flow_field in result["flow_fields"]:
         print(flow_field)
+    return 0
+
+
+def run_dartel_mni_norm(args: argparse.Namespace) -> int:
+    from ..validation.spm import run_spm_dartel_mni_norm
+
+    n_flowfields = len(args.flowfields)
+    if len(args.images) % n_flowfields != 0:
+        raise ValueError("images must be evenly divisible by flowfields")
+    per_subject = len(args.images) // n_flowfields
+    subjects = []
+    for index, flowfield in enumerate(args.flowfields):
+        start = index * per_subject
+        subjects.append(
+            {
+                "flowfield": flowfield,
+                "images": args.images[start : start + per_subject],
+            }
+        )
+    result = run_spm_dartel_mni_norm(
+        args.template,
+        subjects,
+        args.output_dir,
+        spm_exe=Path(args.spm_exe) if args.spm_exe else None,
+        timeout=args.timeout,
+    )
+    for warped in result["warped_images"]:
+        print(warped)
     return 0
 
 

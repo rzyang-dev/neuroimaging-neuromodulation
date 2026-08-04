@@ -596,6 +596,112 @@ def run_spm_dartel_template(
     }
 
 
+def write_dartel_mni_norm_batch(
+    template_path: str | Path,
+    subjects: list[dict[str, object]],
+    batch_path: Path,
+    *,
+    vox: tuple[float, float, float] | None = None,
+    bb: tuple[tuple[float, float, float], tuple[float, float, float]] | None = None,
+    preserve: int = 0,
+    fwhm: tuple[float, float, float] = (8.0, 8.0, 8.0),
+) -> Path:
+    """Write an SPM DARTEL Normalise-to-MNI batch."""
+
+    if not subjects:
+        raise ValueError("subjects must contain at least one subject")
+    vox_text = " ".join(str(value) for value in vox) if vox is not None else "NaN NaN NaN"
+    bb_text = (
+        "; ".join(" ".join(str(value) for value in row) for row in bb)
+        if bb is not None
+        else "NaN NaN NaN; NaN NaN NaN"
+    )
+    batch_path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.template = {{{_matlab_str(Path(template_path))}}};",
+    ]
+    for index, subject in enumerate(subjects, start=1):
+        flowfield = subject["flowfield"]
+        images = subject["images"]
+        lines.append(
+            f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.data.subjs.flowfields({index}) = {{{_matlab_str(Path(flowfield))}}};"
+        )
+        lines.append(
+            f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.data.subjs.images{{{index}}} = {{{'; '.join(_matlab_str(Path(image)) for image in images)}}};"
+        )
+    lines.extend(
+        [
+            f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.vox = [{vox_text}];",
+            f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.bb = [{bb_text}];",
+            f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.preserve = {preserve};",
+            f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.fwhm = [{' '.join(str(value) for value in fwhm)}];",
+        ]
+    )
+    batch_path.write_text("\n".join(lines) + "\n", encoding="ascii")
+    return batch_path
+
+
+def run_spm_dartel_mni_norm(
+    template_path: str | Path,
+    subjects: list[dict[str, object]],
+    output_dir: str | Path,
+    *,
+    spm_exe: Path | None = None,
+    timeout: int = 7200,
+) -> dict[str, object]:
+    """Run SPM DARTEL Normalise-to-MNI and return warped image paths."""
+
+    exe = spm_exe or find_spm25()
+    if exe is None:
+        raise RuntimeError("SPM25 standalone executable not found")
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    work_template = output_dir / "Template.nii"
+    shutil.copy2(Path(template_path), work_template)
+    work_subjects: list[dict[str, object]] = []
+    for subject_index, subject in enumerate(subjects, start=1):
+        work_flow = output_dir / f"flow_{subject_index:02d}.nii"
+        shutil.copy2(Path(subject["flowfield"]), work_flow)
+        work_images = []
+        for image_index, image in enumerate(subject["images"], start=1):
+            work_image = output_dir / f"img_{subject_index:02d}_{image_index:02d}.nii"
+            shutil.copy2(Path(image), work_image)
+            work_images.append(work_image)
+        work_subjects.append({"flowfield": work_flow, "images": work_images})
+    batch_path = write_dartel_mni_norm_batch(
+        work_template,
+        work_subjects,
+        output_dir / "dartel_mni_batch.m",
+    )
+    completed = subprocess.run(
+        [str(exe), "batch", str(batch_path), "--silent"],
+        cwd=str(output_dir),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=timeout,
+        check=False,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            f"SPM DARTEL MNI norm failed with exit code {completed.returncode}:\n"
+            f"{completed.stdout}\n{completed.stderr}"
+        )
+    warped = sorted(
+        path for path in output_dir.glob("*.nii") if path.name.startswith(("w", "sw"))
+    )
+    if not warped:
+        raise RuntimeError("SPM DARTEL MNI norm did not produce warped outputs")
+    return {
+        "returncode": completed.returncode,
+        "stdout": completed.stdout,
+        "stderr": completed.stderr,
+        "output_dir": output_dir,
+        "warped_images": warped,
+    }
+
+
 def run_spm_segmentation(
     t1_path: str | Path,
     output_dir: str | Path,
@@ -697,6 +803,7 @@ __all__ = [
     "find_tpm_dir",
     "run_spm_coreg",
     "run_spm_dartel_template",
+    "run_spm_dartel_mni_norm",
     "run_spm_segmentation",
     "run_spm_realign",
     "validate_coreg_against_spm",
@@ -705,6 +812,7 @@ __all__ = [
     "validate_motion_against_spm",
     "write_coreg_batch",
     "write_dartel_batch",
+    "write_dartel_mni_norm_batch",
     "write_segment_batch",
     "write_realign_batch",
 ]

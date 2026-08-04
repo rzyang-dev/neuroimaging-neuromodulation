@@ -100,3 +100,22 @@ def test_dartel_template_parser() -> None:
         ]
     )
     assert callable(args.handler)
+
+
+def test_dartel_mni_norm_parser() -> None:
+    args = build_parser().parse_args(
+        [
+            "dartel-mni-norm",
+            "--template",
+            "Template.nii",
+            "--flowfields",
+            "u1.nii",
+            "u2.nii",
+            "--images",
+            "c1a.nii",
+            "c1b.nii",
+            "--output-dir",
+            "out",
+        ]
+    )
+    assert callable(args.handler)

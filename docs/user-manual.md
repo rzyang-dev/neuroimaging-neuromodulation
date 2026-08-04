@@ -354,6 +354,18 @@ with SPM's warped tissue output.
 
 This writes `Template_*.nii` files and per-subject `u_*` DARTEL flow fields.
 
+### Run SPM DARTEL Normalise-to-MNI
+
+```bash
+.venv/bin/nm-preprocess dartel-mni-norm \
+  --template <Template.nii> \
+  --flowfields <u-subj1.nii> <u-subj2.nii> \
+  --images <c1-subj1.nii> <c1-subj2.nii> \
+  --output-dir <mni-output>
+```
+
+This writes `w*` or `sw*` DARTEL-normalised images in MNI space.
+
 ### Validate a deformation field
 
 ```bash
