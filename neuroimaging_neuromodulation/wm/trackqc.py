@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import html
 import json
+import shutil
 from pathlib import Path
 
 import numpy as np
@@ -19,6 +20,7 @@ def tract_qc_report(
     n_group1: int,
     labels: list[str] | None = None,
     segmentation_json: str | Path | None = None,
+    render_html: str | Path | None = None,
 ) -> Path:
     """Write an HTML QC report with profile statistics and SVG plots."""
 
@@ -43,6 +45,13 @@ def tract_qc_report(
             "<h2>Tract segmentation counts</h2><table>"
             "<tr><th>Atlas label</th><th>Streamlines</th></tr>"
             f"{count_rows}</table>"
+        )
+    render_link = ""
+    if render_html is not None:
+        render_dest = output_dir / "tract_3d.html"
+        shutil.copy2(Path(render_html), render_dest)
+        render_link = (
+            '<h2><a href="tract_3d.html">Interactive 3D fiber viewer</a></h2>'
         )
 
     rows = []
@@ -69,6 +78,7 @@ th, td {{ border: 1px solid #d2d6dc; padding: 0.5rem; text-align: left; }}
 <table><tr><th>Tract</th><th>Mean group difference</th><th>Minimum p</th><th>Plot</th></tr>
 {''.join(rows)}</table>
 {segmentation_counts}
+{render_link}
 </body></html>
 """
     report_path = output_dir / "qc.html"

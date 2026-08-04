@@ -108,6 +108,7 @@ def build_parser() -> argparse.ArgumentParser:
     qc.add_argument("--n-group1", type=int, required=True)
     qc.add_argument("--labels", nargs="*", default=None)
     qc.add_argument("--segmentation-json")
+    qc.add_argument("--render-html", help="Optional interactive 3D fiber viewer HTML")
     qc.add_argument("--output-dir", required=True)
     qc.set_defaults(handler=run_tract_qc)
 
@@ -249,6 +250,7 @@ def run_tract_qc(args: argparse.Namespace) -> int:
         n_group1=args.n_group1,
         labels=args.labels,
         segmentation_json=args.segmentation_json,
+        render_html=args.render_html,
     )
     print(report)
     return 0

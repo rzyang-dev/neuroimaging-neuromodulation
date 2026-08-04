@@ -55,7 +55,7 @@ document records the mapping from MATLAB functions to Python modules.
 | `AFQ_TrackAndSegmentOneSub.m` | `diffusion/afq.py`, `diffusion/transform.py`, `cli/diffusion.py` | Partial: subject-level atlas/ROI pipeline and streamline transforms implemented; validated SPM/ANTS normalization remains external |
 | `dtiXformFiberCoords.m` | `diffusion/transform.py`, `cli/diffusion.py` | Implemented as deformation-field streamline transform |
 | `ANTS_normalize.m` | `preprocess/ants.py`, `cli/preprocess.py` | Partial: ANTs command builders implemented; validated normalization remains external |
-| `TrackQC.m` | `wm/trackqc.py`, `cli/wm.py` | Partial: HTML QC report implemented; fiber-rendering visualization remains external |
+| `TrackQC.m` | `wm/trackqc.py`, `cli/wm.py` | Partial: HTML QC and embedded 3D fiber viewer implemented; tract-to-NIfTI/Randomise workflow remains external |
 | `AFQ_RenderFibers.m` | `diffusion/render.py`, `cli/diffusion.py` | Partial: HTML/SVG 2D projections implemented; interactive 3D rendering remains external |
 | `TMSviewer.m` | `reporting/viewer.py`, `cli/tms.py` | Partial: HTML/SVG slice viewer implemented; interactive MATLAB viewer remains external |
 | `CompCoefs.m`, `chi2test2.m`, `TMSttest2_cov.m`, `quantreg.m` | `stats/group.py`, `cli/tms.py` | Implemented as Python group-statistics commands |

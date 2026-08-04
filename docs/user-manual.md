@@ -606,6 +606,7 @@ directly.
   --profiles <profile1.npy> <profile2.npy> \
   --n-group1 3 \
   --segmentation-json <segmentation.json> \
+  --render-html <tract-render-3d.html> \
   --output-dir <qc-report>
 ```
 

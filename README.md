@@ -101,6 +101,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - HTML/SVG streamline rendering with axial, coronal, and sagittal projections
 - Interactive HTML/WebGL 3D streamline viewer through `nm-diffusion
   render-tracts-3d`
+- HTML tract QC reports can embed the interactive 3D fiber viewer
 
 ## What Is Not Included
 
