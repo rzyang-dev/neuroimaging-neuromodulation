@@ -74,7 +74,7 @@
 - Added `nm-preprocess dartel-mni-norm` and a real SPM DARTEL Normalise-to-MNI
   smoke run.
 - Added an SPM DARTEL reference comparison helper with real-data verification.
-- Extended the SPM DARTEL reference check to five real subjects with mean
+- Extended the SPM DARTEL reference check to seven real subjects with mean
   correlation > 0.85.
 - Added `nm-preprocess dartel-parity` for running multi-subject DARTEL
   reference comparisons from the CLI.
