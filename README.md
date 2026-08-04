@@ -40,6 +40,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - FSL FNIRT normalization execution comparison against DIPY warped output
 - ANTs point-based streamline transformation through `nm-diffusion
   transform-tracts-ants`
+- ANTs SyN streamline transformation execution validation on real templates
 - DIPY-based volume coregistration
 - DTI fitting, deterministic tractography, and seed-target structural
   connectivity through `nm-diffusion`

@@ -78,6 +78,7 @@ def transform_streamlines_with_ants(
     transforms: list[str | Path],
     *,
     use_inverse: int = 1,
+    transform_inverse: list[int] | None = None,
 ) -> list[np.ndarray]:
     """Transform streamlines with ANTs point transforms.
 
@@ -108,6 +109,7 @@ def transform_streamlines_with_ants(
             output_csv,
             transforms,
             use_inverse=use_inverse,
+            transform_inverse=transform_inverse,
         )
         transformed_data = np.loadtxt(output_csv, delimiter=",", skiprows=1)
         if transformed_data.ndim == 1:

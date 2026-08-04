@@ -78,3 +78,32 @@ def test_ants_registration_and_apply_real_templates(package_data_dir, tmp_path) 
     )
     assert len(streamlines) == 1
     assert streamlines[0].shape == (2, 3)
+
+
+@pytest.mark.skipif(
+    shutil.which("antsRegistration") is None or shutil.which("antsApplyTransformsToPoints") is None,
+    reason="ANTs not installed",
+)
+def test_ants_syn_streamline_transformation(package_data_dir, tmp_path) -> None:
+    moving = package_data_dir / "grey.nii"
+    fixed = package_data_dir / "white.nii"
+    prefix = tmp_path / "syn"
+    result = run_ants_registration(
+        moving,
+        fixed,
+        prefix,
+        stages=("rigid", "affine", "syn"),
+    )
+    assert result["returncode"] == 0
+    affine = tmp_path / "syn0GenericAffine.mat"
+    inverse_warp = tmp_path / "syn1InverseWarp.nii.gz"
+    assert affine.exists()
+    assert inverse_warp.exists()
+    streamlines = transform_streamlines_with_ants(
+        [np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])],
+        [affine, inverse_warp],
+        transform_inverse=[1, 0],
+    )
+    assert len(streamlines) == 1
+    assert streamlines[0].shape == (2, 3)
+    assert np.isfinite(streamlines[0]).all()

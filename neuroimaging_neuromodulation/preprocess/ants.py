@@ -108,6 +108,7 @@ def build_ants_apply_transforms_to_points_command(
     *,
     dimensionality: int = 3,
     use_inverse: int = 1,
+    transform_inverse: list[int] | None = None,
 ) -> list[str]:
     """Build an antsApplyTransformsToPoints command for streamline points."""
 
@@ -120,8 +121,11 @@ def build_ants_apply_transforms_to_points_command(
         "-o",
         str(output_csv),
     ]
-    for transform in transforms:
-        cmd += ["-t", f"[{transform},{use_inverse}]"]
+    if transform_inverse is not None and len(transform_inverse) != len(transforms):
+        raise ValueError("transform_inverse must match transforms")
+    for index, transform in enumerate(transforms):
+        inverse = transform_inverse[index] if transform_inverse is not None else use_inverse
+        cmd += ["-t", f"[{transform},{inverse}]"]
     return cmd
 
 

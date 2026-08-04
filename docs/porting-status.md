@@ -71,6 +71,7 @@ noted limitations:
   render-tracts-3d`
 - ANTs point-based streamline transformation through `nm-diffusion
   transform-tracts-ants`
+- ANTs SyN affine + inverse warp streamline transformation composition
 - AFQ-style group profile plots and per-node profile statistics
 - FSL/MRtrix command builders for BET, eddy correction, FA/T1 transforms,
   native/MNI transforms, topup, bedpostx, dtifit, probtrackx, and tckgen
@@ -82,18 +83,10 @@ noted limitations:
 
 ## Not Yet Ported or Verified
 
-### White-matter and AFQ workflows
-
-- Full AFQ tract segmentation with validated ANTs SyN integration
-
 ### T1 target workflows
 
 - Desktop apps expose T1 target generation, but interactive SPM/DARTEL
   segmentation setup remains missing
-
-### Diffusion preprocessing and full tractography workflow
-
-- Full AFQ tract segmentation with validated ANTs SyN integration
 
 ### SPM/DARTEL-equivalent preprocessing
 
@@ -122,9 +115,9 @@ noted limitations:
 - FSL FNIRT normalization execution validation passes in WSL on real templates,
   comparing the FSL warped image with the DIPY warped image
 - ANTs execution tests that skip when binaries are not installed; first run
-  against installed ANTs 2.6.5 on 2026-08-04: 3/3 pass, including a
-  real-template registration/apply integration test
-- Local test suite: `151 tests collected` and passing
+  against installed ANTs 2.6.5 on 2026-08-04: 4/4 pass, including real-template
+  registration/apply and SyN streamline transformation tests
+- Local test suite: `152 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently
@@ -164,12 +157,12 @@ DARTEL-grade parity is still not implemented:
   has been added to the user PATH (2026-08-04). `tests/test_ants_execution.py`
   was run on 2026-08-04 with `.venv-win` (`antsRegistration --version`,
   `antsApplyTransforms --help`, and a real-template rigid/affine
-  registration/apply workflow): 3/3 pass.
+  registration/apply workflow plus a SyN streamline transform): 4/4 pass.
 - Interactive 3D fiber rendering is available as an HTML/WebGL viewer that runs
   in any WebGL-capable browser.
 
 The Python-native port is substantially implemented, and SPM `y_`/`iy_`
 world-coordinate convention, realignment, coregistration, normalization, and
 FSL FNIRT execution validation now pass. DARTEL-grade parity remains unproven.
-ANTs execution tests pass (3/3); FSL/MRtrix execution smoke tests pass (3/3)
+ANTs execution tests pass (4/4); FSL/MRtrix execution smoke tests pass (3/3)
 as of 2026-08-04.

@@ -162,6 +162,7 @@ def build_parser() -> argparse.ArgumentParser:
     transform_ants.add_argument("--transforms", nargs="+", required=True)
     transform_ants.add_argument("--output", required=True)
     transform_ants.add_argument("--use-inverse", type=int, default=1, choices=[0, 1])
+    transform_ants.add_argument("--transform-inverse", default=None, help="Comma-separated use-inverse flags per transform")
     transform_ants.set_defaults(handler=run_transform_tracts_ants)
 
     render = subparsers.add_parser("render-tracts", help="Render streamlines as HTML/SVG projections")
@@ -488,6 +489,11 @@ def run_transform_tracts_ants(args: argparse.Namespace) -> int:
         streamlines,
         [Path(transform) for transform in args.transforms],
         use_inverse=args.use_inverse,
+        transform_inverse=(
+            [int(value) for value in args.transform_inverse.split(",")]
+            if args.transform_inverse
+            else None
+        ),
     )
     sft = StatefulTractogram(transformed, reference, Space.RASMM)
     save_tractogram(sft, args.output, bbox_valid_check=False)
