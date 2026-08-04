@@ -74,8 +74,8 @@
 - Added `nm-preprocess dartel-mni-norm` and a real SPM DARTEL Normalise-to-MNI
   smoke run.
 - Added an SPM DARTEL reference comparison helper with real-data verification.
-- Extended the SPM DARTEL reference check to multiple subjects with mean
-  correlation > 0.81 on two real subjects.
+- Extended the SPM DARTEL reference check to three real subjects with mean
+  correlation > 0.83.
 - Added `nm-preprocess dartel-parity` for running multi-subject DARTEL
   reference comparisons from the CLI.
 - Added FSL command pipelines for BET, eddy correction, FA/T1 transforms,
