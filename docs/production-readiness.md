@@ -49,7 +49,7 @@ and what remains before the package can be called production-ready.
 
 ## Verification
 
-- [x] `152` automated tests pass locally
+- [x] `155` automated tests pass locally
 - [ ] Tests prove numerical equivalence to original MATLAB/SPM/FSL workflows
 - [ ] Tests cover missing workflows listed in `docs/porting-status.md`
 - [x] Tests use real public fMRI, diffusion, DICOM, T1, template, and mask data

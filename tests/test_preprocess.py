@@ -80,3 +80,23 @@ def test_spm_segment_parser() -> None:
         ["spm-segment", "--t1", "t1.nii", "--output-dir", "out"]
     )
     assert callable(args.handler)
+
+
+def test_dartel_template_parser() -> None:
+    args = build_parser().parse_args(
+        [
+            "dartel-template",
+            "--rc1",
+            "a.nii",
+            "b.nii",
+            "--rc2",
+            "c.nii",
+            "d.nii",
+            "--rc3",
+            "e.nii",
+            "f.nii",
+            "--output-dir",
+            "out",
+        ]
+    )
+    assert callable(args.handler)

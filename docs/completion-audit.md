@@ -29,7 +29,7 @@ the full port and production-readiness claims are not met.
 
 ## Verification Evidence
 
-- `152` automated tests are collected and pass locally.
+- `155` automated tests are collected and pass locally.
 - Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`.
 - `pip check` reports no broken requirements.
 - SPM25 reference validation confirms the package applies SPM `y_`/`iy_`

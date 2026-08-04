@@ -68,6 +68,8 @@
   validation.
 - Added an interactive SPM segmentation action to the advanced desktop GUI.
 - SPM25 segmentation now emits imported `rc1/rc2/rc3` DARTEL tissue maps.
+- Added `nm-preprocess dartel-template` and a real SPM DARTEL template/flow
+  field smoke run.
 - Added FSL command pipelines for BET, eddy correction, FA/T1 transforms,
   native/MNI transforms, and topup.
 - Added group-statistics commands for correlation comparison, chi-square,
@@ -75,7 +77,7 @@
 - Added reslice, detrend, merge-images, concatenate-sessions, combine-images,
   timepoint-count, text-to-nifti, and directory-of-3D signal-extraction
   commands.
-- Expanded tests from 74 to 152 collected/passing tests.
+- Expanded tests from 74 to 155 collected/passing tests.
 
 ## 0.18.0 - 2026-08-03
 

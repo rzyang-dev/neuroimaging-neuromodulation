@@ -43,6 +43,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - ANTs SyN streamline transformation execution validation on real templates
 - Interactive SPM segmentation action in the advanced desktop GUI
 - SPM25 segmentation emits imported `rc*` DARTEL tissue maps
+- SPM DARTEL template runner through `nm-preprocess dartel-template`
 - DIPY-based volume coregistration
 - DTI fitting, deterministic tractography, and seed-target structural
   connectivity through `nm-diffusion`

@@ -154,6 +154,16 @@ def build_parser() -> argparse.ArgumentParser:
     spm_seg.add_argument("--timeout", type=int, default=1800)
     spm_seg.set_defaults(handler=run_spm_segment)
 
+    dartel = subparsers.add_parser("dartel-template", help="Run SPM DARTEL template estimation")
+    dartel.add_argument("--rc1", nargs="+", required=True)
+    dartel.add_argument("--rc2", nargs="+", required=True)
+    dartel.add_argument("--rc3", nargs="+", required=True)
+    dartel.add_argument("--output-dir", required=True)
+    dartel.add_argument("--template-basename", default="Template")
+    dartel.add_argument("--spm-exe")
+    dartel.add_argument("--timeout", type=int, default=7200)
+    dartel.set_defaults(handler=run_dartel_template)
+
     ants = subparsers.add_parser("ants-register", help="Run ANTs registration (requires ANTs)")
     ants.add_argument("--moving", required=True)
     ants.add_argument("--fixed", required=True)
@@ -438,6 +448,23 @@ def run_spm_segment(args: argparse.Namespace) -> int:
     print("c1", result["c1"])
     print("wc1", result["wc1"])
     print("metrics", result["metrics"])
+    return 0
+
+
+def run_dartel_template(args: argparse.Namespace) -> int:
+    from ..validation.spm import run_spm_dartel_template
+
+    result = run_spm_dartel_template(
+        [args.rc1, args.rc2, args.rc3],
+        args.output_dir,
+        template_basename=args.template_basename,
+        spm_exe=Path(args.spm_exe) if args.spm_exe else None,
+        timeout=args.timeout,
+    )
+    for template in result["templates"]:
+        print(template)
+    for flow_field in result["flow_fields"]:
+        print(flow_field)
     return 0
 
 

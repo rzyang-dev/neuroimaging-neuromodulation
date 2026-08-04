@@ -510,6 +510,92 @@ def validate_normalization_against_spm(
     }
 
 
+def write_dartel_batch(
+    rc_groups: list[list[str | Path]],
+    batch_path: Path,
+    *,
+    template_basename: str = "Template",
+) -> Path:
+    """Write an SPM DARTEL create-template batch from imported tissue maps."""
+
+    if not rc_groups:
+        raise ValueError("rc_groups must contain at least one tissue group")
+    n_subjects = len(rc_groups[0])
+    if n_subjects < 2:
+        raise ValueError("DARTEL template estimation requires at least two subjects")
+    for group in rc_groups:
+        if len(group) != n_subjects:
+            raise ValueError("All tissue groups must contain the same number of subjects")
+    group_cells = []
+    for group in rc_groups:
+        group_cells.append("{" + "; ".join(_matlab_str(Path(path)) for path in group) + "}")
+    images_cell = "{\n" + "\n".join("    " + cell for cell in group_cells) + "\n};"
+    batch_path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        f"matlabbatch{{1}}.spm.tools.dartel.warp.images = {images_cell};",
+        f"matlabbatch{{1}}.spm.tools.dartel.warp.settings.template = {_matlab_str(Path(template_basename))};",
+        "matlabbatch{1}.spm.tools.dartel.warp.settings.rform = 0;",
+        "matlabbatch{1}.spm.tools.dartel.warp.settings.param(1).its = 3;",
+        "matlabbatch{1}.spm.tools.dartel.warp.settings.param(1).rparam = [4 2 1e-06];",
+        "matlabbatch{1}.spm.tools.dartel.warp.settings.param(1).K = 0;",
+        "matlabbatch{1}.spm.tools.dartel.warp.settings.param(1).slam = 16;",
+        "matlabbatch{1}.spm.tools.dartel.warp.settings.optim.lmreg = 0.01;",
+        "matlabbatch{1}.spm.tools.dartel.warp.settings.optim.cyc = 3;",
+        "matlabbatch{1}.spm.tools.dartel.warp.settings.optim.its = 3;",
+    ]
+    batch_path.write_text("\n".join(lines) + "\n", encoding="ascii")
+    return batch_path
+
+
+def run_spm_dartel_template(
+    rc_groups: list[list[str | Path]],
+    output_dir: str | Path,
+    *,
+    template_basename: str = "Template",
+    spm_exe: Path | None = None,
+    timeout: int = 7200,
+) -> dict[str, object]:
+    """Run SPM DARTEL template estimation and return template/flow paths."""
+
+    exe = spm_exe or find_spm25()
+    if exe is None:
+        raise RuntimeError("SPM25 standalone executable not found")
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    batch_path = write_dartel_batch(
+        rc_groups,
+        output_dir / "dartel_batch.m",
+        template_basename=template_basename,
+    )
+    completed = subprocess.run(
+        [str(exe), "batch", str(batch_path), "--silent"],
+        cwd=str(output_dir),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=timeout,
+        check=False,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            f"SPM DARTEL failed with exit code {completed.returncode}:\n"
+            f"{completed.stdout}\n{completed.stderr}"
+        )
+    templates = sorted(output_dir.glob(f"{template_basename}_*.nii"))
+    flow_fields = sorted(output_dir.glob("u_*.nii"))
+    if not templates or not flow_fields:
+        raise RuntimeError("SPM DARTEL did not produce expected template/flow outputs")
+    return {
+        "returncode": completed.returncode,
+        "stdout": completed.stdout,
+        "stderr": completed.stderr,
+        "output_dir": output_dir,
+        "templates": templates,
+        "flow_fields": flow_fields,
+    }
+
+
 def run_spm_segmentation(
     t1_path: str | Path,
     output_dir: str | Path,
@@ -610,6 +696,7 @@ __all__ = [
     "find_spm25",
     "find_tpm_dir",
     "run_spm_coreg",
+    "run_spm_dartel_template",
     "run_spm_segmentation",
     "run_spm_realign",
     "validate_coreg_against_spm",
@@ -617,6 +704,7 @@ __all__ = [
     "validate_spm_deformation_convention",
     "validate_motion_against_spm",
     "write_coreg_batch",
+    "write_dartel_batch",
     "write_segment_batch",
     "write_realign_batch",
 ]

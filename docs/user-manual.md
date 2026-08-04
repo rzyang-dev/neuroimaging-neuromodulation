@@ -341,6 +341,19 @@ This writes SPM `y_T1.nii`, `iy_T1.nii`, native `c*` tissue maps, imported
 `rc*` DARTEL maps, and warped `wc*` maps, then reports the package's agreement
 with SPM's warped tissue output.
 
+### Run SPM DARTEL template estimation
+
+```bash
+.venv/bin/nm-preprocess dartel-template \
+  --rc1 <subj1-rc1.nii> <subj2-rc1.nii> \
+  --rc2 <subj1-rc2.nii> <subj2-rc2.nii> \
+  --rc3 <subj1-rc3.nii> <subj2-rc3.nii> \
+  --output-dir <dartel-output> \
+  --template-basename Template
+```
+
+This writes `Template_*.nii` files and per-subject `u_*` DARTEL flow fields.
+
 ### Validate a deformation field
 
 ```bash

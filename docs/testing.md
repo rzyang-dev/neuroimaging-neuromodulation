@@ -56,6 +56,8 @@ Tests are grouped by responsibility:
   deformation fields on real templates.
 - `test_spm_reference.py` verifies SPM segmentation also emits the imported
   `rc1/rc2/rc3` DARTEL tissue maps.
+- `test_spm_dartel_batch.py` verifies the SPM DARTEL create-template batch
+  writer.
 - `test_fsl_normalization_execution.py` runs FSL FNIRT on real templates when
   FSL is installed.
 - `test_streamline_transform.py` and `test_ants_execution.py` verify ANTs
@@ -79,13 +81,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-152 tests collected and passing
+155 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-152 tests collected and passing
+155 tests collected and passing
 ```
 
 The test command is:
