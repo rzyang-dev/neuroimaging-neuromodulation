@@ -125,9 +125,9 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 
 This release does not reimplement SPM/FSL preprocessing internally. It includes
 an approximate atlas-guided tissue probability estimator and can invoke SPM25
-standalone for SPM segmentation when installed, but DARTEL-grade segmentation,
-FSL BEDPOSTX tractography, and SPM/DARTEL-compatible deformation estimation are
-not reproduced by the Python core.
+standalone for SPM segmentation, DARTEL template estimation, and DARTEL
+Normalise-to-MNI when installed, but the Python core does not reimplement SPM,
+FSL, or DARTEL.
 DICOM conversion is handled through `nm-dicom`, and other inputs should already
 be in the expected NIfTI space or produced with existing preprocessing tools.
 The decision record in `docs/decisions.md` explains why this boundary is
@@ -135,10 +135,8 @@ intentional.
 
 The following original workflows are not yet ported:
 
-- Full AFQ 20-tract segmentation
-- Desktop T1 target workflow with interactive SPM/DARTEL segmentation setup
-- TrackQC and tract-profile statistical workflows
-- SPM/DARTEL-compatible segmentation, normalization, and QC workflows
+- Clinical-scale validation of AFQ 20-tract segmentation and TrackQC workflows
+- Full numerical parity across larger clinical multi-subject DARTEL datasets
 
 The shipped CLI exposes a subset of the Python-native primitives, not a full
 replacement for the original end-user application.

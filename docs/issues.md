@@ -5,8 +5,10 @@
 1. SPM/DARTEL-compatible normalization is not fully reproduced.
 
    This package can apply SPM world-coordinate `y_`/`iy_` fields and emits
-   matching DIPY-derived fields, but exact SPM/DARTEL numerical compatibility
-   is not guaranteed.
+   matching DIPY-derived fields. SPM25 runners are available for segmentation,
+   DARTEL template estimation, and DARTEL Normalise-to-MNI, but exact numerical
+   compatibility across larger clinical multi-subject datasets is not yet
+   demonstrated.
 
 2. Vendor-specific DICOM edge cases may require manual review.
 
