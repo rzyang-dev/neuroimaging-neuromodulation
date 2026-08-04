@@ -16,4 +16,7 @@ def test_spm_deformation_convention_on_real_template(tmp_path: Path, package_dat
     result = validate_spm_deformation_convention(t1, tmp_path / "spm", timeout=1800)
     assert Path(result["iy_field"]).exists()
     assert Path(result["y_field"]).exists()
+    assert Path(result["rc1"]).exists()
+    assert Path(result["rc2"]).exists()
+    assert Path(result["rc3"]).exists()
     assert result["metrics"]["correlation"] > 0.8

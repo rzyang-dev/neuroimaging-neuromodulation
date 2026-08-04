@@ -54,6 +54,8 @@ Tests are grouped by responsibility:
   FSL is installed.
 - `test_spm_normalization_reference.py` compares SPM and DIPY normalization
   deformation fields on real templates.
+- `test_spm_reference.py` verifies SPM segmentation also emits the imported
+  `rc1/rc2/rc3` DARTEL tissue maps.
 - `test_fsl_normalization_execution.py` runs FSL FNIRT on real templates when
   FSL is installed.
 - `test_streamline_transform.py` and `test_ants_execution.py` verify ANTs

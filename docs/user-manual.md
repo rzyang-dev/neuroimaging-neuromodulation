@@ -337,8 +337,9 @@ forward field for streamline transforms.
   --spm-exe <path-to-spm25.exe>
 ```
 
-This writes SPM `y_T1.nii`, `iy_T1.nii`, native tissue maps, and warped tissue
-maps, then reports the package's agreement with SPM's warped tissue output.
+This writes SPM `y_T1.nii`, `iy_T1.nii`, native `c*` tissue maps, imported
+`rc*` DARTEL maps, and warped `wc*` maps, then reports the package's agreement
+with SPM's warped tissue output.
 
 ### Validate a deformation field
 

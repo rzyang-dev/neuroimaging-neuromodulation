@@ -89,7 +89,7 @@ def write_segment_batch(
     ngaus = {1: 1, 2: 1, 3: 2, 4: 3, 5: 4, 6: 2}
     for tissue_index in range(1, 7):
         tpm = tpm_dir / f"TPM.nii,{tissue_index}"
-        native = "[1 0]" if tissue_index <= 3 else "[0 0]"
+        native = "[1 1]" if tissue_index <= 3 else "[0 0]"
         warped = "[1 1]" if tissue_index <= 3 else "[0 0]"
         lines.extend(
             [
@@ -551,6 +551,9 @@ def run_spm_segmentation(
         "c1": output_dir / "c1T1.nii",
         "c2": output_dir / "c2T1.nii",
         "c3": output_dir / "c3T1.nii",
+        "rc1": output_dir / "rc1T1.nii",
+        "rc2": output_dir / "rc2T1.nii",
+        "rc3": output_dir / "rc3T1.nii",
         "wc1": output_dir / "wc1T1.nii",
         "wc2": output_dir / "wc2T1.nii",
         "wc3": output_dir / "wc3T1.nii",

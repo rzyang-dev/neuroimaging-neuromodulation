@@ -46,7 +46,8 @@ noted limitations:
 - DIPY-based motion estimation, coregistration, nonlinear deformation
   estimation with SPM world-coordinate `y_`/`iy_` output, DTI fitting, and
   deterministic/probabilistic tensor tractography
-- SPM25 standalone segmentation through `nm-preprocess spm-segment`
+- SPM25 standalone segmentation through `nm-preprocess spm-segment`, including
+  native `c*` maps, imported `rc*` DARTEL maps, and warped `wc*` maps
 - Tract-profile extraction from TRK/TCK streamlines and scalar images
 - Atlas-based streamline tract segmentation using JHU-style label maps
 - ROI-based AFQ 20-tract segmentation using the original Mori/JHU waypoint
