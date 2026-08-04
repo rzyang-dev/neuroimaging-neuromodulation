@@ -60,7 +60,7 @@
 13. Fixed: external-execution tests for FSL/MRtrix now pass 3/3 against the
     installed WSL binaries on 2026-08-04. FSL `eddy_correct` and BET pass on a
     realistic ellipsoid fixture, and MRtrix `tckgen` passes with the required
-    `-seed_image` source. ANTs execution tests pass 2/2 on Windows.
+    `-seed_image` source. ANTs execution tests pass 3/3 on Windows.
 
 ## Data Issues
 

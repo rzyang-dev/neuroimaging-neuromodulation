@@ -55,13 +55,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-135 tests collected and passing
+136 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-135 tests collected and passing
+136 tests collected and passing
 ```
 
 The test command is:
@@ -134,8 +134,9 @@ install `~/nm-src`) with `source /home/dev/fsl/etc/fslconf/fsl.sh` so that
 
 Verified against the installed binaries:
 
-- `tests/test_ants_execution.py` (Windows, `.venv-win`): **2/2 pass**
-  (`antsRegistration --version`, `antsApplyTransforms --help`).
+- `tests/test_ants_execution.py` (Windows, `.venv-win`): **3/3 pass**
+  (`antsRegistration --version`, `antsApplyTransforms --help`, and a
+  real-template rigid/affine registration/apply workflow).
 - `tests/test_spm_reference.py` (Windows, `.venv-win`, SPM25 standalone):
   **1/1 pass**. Applying SPM's `y_T1.nii` with the package reproduces SPM's
   `wc1T1.nii` warped tissue output with correlation > 0.99.

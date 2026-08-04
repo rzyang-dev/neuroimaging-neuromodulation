@@ -105,8 +105,9 @@ noted limitations:
   template-to-native field with the package reproduces SPM's `wc1T1.nii`
   warped tissue output (correlation > 0.99)
 - ANTs execution tests that skip when binaries are not installed; first run
-  against installed ANTs 2.6.5 on 2026-08-04: 2/2 pass
-- Local test suite: `135 tests collected` and passing
+  against installed ANTs 2.6.5 on 2026-08-04: 3/3 pass, including a
+  real-template registration/apply integration test
+- Local test suite: `136 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently
@@ -142,11 +143,12 @@ still not implemented:
 - ANTs 2.6.5 is installed on Windows (`C:\Program Files\ants-2.6.5\bin`) and
   has been added to the user PATH (2026-08-04). `tests/test_ants_execution.py`
   was run on 2026-08-04 with `.venv-win` (`antsRegistration --version`,
-  `antsApplyTransforms --help`): 2/2 pass.
+  `antsApplyTransforms --help`, and a real-template rigid/affine
+  registration/apply workflow): 3/3 pass.
 - Interactive 3D fiber rendering still requires a rendering runtime that is
   not part of this environment.
 
 The Python-native port is substantially implemented, and SPM `y_`/`iy_`
 world-coordinate convention validation now passes against SPM25. DARTEL-grade
 normalization and FSL reference comparisons remain unproven. ANTs execution
-tests pass (2/2); FSL/MRtrix execution smoke tests pass (3/3) as of 2026-08-04.
+tests pass (3/3); FSL/MRtrix execution smoke tests pass (3/3) as of 2026-08-04.

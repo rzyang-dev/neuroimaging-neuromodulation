@@ -29,7 +29,7 @@ the full port and production-readiness claims are not met.
 
 ## Verification Evidence
 
-- `135` automated tests are collected and pass locally.
+- `136` automated tests are collected and pass locally.
 - Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`.
 - `pip check` reports no broken requirements.
 - SPM25 reference validation confirms the package applies SPM `y_`/`iy_`
@@ -64,6 +64,6 @@ MATLAB R2015b, SPM standalone, ANTs 2.6.5 (Windows) and FSL/MRtrix (WSL dev
 environment) are installed, so reference/parity execution is possible.
 SPM `y_`/`iy_` world-coordinate convention validation is implemented, while
 DARTEL-grade normalization and FSL reference comparisons remain unproven.
-External-execution smoke tests pass (FSL/MRtrix 3/3 in WSL, ANTs 2/2 on
+External-execution smoke tests pass (FSL/MRtrix 3/3 in WSL, ANTs 3/3 on
 Windows). A 3D rendering runtime for interactive fiber visualization is still
 missing. See `docs/porting-status.md`.
