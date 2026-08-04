@@ -60,6 +60,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
   validated SPM/DARTEL replacement)
 - DIPY-based nonlinear deformation estimation with SPM world-coordinate
   `y_`/`iy_` output
+- SPM25 standalone segmentation command through `nm-preprocess spm-segment`
 - SPM25-validated `y_`/`iy_` world-coordinate convention
 - Quantitative deformation/image validation commands
 - Optional FSL/MRtrix wrappers with clear missing-binary errors

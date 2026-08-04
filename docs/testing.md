@@ -34,6 +34,8 @@ Tests are grouped by responsibility:
   with a supplied SPM `y_` field.
 - `test_enduser_app.py` verifies the `nm-app` pipeline config includes
   T1-space target generation when T1 and target ROI are supplied.
+- `test_preprocess.py` verifies the `nm-preprocess spm-segment` parser exposes
+  the SPM25 workflow.
 - `test_pipeline.py` verifies a config-driven real-data pipeline.
 - `test_validation.py` verifies image and deformation validation metrics.
 - `test_external.py` verifies FSL/MRtrix command builders and missing-binary
@@ -51,13 +53,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-131 tests collected and passing
+132 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-131 tests collected and passing
+132 tests collected and passing
 ```
 
 The test command is:

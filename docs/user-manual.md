@@ -316,6 +316,18 @@ Outputs include `dipy_mapping.nii.gz`, `coordinate_field.nii`, and
 field for `apply_deformation`; `iy_ac_coT1.nii` is the native-to-template
 forward field for streamline transforms.
 
+### Run SPM25 standalone segmentation
+
+```bash
+.venv/bin/nm-preprocess spm-segment \
+  --t1 <T1.nii> \
+  --output-dir <output-directory> \
+  --spm-exe <path-to-spm25.exe>
+```
+
+This writes SPM `y_T1.nii`, `iy_T1.nii`, native tissue maps, and warped tissue
+maps, then reports the package's agreement with SPM's warped tissue output.
+
 ### Validate a deformation field
 
 ```bash

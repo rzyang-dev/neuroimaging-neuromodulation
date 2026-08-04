@@ -46,6 +46,7 @@ noted limitations:
 - DIPY-based motion estimation, coregistration, nonlinear deformation
   estimation with SPM world-coordinate `y_`/`iy_` output, DTI fitting, and
   deterministic/probabilistic tensor tractography
+- SPM25 standalone segmentation through `nm-preprocess spm-segment`
 - Tract-profile extraction from TRK/TCK streamlines and scalar images
 - Atlas-based streamline tract segmentation using JHU-style label maps
 - ROI-based AFQ tract segmentation using the original Mori/JHU waypoint ROIs
@@ -105,7 +106,7 @@ noted limitations:
   warped tissue output (correlation > 0.99)
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 2/2 pass
-- Local test suite: `131 tests collected` and passing
+- Local test suite: `132 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently

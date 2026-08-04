@@ -5,7 +5,7 @@ from pathlib import Path
 import nibabel as nib
 import numpy as np
 
-from neuroimaging_neuromodulation.cli.preprocess import main
+from neuroimaging_neuromodulation.cli.preprocess import build_parser, main
 from neuroimaging_neuromodulation.io.nifti import load_volume
 from neuroimaging_neuromodulation.preprocess.imaging import flip_left_right
 from neuroimaging_neuromodulation.preprocess.spatial import smooth_volume
@@ -73,3 +73,10 @@ def test_text_to_nifti_cli(tmp_path: Path) -> None:
     assert main(["text-to-nifti", "--text", str(text), "--output", str(output), "--shape", "2,2,2"]) == 0
     _, data = load_volume(output)
     assert data.shape == (2, 2, 2)
+
+
+def test_spm_segment_parser() -> None:
+    args = build_parser().parse_args(
+        ["spm-segment", "--t1", "t1.nii", "--output-dir", "out"]
+    )
+    assert callable(args.handler)

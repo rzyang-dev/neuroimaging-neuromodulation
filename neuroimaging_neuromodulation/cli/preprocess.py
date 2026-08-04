@@ -147,6 +147,13 @@ def build_parser() -> argparse.ArgumentParser:
     est.add_argument("--step-length", type=float, default=0.25)
     est.set_defaults(handler=run_estimate_deformation)
 
+    spm_seg = subparsers.add_parser("spm-segment", help="Run SPM25 standalone segmentation")
+    spm_seg.add_argument("--t1", required=True)
+    spm_seg.add_argument("--output-dir", required=True)
+    spm_seg.add_argument("--spm-exe")
+    spm_seg.add_argument("--timeout", type=int, default=1800)
+    spm_seg.set_defaults(handler=run_spm_segment)
+
     ants = subparsers.add_parser("ants-register", help="Run ANTs registration (requires ANTs)")
     ants.add_argument("--moving", required=True)
     ants.add_argument("--fixed", required=True)
@@ -414,6 +421,23 @@ def run_estimate_deformation(args: argparse.Namespace) -> int:
     )
     for key, path in paths.items():
         print(key, path)
+    return 0
+
+
+def run_spm_segment(args: argparse.Namespace) -> int:
+    from ..validation.spm import validate_spm_deformation_convention
+
+    result = validate_spm_deformation_convention(
+        args.t1,
+        args.output_dir,
+        spm_exe=Path(args.spm_exe) if args.spm_exe else None,
+        timeout=args.timeout,
+    )
+    print("y_field", result["y_field"])
+    print("iy_field", result["iy_field"])
+    print("c1", result["c1"])
+    print("wc1", result["wc1"])
+    print("metrics", result["metrics"])
     return 0
 
 
