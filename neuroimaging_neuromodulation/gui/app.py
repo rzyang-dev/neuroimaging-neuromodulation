@@ -197,6 +197,10 @@ class ToolboxApp(tk.Tk):
         ttk.Button(frame, text="Compute Deep Target", command=self._run_deep).pack(side="left")
 
     def _build_preprocess_tab(self) -> None:
+        self.spm_t1_var = tk.StringVar()
+        self.spm_out_var = tk.StringVar()
+        self.spm_exe_var = tk.StringVar()
+
         self.em_func_var = tk.StringVar()
         self.em_out_var = tk.StringVar()
         self.em_rp_var = tk.StringVar()
@@ -224,6 +228,15 @@ class ToolboxApp(tk.Tk):
         self.co_out_var = tk.StringVar()
         self.co_affine_var = tk.StringVar()
         self.co_volume_var = tk.StringVar(value="0")
+
+        frame = self._row(self.preprocess_tab)
+        self._file_picker(frame, self.spm_t1_var, "SPM T1", (("NIfTI", "*.nii *.nii.gz"),))
+        frame = self._row(self.preprocess_tab)
+        self._dir_picker(frame, self.spm_out_var, "SPM Out")
+        frame = self._row(self.preprocess_tab)
+        self._file_picker(frame, self.spm_exe_var, "SPM Exe", (("Executable", "*.exe"),))
+        frame = self._row(self.preprocess_tab)
+        ttk.Button(frame, text="SPM Segment", command=self._run_spm_segment).pack(side="left")
 
         frame = self._row(self.preprocess_tab)
         self._file_picker(frame, self.em_func_var, "Motion fMRI", (("NIfTI", "*.nii *.nii.gz"),))
@@ -470,6 +483,19 @@ class ToolboxApp(tk.Tk):
                 order=order,
             )
         )
+
+    def _run_spm_segment(self) -> None:
+        from ..validation.spm import validate_spm_deformation_convention
+
+        def task() -> str:
+            result = validate_spm_deformation_convention(
+                self.spm_t1_var.get(),
+                self.spm_out_var.get(),
+                spm_exe=Path(self.spm_exe_var.get()) if self.spm_exe_var.get() else None,
+            )
+            return str(result["y_field"])
+
+        self._run_worker(task)
 
     def _run_smooth(self) -> None:
         try:

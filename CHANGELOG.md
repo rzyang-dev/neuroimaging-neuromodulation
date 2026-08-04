@@ -66,6 +66,7 @@
   transform-tracts-ants`.
 - Added ANTs SyN affine + inverse warp streamline transformation execution
   validation.
+- Added an interactive SPM segmentation action to the advanced desktop GUI.
 - Added FSL command pipelines for BET, eddy correction, FA/T1 transforms,
   native/MNI transforms, and topup.
 - Added group-statistics commands for correlation comparison, chi-square,

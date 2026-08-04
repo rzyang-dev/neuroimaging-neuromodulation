@@ -85,8 +85,8 @@ noted limitations:
 
 ### T1 target workflows
 
-- Desktop apps expose T1 target generation, but interactive SPM/DARTEL
-  segmentation setup remains missing
+- Desktop apps expose T1 target generation and interactive SPM segmentation;
+  interactive DARTEL template setup remains missing
 
 ### SPM/DARTEL-equivalent preprocessing
 
