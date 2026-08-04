@@ -61,6 +61,8 @@ noted limitations:
 - HTML tract QC reports combining profile statistics, plots, and segmentation
   counts
 - TrackQC reports can embed the interactive HTML/WebGL 3D fiber viewer
+- Python-native tract-measure NIfTI conversion, merged 4D images, and analysis
+  masks through `nm-wm tract-ms2nii`
 - HTML/SVG image QC viewer with axial slices and target overlays
 - HTML/SVG streamline rendering with axial, coronal, and sagittal projections
 - Interactive HTML/WebGL 3D streamline viewer through `nm-diffusion
@@ -80,7 +82,8 @@ noted limitations:
 
 - Validated ANTs integration and TrackQC statistical workflow integration for
   AFQ segmentation
-- `TractMS2Nii`/`TMSmerge.sh`/`TwoSamTTest.sh`/Randomise statistical workflow
+- `TwoSamTTest.sh`/Randomise wrapper integration for the tract-measure NIfTI
+  workflow
 
 ### T1 target workflows
 
@@ -115,7 +118,7 @@ noted limitations:
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 3/3 pass, including a
   real-template registration/apply integration test
-- Local test suite: `140 tests collected` and passing
+- Local test suite: `142 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently

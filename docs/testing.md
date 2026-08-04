@@ -46,6 +46,8 @@ Tests are grouped by responsibility:
   viewer output.
 - `test_trackqc.py` verifies TrackQC reports can embed the interactive 3D
   fiber viewer.
+- `test_tract_ms2nii.py` verifies per-subject NIfTI conversion, merged 4D
+  output, and the analysis mask.
 - `test_pipeline.py` verifies a config-driven real-data pipeline.
 - `test_validation.py` verifies image and deformation validation metrics.
 - `test_external.py` verifies FSL/MRtrix command builders and missing-binary
@@ -63,13 +65,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-140 tests collected and passing
+142 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-140 tests collected and passing
+142 tests collected and passing
 ```
 
 The test command is:

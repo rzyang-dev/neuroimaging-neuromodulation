@@ -56,6 +56,7 @@ document records the mapping from MATLAB functions to Python modules.
 | `dtiXformFiberCoords.m` | `diffusion/transform.py`, `cli/diffusion.py` | Implemented as deformation-field streamline transform |
 | `ANTS_normalize.m` | `preprocess/ants.py`, `cli/preprocess.py` | Partial: ANTs command builders implemented; validated normalization remains external |
 | `TrackQC.m` | `wm/trackqc.py`, `cli/wm.py` | Partial: HTML QC and embedded 3D fiber viewer implemented; tract-to-NIfTI/Randomise workflow remains external |
+| `TractMS2Nii.m`, `TMSmerge.sh` | `wm/ms2nii.py`, `cli/wm.py` | Implemented Python-native per-subject NIfTI conversion, merged 4D output, and analysis mask |
 | `AFQ_RenderFibers.m` | `diffusion/render.py`, `cli/diffusion.py` | Partial: HTML/SVG 2D projections implemented; interactive 3D rendering remains external |
 | `TMSviewer.m` | `reporting/viewer.py`, `cli/tms.py` | Partial: HTML/SVG slice viewer implemented; interactive MATLAB viewer remains external |
 | `CompCoefs.m`, `chi2test2.m`, `TMSttest2_cov.m`, `quantreg.m` | `stats/group.py`, `cli/tms.py` | Implemented as Python group-statistics commands |

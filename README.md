@@ -102,6 +102,8 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - Interactive HTML/WebGL 3D streamline viewer through `nm-diffusion
   render-tracts-3d`
 - HTML tract QC reports can embed the interactive 3D fiber viewer
+- Python-native tract-measure NIfTI conversion and Randomise-style merged 4D
+  outputs through `nm-wm tract-ms2nii`
 
 ## What Is Not Included
 

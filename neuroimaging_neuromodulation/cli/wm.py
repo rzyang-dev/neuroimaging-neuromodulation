@@ -9,6 +9,7 @@ from ..wm.alff import compute_alff
 from ..wm.dynamic import dynamic_alff
 from ..wm.group import group_probability_maps
 from ..wm.masks import make_gm_mask, make_wm_mask
+from ..wm.ms2nii import tract_measures_to_nifti
 from ..wm.plots import plot_group_profiles
 from ..wm.seedfc import wm_multi_seed_fc, wm_seed_fc
 from ..wm.statistics import profile_group_statistics
@@ -111,6 +112,13 @@ def build_parser() -> argparse.ArgumentParser:
     qc.add_argument("--render-html", help="Optional interactive 3D fiber viewer HTML")
     qc.add_argument("--output-dir", required=True)
     qc.set_defaults(handler=run_tract_qc)
+
+    ms2nii = subparsers.add_parser("tract-ms2nii", help="Convert tract measures to NIfTI/4D for group analysis")
+    ms2nii.add_argument("--profiles", nargs="+", required=True, help="Per-subject tract profile matrices (.npy or text)")
+    ms2nii.add_argument("--subject-names", nargs="*", default=None)
+    ms2nii.add_argument("--n-tracts", type=int, default=18)
+    ms2nii.add_argument("--output-dir", required=True)
+    ms2nii.set_defaults(handler=run_tract_ms2nii)
 
     return parser
 
@@ -253,6 +261,20 @@ def run_tract_qc(args: argparse.Namespace) -> int:
         render_html=args.render_html,
     )
     print(report)
+    return 0
+
+
+def run_tract_ms2nii(args: argparse.Namespace) -> int:
+    result = tract_measures_to_nifti(
+        args.profiles,
+        args.output_dir,
+        subject_names=args.subject_names,
+        n_tracts=args.n_tracts,
+    )
+    for subject_path in result["subject_images"]:
+        print(subject_path)
+    print(result["merged"])
+    print(result["mask"])
     return 0
 
 

@@ -608,6 +608,12 @@ directly.
   --segmentation-json <segmentation.json> \
   --render-html <tract-render-3d.html> \
   --output-dir <qc-report>
+
+.venv/bin/nm-wm tract-ms2nii \
+  --profiles <subject1.npy> <subject2.npy> \
+  --subject-names subject1 subject2 \
+  --n-tracts 18 \
+  --output-dir <randomise-input>
 ```
 
 ### Head-motion QC and c6 mask
