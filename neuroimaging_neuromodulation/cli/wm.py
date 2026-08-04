@@ -7,6 +7,7 @@ from pathlib import Path
 
 from ..wm.alff import compute_alff
 from ..wm.dynamic import dynamic_alff
+from ..wm.design import write_two_group_design
 from ..wm.group import group_probability_maps
 from ..wm.masks import make_gm_mask, make_wm_mask
 from ..wm.ms2nii import tract_measures_to_nifti
@@ -292,16 +293,12 @@ def run_tract_ms2nii(args: argparse.Namespace) -> int:
 
 def run_randomise(args: argparse.Namespace) -> int:
     from ..diffusion.external import (
-        build_fsl_design_ttest2_command,
         build_fsl_randomise_command,
-        run_fsl_design_ttest2,
         run_fsl_randomise,
     )
 
     design_prefix = args.design_prefix or str(Path(args.output_prefix).parent / "design")
-    design_mat = f"{design_prefix}.mat"
-    design_con = f"{design_prefix}.con"
-    design_cmd = build_fsl_design_ttest2_command(
+    design_mat, design_con = write_two_group_design(
         design_prefix,
         args.n_group1,
         args.n_group2,
@@ -316,10 +313,10 @@ def run_randomise(args: argparse.Namespace) -> int:
         tfce=not args.no_tfce,
     )
     if args.dry_run:
-        print(" ".join(design_cmd))
+        print(design_mat)
+        print(design_con)
         print(" ".join(randomise_cmd))
         return 0
-    run_fsl_design_ttest2(design_prefix, args.n_group1, args.n_group2)
     run_fsl_randomise(
         args.input,
         args.output_prefix,

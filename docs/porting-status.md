@@ -84,7 +84,6 @@ noted limitations:
 
 - Validated ANTs integration and TrackQC statistical workflow integration for
   AFQ segmentation
-- FSL Randomise execution test against installed binaries
 
 ### T1 target workflows
 
@@ -116,10 +115,12 @@ noted limitations:
 - SPM25 coregistration reference validation on 2026-08-04: DIPY rigid
   coregistration agrees with SPM on known real-image shifts (minimum aligned
   column correlation > 0.59)
+- FSL Randomise execution test passes in the WSL dev environment on
+  2026-08-04 with a small 4D input and analysis mask
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 3/3 pass, including a
   real-template registration/apply integration test
-- Local test suite: `144 tests collected` and passing
+- Local test suite: `146 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently
@@ -152,6 +153,8 @@ and FSL normalization comparisons are still not implemented:
   - `test_fsl_bet_execution`: pass on a realistic 32x32x32 ellipsoid fixture.
   - `test_mrtrix_tckgen_execution`: pass with the new `-seed_image` option and
     the `SeedTest` algorithm.
+  - `test_randomise_execution`: pass with Python-generated two-group design
+    files and FSL `randomise`.
 - ANTs 2.6.5 is installed on Windows (`C:\Program Files\ants-2.6.5\bin`) and
   has been added to the user PATH (2026-08-04). `tests/test_ants_execution.py`
   was run on 2026-08-04 with `.venv-win` (`antsRegistration --version`,

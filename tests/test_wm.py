@@ -9,6 +9,7 @@ from neuroimaging_neuromodulation.cli.wm import main
 from neuroimaging_neuromodulation.io.nifti import load_volume, resample_to_grid, save_volume
 from neuroimaging_neuromodulation.targets.roi import sphere_roi
 from neuroimaging_neuromodulation.wm.alff import compute_alff
+from neuroimaging_neuromodulation.wm.design import write_two_group_design
 from neuroimaging_neuromodulation.wm.dynamic import dynamic_alff
 from neuroimaging_neuromodulation.wm.group import group_probability_maps
 from neuroimaging_neuromodulation.wm.masks import make_wm_mask
@@ -165,3 +166,13 @@ def test_randomise_cli_dry_run(tmp_path: Path) -> None:
         )
         == 0
     )
+
+
+def test_write_two_group_design(tmp_path: Path) -> None:
+    design = tmp_path / "design"
+    mat, con = write_two_group_design(design, 2, 3)
+    assert mat.exists()
+    assert con.exists()
+    assert "/NumPoints 5" in mat.read_text(encoding="ascii")
+    assert "1 0\n1 0\n0 1\n0 1\n0 1" in mat.read_text(encoding="ascii")
+    assert "1 -1" in con.read_text(encoding="ascii")

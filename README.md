@@ -106,6 +106,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
   outputs through `nm-wm tract-ms2nii`
 - FSL `design_ttest2`/`randomise` workflow integration through `nm-wm
   randomise`
+- Verified FSL Randomise execution on a small two-group 4D tract-measure input
 
 ## What Is Not Included
 

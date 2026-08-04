@@ -50,6 +50,8 @@ Tests are grouped by responsibility:
   output, and the analysis mask.
 - `test_external.py` and `test_wm.py` verify the FSL `design_ttest2`/Randomise
   command builders and CLI dry-run path.
+- `test_randomise_execution.py` runs FSL `randomise` on a small 4D input when
+  FSL is installed.
 - `test_pipeline.py` verifies a config-driven real-data pipeline.
 - `test_validation.py` verifies image and deformation validation metrics.
 - `test_external.py` verifies FSL/MRtrix command builders and missing-binary
@@ -67,13 +69,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-144 tests collected and passing
+146 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-144 tests collected and passing
+146 tests collected and passing
 ```
 
 The test command is:
@@ -166,6 +168,8 @@ Verified against the installed binaries:
     replaced with a non-degenerate input.
   - `test_mrtrix_tckgen_execution`: pass with `-seed_image` and the
     `SeedTest` algorithm.
+- `tests/test_randomise_execution.py` (WSL, FSL): **1/1 pass** with a small
+  two-group 4D input and analysis mask.
 
 The external wrapper smoke coverage is complete for the installed binaries;
 reference parity against MATLAB/SPM/FSL remains a separate objective.
