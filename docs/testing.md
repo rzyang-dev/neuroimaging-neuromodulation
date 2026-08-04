@@ -36,6 +36,8 @@ Tests are grouped by responsibility:
   T1-space target generation when T1 and target ROI are supplied.
 - `test_preprocess.py` verifies the `nm-preprocess spm-segment` parser exposes
   the SPM25 workflow.
+- `test_roi_segmentation.py` verifies the bundled AFQ ROI list aligns with the
+  20-channel JHU tract probability atlas.
 - `test_pipeline.py` verifies a config-driven real-data pipeline.
 - `test_validation.py` verifies image and deformation validation metrics.
 - `test_external.py` verifies FSL/MRtrix command builders and missing-binary
@@ -53,13 +55,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-132 tests collected and passing
+135 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-132 tests collected and passing
+135 tests collected and passing
 ```
 
 The test command is:

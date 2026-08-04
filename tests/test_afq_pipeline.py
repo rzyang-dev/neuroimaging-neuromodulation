@@ -71,3 +71,20 @@ def test_afq_subject_pipeline_roi_method(monkeypatch, tmp_path) -> None:
     )
     assert len(result["tracts"]) == 1
     assert result["tracts"][0]["output_streamlines"] == 1
+
+
+def test_afq_roi_method_with_bundled_20_tract_data(package_data_dir) -> None:
+    atlas_img = package_data_dir / "MNI_JHU_tracts_prob.nii.gz"
+    scalar_img = package_data_dir / "grey333.nii"
+    result = afq_subject_pipeline(
+        [],
+        atlas_img,
+        scalar_img,
+        n_samples=20,
+        num_nodes=10,
+        segmentation="roi",
+        roi_dir=package_data_dir / "MNI_JHU_tracts_ROIs",
+        tract_atlas=atlas_img,
+    )
+    assert result["n_streamlines"] == 0
+    assert result["tracts"] == []

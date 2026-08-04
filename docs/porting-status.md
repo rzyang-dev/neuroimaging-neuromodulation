@@ -49,8 +49,8 @@ noted limitations:
 - SPM25 standalone segmentation through `nm-preprocess spm-segment`
 - Tract-profile extraction from TRK/TCK streamlines and scalar images
 - Atlas-based streamline tract segmentation using JHU-style label maps
-- ROI-based AFQ tract segmentation using the original Mori/JHU waypoint ROIs
-  and probability atlas
+- ROI-based AFQ 20-tract segmentation using the original Mori/JHU waypoint
+  ROIs and 20-channel probability atlas
 - Deformation-field transform for native-to-MNI streamline normalization
 - Optional ANTs registration and transform-application command builders
 - AFQ-style streamline outlier cleaning using length and per-node Mahalanobis
@@ -75,8 +75,8 @@ noted limitations:
 
 ### White-matter and AFQ workflows
 
-- Full AFQ 20-tract segmentation with validated ANTs integration and
-  interactive 3D fiber rendering
+- Validated ANTs integration and interactive 3D fiber rendering for AFQ
+  segmentation
 - Full `TrackQC` fiber-rendering visualization and the
   `TractMS2Nii`/`TMSmerge.sh`/`TwoSamTTest.sh` statistical workflow
 
@@ -87,7 +87,7 @@ noted limitations:
 
 ### Diffusion preprocessing and full tractography workflow
 
-- Full AFQ tract segmentation
+- Full AFQ tract segmentation with validated ANTs integration
 
 ### SPM/DARTEL-equivalent preprocessing
 
@@ -106,7 +106,7 @@ noted limitations:
   warped tissue output (correlation > 0.99)
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 2/2 pass
-- Local test suite: `132 tests collected` and passing
+- Local test suite: `135 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently

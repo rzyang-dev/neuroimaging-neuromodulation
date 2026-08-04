@@ -21,7 +21,7 @@ TRACT_ROI_FILES = [
     ("CGC_roi1_R.nii.gz", "CGC_roi2_R.nii.gz"),
     ("HCC_roi1_L.nii.gz", "HCC_roi2_L.nii.gz"),
     ("HCC_roi1_R.nii.gz", "HCC_roi2_R.nii.gz"),
-    ("FP_R.nii.gz", "FP_L.nii.gz"),
+    ("FP_L.nii.gz", "FP_R.nii.gz"),
     ("FA_L.nii.gz", "FA_R.nii.gz"),
     ("IFO_roi1_L.nii.gz", "IFO_roi2_L.nii.gz"),
     ("IFO_roi1_R.nii.gz", "IFO_roi2_R.nii.gz"),

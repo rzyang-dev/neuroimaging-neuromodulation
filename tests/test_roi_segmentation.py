@@ -34,3 +34,19 @@ def test_segment_streamlines_by_rois(monkeypatch, tmp_path) -> None:
         n_samples=10,
     )
     assert result["labels"] == [1, 0]
+
+
+def test_roi_tract_list_matches_bundled_jhu_atlas(package_data_dir) -> None:
+    atlas_img = nib.load(package_data_dir / "MNI_JHU_tracts_prob.nii.gz")
+    assert len(roi_segmentation.TRACT_ROI_FILES) == 20
+    assert atlas_img.shape[3] == len(roi_segmentation.TRACT_ROI_FILES)
+
+
+def test_roi_segmentation_loads_bundled_20_tract_data(package_data_dir) -> None:
+    result = roi_segmentation.segment_streamlines_by_rois(
+        [],
+        package_data_dir / "MNI_JHU_tracts_ROIs",
+        atlas_image=package_data_dir / "MNI_JHU_tracts_prob.nii.gz",
+    )
+    assert result["n_streamlines"] == 0
+    assert result["counts"] == {}

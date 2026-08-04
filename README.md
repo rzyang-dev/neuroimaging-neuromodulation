@@ -39,8 +39,8 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
   connectivity through `nm-diffusion`
 - Tract-profile extraction from TRK/TCK streamlines and scalar images
 - Atlas-based streamline tract segmentation using JHU-style label maps
-- ROI-based AFQ tract segmentation using the original Mori/JHU waypoint ROIs
-  and probability atlas
+- ROI-based AFQ 20-tract segmentation using the original Mori/JHU waypoint
+  ROIs and probability atlas
 - Deformation-field transform for native-to-MNI streamline normalization
 - Optional ANTs registration and transform-application commands
 - AFQ-style streamline outlier cleaning with length and Mahalanobis distance
