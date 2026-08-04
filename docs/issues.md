@@ -17,9 +17,9 @@
 3. Tissue segmentation is approximate and not DARTEL-grade.
 
    Atlas-guided GM/WM/CSF probability estimation is implemented for common T1
-   data. SPM25 standalone can be used optionally for SPM segmentation and
-   `y_`/`iy_` field generation, but the Python-native atlas path remains an
-   approximation.
+   data. SPM25 standalone can be used optionally for SPM segmentation, `y_`/
+   `iy_` field generation, DARTEL template estimation, and DARTEL
+   Normalise-to-MNI; the Python-native atlas path remains an approximation.
 
 4. FSL BEDPOSTX-based probabilistic tractography is optional.
 

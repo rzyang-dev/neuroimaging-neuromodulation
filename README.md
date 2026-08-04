@@ -46,6 +46,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - SPM25 segmentation emits imported `rc*` DARTEL tissue maps
 - SPM DARTEL template runner through `nm-preprocess dartel-template`
 - SPM DARTEL Normalise-to-MNI runner through `nm-preprocess dartel-mni-norm`
+- SPM DARTEL reference comparison against SPM unified normalization
 - DIPY-based volume coregistration
 - DTI fitting, deterministic tractography, and seed-target structural
   connectivity through `nm-diffusion`

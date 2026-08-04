@@ -702,6 +702,40 @@ def run_spm_dartel_mni_norm(
     }
 
 
+def validate_dartel_against_spm(
+    moving_image: str | Path,
+    template_path: str | Path,
+    flowfield: str | Path,
+    spm_output_dir: str | Path,
+    output_dir: str | Path,
+    *,
+    spm_exe: Path | None = None,
+    timeout: int = 7200,
+) -> dict[str, object]:
+    """Compare SPM DARTEL normalization with SPM unified normalization."""
+
+    spm_dir = Path(spm_output_dir)
+    wc1 = spm_dir / "wc1T1.nii"
+    c1 = spm_dir / "c1T1.nii"
+    if not wc1.exists() or not c1.exists():
+        raise RuntimeError("SPM segmentation outputs wc1T1.nii/c1T1.nii are required")
+    dartel_result = run_spm_dartel_mni_norm(
+        template_path,
+        [{"flowfield": flowfield, "images": [c1]}],
+        output_dir,
+        spm_exe=spm_exe,
+        timeout=timeout,
+    )
+    warped = Path(dartel_result["warped_images"][0])
+    metrics = compare_volumes(wc1, warped)
+    return {
+        **dartel_result,
+        "metrics": metrics,
+        "reference_wc1": wc1,
+        "warped": warped,
+    }
+
+
 def run_spm_segmentation(
     t1_path: str | Path,
     output_dir: str | Path,
@@ -807,6 +841,7 @@ __all__ = [
     "run_spm_segmentation",
     "run_spm_realign",
     "validate_coreg_against_spm",
+    "validate_dartel_against_spm",
     "validate_normalization_against_spm",
     "validate_spm_deformation_convention",
     "validate_motion_against_spm",

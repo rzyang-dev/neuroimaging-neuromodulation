@@ -42,6 +42,8 @@ the full port and production-readiness claims are not met.
   with SPM output on real templates.
 - FSL FNIRT normalization execution validation compares FSL and DIPY warped
   images on real templates.
+- SPM DARTEL reference comparison compares DARTEL-normalized tissue maps with
+  SPM unified-normalization outputs on real data.
 - CI matrix results are recorded in `docs/ci-validation.md`; no run artifacts
   are present in this workspace.
 - Tests are primarily smoke tests. They do not prove numerical equivalence
@@ -52,8 +54,7 @@ the full port and production-readiness claims are not met.
 The remaining work is listed in `docs/porting-status.md` and `docs/issues.md`.
 It includes, but is not limited to:
 
-- Porting missing white-matter/AFQ statistics, TrackQC, and DARTEL-grade
-  normalization workflows.
+- Porting missing white-matter/AFQ statistics and TrackQC workflows.
 - Integrating the individualized target-mask path into the desktop apps.
 - Adding reference comparisons against original MATLAB/SPM/FSL outputs.
 - Hardening the GUI, DICOM series selection, and production packaging.
@@ -71,7 +72,8 @@ original MATLAB toolbox.
 MATLAB R2015b, SPM standalone, ANTs 2.6.5 (Windows) and FSL/MRtrix (WSL dev
 environment) are installed, so reference/parity execution is possible.
 SPM `y_`/`iy_` world-coordinate convention, realignment, coregistration,
-normalization, and FSL FNIRT execution comparisons are implemented, while
-DARTEL-grade parity remains unproven. External-execution smoke tests pass
+normalization, FSL FNIRT, and DARTEL reference comparisons are implemented,
+while full numerical parity across a clinical multi-subject DARTEL dataset
+remains to be demonstrated. External-execution smoke tests pass
 (FSL/MRtrix 3/3 in WSL, ANTs 4/4 on Windows). A 3D rendering runtime for
 interactive fiber visualization is still missing. See `docs/porting-status.md`.

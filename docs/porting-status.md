@@ -93,7 +93,7 @@ noted limitations:
 
 ### SPM/DARTEL-equivalent preprocessing
 
-- Full reference parity against the MATLAB/SPM DARTEL workflows
+- Full numerical parity across a clinical multi-subject DARTEL dataset
 
 ## Verification Evidence
 
@@ -121,6 +121,8 @@ noted limitations:
   producing `Template_0/1.nii` and `u_*` flow fields
 - SPM DARTEL Normalise-to-MNI runner executed on real template/flow outputs,
   producing `sw*` warped images
+- SPM DARTEL reference comparison on real data: DARTEL-normalized tissue maps
+  agree with SPM unified-normalization outputs (correlation > 0.70)
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 4/4 pass, including real-template
   registration/apply and SyN streamline transformation tests
@@ -139,7 +141,8 @@ As of 2026-08-04 the external runtimes below are installed and usable for
 reference/comparison work. The execution tests were run for the first time on
 2026-08-04; SPM `y_`/`iy_` convention, realignment, coregistration,
 normalization, and FSL FNIRT execution comparisons are now implemented, while
-DARTEL-grade parity is still not implemented:
+full numerical parity across a clinical multi-subject DARTEL dataset is not yet
+demonstrated:
 
 - MATLAB R2015b and SPM standalone 25.01.02 are installed on Windows
   (`C:\Program Files\MATLAB\R2015b\bin`,
@@ -169,7 +172,8 @@ DARTEL-grade parity is still not implemented:
   in any WebGL-capable browser.
 
 The Python-native port is substantially implemented, and SPM `y_`/`iy_`
-world-coordinate convention, realignment, coregistration, normalization, and
-FSL FNIRT execution validation now pass. DARTEL-grade parity remains unproven.
-ANTs execution tests pass (4/4); FSL/MRtrix execution smoke tests pass (3/3)
-as of 2026-08-04.
+world-coordinate convention, realignment, coregistration, normalization, FSL
+FNIRT, and DARTEL reference validation now pass. Full numerical parity across a
+clinical multi-subject DARTEL dataset remains to be demonstrated. ANTs
+execution tests pass (4/4); FSL/MRtrix execution smoke tests pass (3/3) as of
+2026-08-04.

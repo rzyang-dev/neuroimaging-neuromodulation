@@ -73,6 +73,7 @@
   field smoke run.
 - Added `nm-preprocess dartel-mni-norm` and a real SPM DARTEL Normalise-to-MNI
   smoke run.
+- Added an SPM DARTEL reference comparison helper with real-data verification.
 - Added FSL command pipelines for BET, eddy correction, FA/T1 transforms,
   native/MNI transforms, and topup.
 - Added group-statistics commands for correlation comparison, chi-square,
