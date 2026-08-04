@@ -598,7 +598,8 @@ def run_spm_dartel_template(
 
 def write_dartel_mni_norm_batch(
     template_path: str | Path,
-    subjects: list[dict[str, object]],
+    flowfields: list[str | Path],
+    image_sets: list[list[str | Path]],
     batch_path: Path,
     *,
     vox: tuple[float, float, float] | None = None,
@@ -608,8 +609,12 @@ def write_dartel_mni_norm_batch(
 ) -> Path:
     """Write an SPM DARTEL Normalise-to-MNI batch."""
 
-    if not subjects:
-        raise ValueError("subjects must contain at least one subject")
+    if not flowfields:
+        raise ValueError("flowfields must contain at least one subject")
+    n_subjects = len(flowfields)
+    for images in image_sets:
+        if len(images) != n_subjects:
+            raise ValueError("Each image set must contain one image per flow field")
     vox_text = " ".join(str(value) for value in vox) if vox is not None else "NaN NaN NaN"
     bb_text = (
         "; ".join(" ".join(str(value) for value in row) for row in bb)
@@ -620,14 +625,14 @@ def write_dartel_mni_norm_batch(
     lines = [
         f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.template = {{{_matlab_str(Path(template_path))}}};",
     ]
-    for index, subject in enumerate(subjects, start=1):
-        flowfield = subject["flowfield"]
-        images = subject["images"]
+    flow_cell = "; ".join(_matlab_str(Path(flowfield)) for flowfield in flowfields)
+    lines.append(
+        f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.data.subjs.flowfields = {{{flow_cell}}};"
+    )
+    for image_index, images in enumerate(image_sets, start=1):
+        image_cell = "; ".join(_matlab_str(Path(image)) for image in images)
         lines.append(
-            f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.data.subjs.flowfields({index}) = {{{_matlab_str(Path(flowfield))}}};"
-        )
-        lines.append(
-            f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.data.subjs.images{{{index}}} = {{{'; '.join(_matlab_str(Path(image)) for image in images)}}};"
+            f"matlabbatch{{1}}.spm.tools.dartel.mni_norm.data.subjs.images{{{image_index}}} = {{{image_cell}}};"
         )
     lines.extend(
         [
@@ -670,7 +675,11 @@ def run_spm_dartel_mni_norm(
         work_subjects.append({"flowfield": work_flow, "images": work_images})
     batch_path = write_dartel_mni_norm_batch(
         work_template,
-        work_subjects,
+        [Path(subject["flowfield"]) for subject in work_subjects],
+        [
+            [Path(subject["images"][image_index]) for subject in work_subjects]
+            for image_index in range(len(work_subjects[0]["images"]))
+        ],
         output_dir / "dartel_mni_batch.m",
     )
     completed = subprocess.run(
@@ -733,6 +742,58 @@ def validate_dartel_against_spm(
         "metrics": metrics,
         "reference_wc1": wc1,
         "warped": warped,
+    }
+
+
+def validate_dartel_against_spm_multi(
+    template_path: str | Path,
+    subjects: list[dict[str, object]],
+    output_dir: str | Path,
+    *,
+    spm_exe: Path | None = None,
+    timeout: int = 7200,
+) -> dict[str, object]:
+    """Compare SPM DARTEL normalization with SPM unified normalization across subjects."""
+
+    if not subjects:
+        raise ValueError("subjects must contain at least one subject")
+    dartel_subjects = []
+    for subject in subjects:
+        c1 = Path(subject["c1"])
+        if not c1.exists():
+            raise RuntimeError(f"SPM c1 image not found: {c1}")
+        dartel_subjects.append(
+            {
+                "flowfield": Path(subject["flowfield"]),
+                "images": [c1],
+            }
+        )
+    dartel_result = run_spm_dartel_mni_norm(
+        template_path,
+        dartel_subjects,
+        output_dir,
+        spm_exe=spm_exe,
+        timeout=timeout,
+    )
+    per_subject = []
+    correlations = []
+    for index, subject in enumerate(subjects):
+        wc1 = Path(subject["wc1"])
+        warped = Path(dartel_result["warped_images"][index])
+        metrics = compare_volumes(wc1, warped)
+        correlations.append(metrics["correlation"])
+        per_subject.append(
+            {
+                "subject": subject.get("subject", str(index + 1)),
+                "metrics": metrics,
+                "reference_wc1": wc1,
+                "warped": warped,
+            }
+        )
+    return {
+        **dartel_result,
+        "subjects": per_subject,
+        "mean_correlation": float(np.mean(correlations)),
     }
 
 
@@ -842,6 +903,7 @@ __all__ = [
     "run_spm_realign",
     "validate_coreg_against_spm",
     "validate_dartel_against_spm",
+    "validate_dartel_against_spm_multi",
     "validate_normalization_against_spm",
     "validate_spm_deformation_convention",
     "validate_motion_against_spm",

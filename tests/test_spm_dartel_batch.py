@@ -38,16 +38,16 @@ def test_write_dartel_batch_requires_equal_groups(tmp_path: Path) -> None:
 def test_write_dartel_mni_norm_batch(tmp_path: Path) -> None:
     batch = write_dartel_mni_norm_batch(
         tmp_path / "Template.nii",
+        [tmp_path / "u_subj1.nii", tmp_path / "u_subj2.nii"],
         [
-            {
-                "flowfield": tmp_path / "u_subj1.nii",
-                "images": [tmp_path / "c1.nii", tmp_path / "c2.nii"],
-            }
+            [tmp_path / "c1_s1.nii", tmp_path / "c1_s2.nii"],
+            [tmp_path / "c2_s1.nii", tmp_path / "c2_s2.nii"],
         ],
         tmp_path / "mni.m",
     )
     content = batch.read_text(encoding="ascii")
     assert "spm.tools.dartel.mni_norm.template" in content
-    assert "data.subjs.flowfields(1)" in content
-    assert "c2.nii" in content
+    assert "data.subjs.flowfields =" in content
+    assert "c2_s1.nii" in content
+    assert "c2_s2.nii" in content
     assert "mni_norm.fwhm" in content

@@ -47,6 +47,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - SPM DARTEL template runner through `nm-preprocess dartel-template`
 - SPM DARTEL Normalise-to-MNI runner through `nm-preprocess dartel-mni-norm`
 - SPM DARTEL reference comparison against SPM unified normalization
+- Multi-subject SPM DARTEL reference comparison with real-data verification
 - DIPY-based volume coregistration
 - DTI fitting, deterministic tractography, and seed-target structural
   connectivity through `nm-diffusion`
