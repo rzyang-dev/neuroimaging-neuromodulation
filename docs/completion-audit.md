@@ -44,8 +44,8 @@ the full port and production-readiness claims are not met.
   images on real templates.
 - SPM DARTEL reference comparison compares DARTEL-normalized tissue maps with
   SPM unified-normalization outputs on real data.
-- SPM DARTEL multi-subject reference comparison on three real subjects achieves
-  mean correlation > 0.83.
+- SPM DARTEL multi-subject reference comparison on five real subjects achieves
+  mean correlation > 0.85.
 - CI matrix results are recorded in `docs/ci-validation.md`; no run artifacts
   are present in this workspace.
 - Tests are primarily smoke tests. They do not prove numerical equivalence
@@ -76,7 +76,7 @@ environment) are installed, so reference/parity execution is possible.
 SPM `y_`/`iy_` world-coordinate convention, realignment, coregistration,
 normalization, FSL FNIRT, and DARTEL reference comparisons are implemented,
 while full numerical parity across a larger clinical multi-subject DARTEL
-dataset beyond the three real template subjects remains to be demonstrated.
+dataset beyond the five real template subjects remains to be demonstrated.
 External-execution smoke tests pass
 (FSL/MRtrix 3/3 in WSL, ANTs 4/4 on Windows). A 3D rendering runtime for
 interactive fiber visualization is still missing. See `docs/porting-status.md`.
