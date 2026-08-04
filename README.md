@@ -42,6 +42,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
   transform-tracts-ants`
 - ANTs SyN streamline transformation execution validation on real templates
 - Interactive SPM segmentation action in the advanced desktop GUI
+- Interactive DARTEL template action in the advanced desktop GUI
 - SPM25 segmentation emits imported `rc*` DARTEL tissue maps
 - SPM DARTEL template runner through `nm-preprocess dartel-template`
 - SPM DARTEL Normalise-to-MNI runner through `nm-preprocess dartel-mni-norm`

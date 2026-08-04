@@ -89,11 +89,11 @@ noted limitations:
 ### T1 target workflows
 
 - Desktop apps expose T1 target generation and interactive SPM segmentation;
-  interactive DARTEL template setup remains missing
+  the advanced GUI also exposes an interactive DARTEL template action
 
 ### SPM/DARTEL-equivalent preprocessing
 
-- Interactive DARTEL template setup in the desktop apps
+- Full reference parity against the MATLAB/SPM DARTEL workflows
 
 ## Verification Evidence
 

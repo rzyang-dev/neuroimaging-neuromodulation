@@ -200,6 +200,11 @@ class ToolboxApp(tk.Tk):
         self.spm_t1_var = tk.StringVar()
         self.spm_out_var = tk.StringVar()
         self.spm_exe_var = tk.StringVar()
+        self.dartel_rc1_var = tk.StringVar()
+        self.dartel_rc2_var = tk.StringVar()
+        self.dartel_rc3_var = tk.StringVar()
+        self.dartel_out_var = tk.StringVar()
+        self.dartel_template_var = tk.StringVar(value="Template")
 
         self.em_func_var = tk.StringVar()
         self.em_out_var = tk.StringVar()
@@ -237,6 +242,22 @@ class ToolboxApp(tk.Tk):
         self._file_picker(frame, self.spm_exe_var, "SPM Exe", (("Executable", "*.exe"),))
         frame = self._row(self.preprocess_tab)
         ttk.Button(frame, text="SPM Segment", command=self._run_spm_segment).pack(side="left")
+
+        frame = self._row(self.preprocess_tab)
+        ttk.Label(frame, text="DARTEL rc1 (comma)").pack(side="left", padx=(0, 8))
+        ttk.Entry(frame, textvariable=self.dartel_rc1_var).pack(side="left", fill="x", expand=True)
+        frame = self._row(self.preprocess_tab)
+        ttk.Label(frame, text="DARTEL rc2 (comma)").pack(side="left", padx=(0, 8))
+        ttk.Entry(frame, textvariable=self.dartel_rc2_var).pack(side="left", fill="x", expand=True)
+        frame = self._row(self.preprocess_tab)
+        ttk.Label(frame, text="DARTEL rc3 (comma)").pack(side="left", padx=(0, 8))
+        ttk.Entry(frame, textvariable=self.dartel_rc3_var).pack(side="left", fill="x", expand=True)
+        frame = self._row(self.preprocess_tab)
+        self._dir_picker(frame, self.dartel_out_var, "DARTEL Out")
+        frame = self._row(self.preprocess_tab)
+        ttk.Label(frame, text="Template base").pack(side="left", padx=(0, 8))
+        ttk.Entry(frame, textvariable=self.dartel_template_var, width=24).pack(side="left")
+        ttk.Button(frame, text="DARTEL Template", command=self._run_dartel_template).pack(side="left", padx=8)
 
         frame = self._row(self.preprocess_tab)
         self._file_picker(frame, self.em_func_var, "Motion fMRI", (("NIfTI", "*.nii *.nii.gz"),))
@@ -494,6 +515,27 @@ class ToolboxApp(tk.Tk):
                 spm_exe=Path(self.spm_exe_var.get()) if self.spm_exe_var.get() else None,
             )
             return str(result["y_field"])
+
+        self._run_worker(task)
+
+    def _run_dartel_template(self) -> None:
+        from ..validation.spm import run_spm_dartel_template
+
+        def parse_csv(value: str) -> list[Path]:
+            return [Path(item.strip()) for item in value.replace(";", ",").split(",") if item.strip()]
+
+        def task() -> str:
+            rc_groups = [
+                parse_csv(self.dartel_rc1_var.get()),
+                parse_csv(self.dartel_rc2_var.get()),
+                parse_csv(self.dartel_rc3_var.get()),
+            ]
+            result = run_spm_dartel_template(
+                rc_groups,
+                self.dartel_out_var.get(),
+                template_basename=self.dartel_template_var.get(),
+            )
+            return f"{len(result['templates'])} templates, {len(result['flow_fields'])} flow fields"
 
         self._run_worker(task)
 

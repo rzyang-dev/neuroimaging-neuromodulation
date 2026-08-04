@@ -564,7 +564,8 @@ The advanced GUI has tabs:
   generate target candidates, or generate a T1-space target image.
 - White Matter: choose functional and mask; run ALFF/fALFF.
 - Preprocess: estimate motion, coregister volumes, correct slice timing, apply
-  deformation fields, run SPM segmentation, or smooth images.
+  deformation fields, run SPM segmentation, run DARTEL template estimation, or
+  smooth images.
 - Utilities: create sphere ROIs or compute deep-target coordinates.
 
 The GUI requires Tkinter, which is included with many Python distributions.

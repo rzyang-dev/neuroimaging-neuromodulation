@@ -67,6 +67,7 @@
 - Added ANTs SyN affine + inverse warp streamline transformation execution
   validation.
 - Added an interactive SPM segmentation action to the advanced desktop GUI.
+- Added an interactive DARTEL template action to the advanced desktop GUI.
 - SPM25 segmentation now emits imported `rc1/rc2/rc3` DARTEL tissue maps.
 - Added `nm-preprocess dartel-template` and a real SPM DARTEL template/flow
   field smoke run.
