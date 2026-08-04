@@ -119,3 +119,25 @@ def test_dartel_mni_norm_parser() -> None:
         ]
     )
     assert callable(args.handler)
+
+
+def test_dartel_parity_parser() -> None:
+    args = build_parser().parse_args(
+        [
+            "dartel-parity",
+            "--template",
+            "Template.nii",
+            "--flowfields",
+            "u1.nii",
+            "u2.nii",
+            "--c1",
+            "c1a.nii",
+            "c1b.nii",
+            "--wc1",
+            "wc1a.nii",
+            "wc1b.nii",
+            "--output-dir",
+            "out",
+        ]
+    )
+    assert callable(args.handler)

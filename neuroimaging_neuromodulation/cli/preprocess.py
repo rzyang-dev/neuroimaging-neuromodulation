@@ -173,6 +173,16 @@ def build_parser() -> argparse.ArgumentParser:
     dartel_mni.add_argument("--timeout", type=int, default=7200)
     dartel_mni.set_defaults(handler=run_dartel_mni_norm)
 
+    dartel_parity = subparsers.add_parser("dartel-parity", help="Run multi-subject SPM DARTEL reference comparison")
+    dartel_parity.add_argument("--template", required=True)
+    dartel_parity.add_argument("--flowfields", nargs="+", required=True)
+    dartel_parity.add_argument("--c1", nargs="+", required=True)
+    dartel_parity.add_argument("--wc1", nargs="+", required=True)
+    dartel_parity.add_argument("--output-dir", required=True)
+    dartel_parity.add_argument("--spm-exe")
+    dartel_parity.add_argument("--timeout", type=int, default=7200)
+    dartel_parity.set_defaults(handler=run_dartel_parity)
+
     ants = subparsers.add_parser("ants-register", help="Run ANTs registration (requires ANTs)")
     ants.add_argument("--moving", required=True)
     ants.add_argument("--fixed", required=True)
@@ -502,6 +512,33 @@ def run_dartel_mni_norm(args: argparse.Namespace) -> int:
     )
     for warped in result["warped_images"]:
         print(warped)
+    return 0
+
+
+def run_dartel_parity(args: argparse.Namespace) -> int:
+    from ..validation.spm import validate_dartel_against_spm_multi
+
+    if not (len(args.flowfields) == len(args.c1) == len(args.wc1)):
+        raise ValueError("flowfields, c1, and wc1 must have the same number of entries")
+    subjects = [
+        {
+            "subject": f"subject_{index + 1}",
+            "flowfield": flowfield,
+            "c1": c1,
+            "wc1": wc1,
+        }
+        for index, (flowfield, c1, wc1) in enumerate(zip(args.flowfields, args.c1, args.wc1))
+    ]
+    result = validate_dartel_against_spm_multi(
+        args.template,
+        subjects,
+        args.output_dir,
+        spm_exe=Path(args.spm_exe) if args.spm_exe else None,
+        timeout=args.timeout,
+    )
+    print("mean_correlation", result["mean_correlation"])
+    for subject in result["subjects"]:
+        print(subject["subject"], subject["metrics"]["correlation"])
     return 0
 
 

@@ -50,6 +50,8 @@ noted limitations:
   native `c*` maps, imported `rc*` DARTEL maps, and warped `wc*` maps
 - SPM DARTEL template runner through `nm-preprocess dartel-template`
 - SPM DARTEL Normalise-to-MNI runner through `nm-preprocess dartel-mni-norm`
+- Multi-subject SPM DARTEL reference comparison through `nm-preprocess
+  dartel-parity`
 - Tract-profile extraction from TRK/TCK streamlines and scalar images
 - Atlas-based streamline tract segmentation using JHU-style label maps
 - ROI-based AFQ 20-tract segmentation using the original Mori/JHU waypoint
@@ -127,7 +129,7 @@ noted limitations:
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 4/4 pass, including real-template
   registration/apply and SyN streamline transformation tests
-- Local test suite: `157 tests collected` and passing
+- Local test suite: `158 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently

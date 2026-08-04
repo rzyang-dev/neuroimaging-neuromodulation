@@ -62,6 +62,7 @@ Tests are grouped by responsibility:
   Normalise-to-MNI batch and CLI parser.
 - Manual SPM DARTEL reference verification compares DARTEL and SPM unified
   normalization outputs on two real subjects (mean correlation > 0.81).
+- `test_preprocess.py` verifies the multi-subject `dartel-parity` CLI parser.
 - `test_fsl_normalization_execution.py` runs FSL FNIRT on real templates when
   FSL is installed.
 - `test_streamline_transform.py` and `test_ants_execution.py` verify ANTs
@@ -85,13 +86,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-157 tests collected and passing
+158 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-157 tests collected and passing
+158 tests collected and passing
 ```
 
 The test command is:

@@ -366,6 +366,20 @@ This writes `Template_*.nii` files and per-subject `u_*` DARTEL flow fields.
 
 This writes `w*` or `sw*` DARTEL-normalised images in MNI space.
 
+### Run multi-subject SPM DARTEL parity
+
+```bash
+.venv/bin/nm-preprocess dartel-parity \
+  --template <Template.nii> \
+  --flowfields <u-subj1.nii> <u-subj2.nii> \
+  --c1 <c1-subj1.nii> <c1-subj2.nii> \
+  --wc1 <wc1-subj1.nii> <wc1-subj2.nii> \
+  --output-dir <parity-output>
+```
+
+This prints the per-subject and mean correlation between DARTEL and SPM
+unified-normalization outputs.
+
 ### Validate a deformation field
 
 ```bash
