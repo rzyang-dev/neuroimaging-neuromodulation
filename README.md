@@ -34,6 +34,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - Detrending and world-space image reslicing
 - Text-to-NIfTI conversion for tract-matrix output workflows
 - Rigid motion-parameter estimation through DIPY
+- SPM25-validated motion parameter reference comparison
 - DIPY-based volume coregistration
 - DTI fitting, deterministic tractography, and seed-target structural
   connectivity through `nm-diffusion`

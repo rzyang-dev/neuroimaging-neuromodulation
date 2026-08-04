@@ -29,11 +29,13 @@ the full port and production-readiness claims are not met.
 
 ## Verification Evidence
 
-- `136` automated tests are collected and pass locally.
+- `137` automated tests are collected and pass locally.
 - Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`.
 - `pip check` reports no broken requirements.
 - SPM25 reference validation confirms the package applies SPM `y_`/`iy_`
   world-coordinate fields correctly and reproduces SPM's warped tissue output.
+- SPM25 realignment reference validation compares DIPY motion estimates with
+  SPM output on real fMRI after sign-convention alignment.
 - CI matrix results are recorded in `docs/ci-validation.md`; no run artifacts
   are present in this workspace.
 - Tests are primarily smoke tests. They do not prove numerical equivalence
@@ -62,8 +64,9 @@ original MATLAB toolbox.
 
 MATLAB R2015b, SPM standalone, ANTs 2.6.5 (Windows) and FSL/MRtrix (WSL dev
 environment) are installed, so reference/parity execution is possible.
-SPM `y_`/`iy_` world-coordinate convention validation is implemented, while
-DARTEL-grade normalization and FSL reference comparisons remain unproven.
-External-execution smoke tests pass (FSL/MRtrix 3/3 in WSL, ANTs 3/3 on
-Windows). A 3D rendering runtime for interactive fiber visualization is still
-missing. See `docs/porting-status.md`.
+SPM `y_`/`iy_` world-coordinate convention and realignment reference
+comparisons are implemented, while DARTEL-grade normalization and
+coregistration reference comparisons remain unproven. External-execution smoke
+tests pass (FSL/MRtrix 3/3 in WSL, ANTs 3/3 on Windows). A 3D rendering runtime
+for interactive fiber visualization is still missing. See
+`docs/porting-status.md`.

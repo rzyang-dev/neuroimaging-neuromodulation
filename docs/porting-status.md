@@ -92,7 +92,7 @@ noted limitations:
 ### SPM/DARTEL-equivalent preprocessing
 
 - DARTEL-grade segmentation
-- SPM/FSL reference comparisons for motion, coregistration, and normalization
+- SPM/FSL coregistration and normalization reference comparisons
 
 ## Verification Evidence
 
@@ -104,10 +104,13 @@ noted limitations:
 - SPM25 reference validation on 2026-08-04: applying the SPM `y_T1.nii`
   template-to-native field with the package reproduces SPM's `wc1T1.nii`
   warped tissue output (correlation > 0.99)
+- SPM25 realignment reference validation on 2026-08-04: DIPY motion estimates
+  agree with SPM after sign-convention alignment (minimum column correlation
+  > 0.57 on real fMRI)
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 3/3 pass, including a
   real-template registration/apply integration test
-- Local test suite: `136 tests collected` and passing
+- Local test suite: `137 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently
@@ -120,9 +123,9 @@ complete.
 
 As of 2026-08-04 the external runtimes below are installed and usable for
 reference/comparison work. The execution tests were run for the first time on
-2026-08-04; SPM `y_`/`iy_` convention validation is now implemented, while
-DARTEL-grade normalization and motion/coregistration reference comparisons are
-still not implemented:
+2026-08-04; SPM `y_`/`iy_` convention and realignment reference comparisons
+are now implemented, while DARTEL-grade normalization and coregistration
+reference comparisons are still not implemented:
 
 - MATLAB R2015b and SPM standalone 25.01.02 are installed on Windows
   (`C:\Program Files\MATLAB\R2015b\bin`,
@@ -149,6 +152,7 @@ still not implemented:
   not part of this environment.
 
 The Python-native port is substantially implemented, and SPM `y_`/`iy_`
-world-coordinate convention validation now passes against SPM25. DARTEL-grade
-normalization and FSL reference comparisons remain unproven. ANTs execution
-tests pass (3/3); FSL/MRtrix execution smoke tests pass (3/3) as of 2026-08-04.
+world-coordinate convention and realignment reference validation now pass
+against SPM25. DARTEL-grade normalization and coregistration reference
+comparisons remain unproven. ANTs execution tests pass (3/3); FSL/MRtrix
+execution smoke tests pass (3/3) as of 2026-08-04.
