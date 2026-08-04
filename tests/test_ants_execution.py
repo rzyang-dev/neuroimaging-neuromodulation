@@ -3,10 +3,13 @@ from __future__ import annotations
 import shutil
 import subprocess
 
+import numpy as np
 import pytest
 
+from neuroimaging_neuromodulation.diffusion.transform import transform_streamlines_with_ants
 from neuroimaging_neuromodulation.preprocess.ants import (
     run_ants_apply_transform,
+    run_ants_apply_transforms_to_points,
     run_ants_registration,
 )
 
@@ -59,3 +62,19 @@ def test_ants_registration_and_apply_real_templates(package_data_dir, tmp_path) 
     )
     assert applied["returncode"] == 0
     assert output.exists()
+    points_csv = tmp_path / "points.csv"
+    points_out = tmp_path / "points_out.csv"
+    points_csv.write_text("x,y,z,t\n1,2,3,0\n4,5,6,1\n", encoding="ascii")
+    points_result = run_ants_apply_transforms_to_points(
+        points_csv,
+        points_out,
+        [affine],
+    )
+    assert points_result["returncode"] == 0
+    assert points_out.exists()
+    streamlines = transform_streamlines_with_ants(
+        [np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])],
+        [affine],
+    )
+    assert len(streamlines) == 1
+    assert streamlines[0].shape == (2, 3)

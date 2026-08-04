@@ -18,7 +18,10 @@ from ..diffusion.roi_segmentation import segment_streamlines_by_rois
 from ..diffusion.segmentation import segment_streamlines_by_atlas
 from ..diffusion.tracking import track_deterministic, track_probabilistic
 from ..diffusion.tract_profile import load_tract_streamlines, tract_profile
-from ..diffusion.transform import transform_streamlines_with_field
+from ..diffusion.transform import (
+    transform_streamlines_with_ants,
+    transform_streamlines_with_field,
+)
 from ..diffusion.external import (
     build_fsl_applytopup_command,
     build_fsl_applywarp_command,
@@ -152,6 +155,14 @@ def build_parser() -> argparse.ArgumentParser:
     transform.add_argument("--output", required=True)
     transform.add_argument("--zero-based", action="store_true")
     transform.set_defaults(handler=run_transform_tracts)
+
+    transform_ants = subparsers.add_parser("transform-tracts-ants", help="Transform streamlines with ANTs point transforms")
+    transform_ants.add_argument("--tracks", required=True)
+    transform_ants.add_argument("--reference", required=True)
+    transform_ants.add_argument("--transforms", nargs="+", required=True)
+    transform_ants.add_argument("--output", required=True)
+    transform_ants.add_argument("--use-inverse", type=int, default=1, choices=[0, 1])
+    transform_ants.set_defaults(handler=run_transform_tracts_ants)
 
     render = subparsers.add_parser("render-tracts", help="Render streamlines as HTML/SVG projections")
     render.add_argument("--tracks", required=True)
@@ -460,6 +471,23 @@ def run_transform_tracts(args: argparse.Namespace) -> int:
         source,
         reference,
         one_based=not args.zero_based,
+    )
+    sft = StatefulTractogram(transformed, reference, Space.RASMM)
+    save_tractogram(sft, args.output, bbox_valid_check=False)
+    print(args.output, len(transformed))
+    return 0
+
+
+def run_transform_tracts_ants(args: argparse.Namespace) -> int:
+    from dipy.io.stateful_tractogram import Space, StatefulTractogram
+    from dipy.io.streamline import save_tractogram
+
+    reference = nib.load(args.reference)
+    streamlines = load_tract_streamlines(args.tracks, reference)
+    transformed = transform_streamlines_with_ants(
+        streamlines,
+        [Path(transform) for transform in args.transforms],
+        use_inverse=args.use_inverse,
     )
     sft = StatefulTractogram(transformed, reference, Space.RASMM)
     save_tractogram(sft, args.output, bbox_valid_check=False)

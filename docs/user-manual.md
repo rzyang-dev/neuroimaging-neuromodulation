@@ -235,6 +235,12 @@ Outputs:
   --reference <MNI-template.nii> \
   --output <mni-tracks.trk>
 
+.venv/bin/nm-diffusion transform-tracts-ants \
+  --tracks <native-tracks.trk> \
+  --reference <native-T1.nii> \
+  --transforms <warp0GenericAffine.mat> <warp1Warp.nii.gz> \
+  --output <mni-tracks.trk>
+
 .venv/bin/nm-diffusion render-tracts \
   --tracks <tracks.trk> \
   --atlas <JHUtractsThr25_3mm.nii> \

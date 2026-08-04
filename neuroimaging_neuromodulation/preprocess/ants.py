@@ -101,6 +101,30 @@ def build_ants_apply_transform_command(
     return cmd
 
 
+def build_ants_apply_transforms_to_points_command(
+    input_csv: str | Path,
+    output_csv: str | Path,
+    transforms: list[str | Path],
+    *,
+    dimensionality: int = 3,
+    use_inverse: int = 1,
+) -> list[str]:
+    """Build an antsApplyTransformsToPoints command for streamline points."""
+
+    cmd = [
+        "antsApplyTransformsToPoints",
+        "-d",
+        str(dimensionality),
+        "-i",
+        str(input_csv),
+        "-o",
+        str(output_csv),
+    ]
+    for transform in transforms:
+        cmd += ["-t", f"[{transform},{use_inverse}]"]
+    return cmd
+
+
 def check_ants_tools() -> dict[str, dict[str, object]]:
     """Report ANTs binary availability."""
 
@@ -109,7 +133,7 @@ def check_ants_tools() -> dict[str, dict[str, object]]:
             "available": shutil.which(name) is not None,
             "path": shutil.which(name),
         }
-        for name in ("antsRegistration", "antsApplyTransforms")
+        for name in ("antsRegistration", "antsApplyTransforms", "antsApplyTransformsToPoints")
     }
 
 
@@ -155,10 +179,28 @@ def run_ants_apply_transform(
     )
 
 
+def run_ants_apply_transforms_to_points(
+    input_csv: str | Path,
+    output_csv: str | Path,
+    transforms: list[str | Path],
+    **kwargs: object,
+) -> dict[str, object]:
+    return _run(
+        build_ants_apply_transforms_to_points_command(
+            input_csv,
+            output_csv,
+            transforms,
+            **kwargs,
+        )
+    )
+
+
 __all__ = [
     "build_ants_apply_transform_command",
+    "build_ants_apply_transforms_to_points_command",
     "build_ants_registration_command",
     "check_ants_tools",
     "run_ants_apply_transform",
+    "run_ants_apply_transforms_to_points",
     "run_ants_registration",
 ]

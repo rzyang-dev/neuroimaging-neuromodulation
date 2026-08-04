@@ -53,7 +53,7 @@ document records the mapping from MATLAB functions to Python modules.
 | `AFQ_SegmentFiberGroups.m` | `diffusion/segmentation.py`, `diffusion/roi_segmentation.py`, `cli/diffusion.py` | ROI-based and atlas-based segmentation implemented; original spatial-normalization integration remains external |
 | `AFQ_removeFiberOutliers.m` | `diffusion/outliers.py`, `cli/diffusion.py` | Implemented as Python outlier cleaning with length and Mahalanobis distance criteria |
 | `AFQ_TrackAndSegmentOneSub.m` | `diffusion/afq.py`, `diffusion/transform.py`, `cli/diffusion.py` | Partial: subject-level atlas/ROI pipeline and streamline transforms implemented; validated SPM/ANTS normalization remains external |
-| `dtiXformFiberCoords.m` | `diffusion/transform.py`, `cli/diffusion.py` | Implemented as deformation-field streamline transform |
+| `dtiXformFiberCoords.m` | `diffusion/transform.py`, `cli/diffusion.py` | Implemented as deformation-field and ANTs point-based streamline transforms |
 | `ANTS_normalize.m` | `preprocess/ants.py`, `cli/preprocess.py` | Partial: ANTs command builders implemented; validated normalization remains external |
 | `TrackQC.m` | `wm/trackqc.py`, `cli/wm.py` | Partial: HTML QC and embedded 3D fiber viewer implemented; tract-to-NIfTI/Randomise workflow remains external |
 | `TractMS2Nii.m`, `TMSmerge.sh` | `wm/ms2nii.py`, `cli/wm.py` | Implemented Python-native per-subject NIfTI conversion, merged 4D output, and analysis mask |

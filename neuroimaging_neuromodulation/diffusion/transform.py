@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import tempfile
 from pathlib import Path
 
 import nibabel as nib
@@ -72,4 +73,52 @@ def transform_streamlines_with_field(
     return transformed
 
 
-__all__ = ["transform_streamlines_with_field"]
+def transform_streamlines_with_ants(
+    streamlines: list[np.ndarray],
+    transforms: list[str | Path],
+    *,
+    use_inverse: int = 1,
+) -> list[np.ndarray]:
+    """Transform streamlines with ANTs point transforms.
+
+    ANTs expects points in LPS coordinates, so RAS streamlines are converted
+    before running ``antsApplyTransformsToPoints`` and converted back after.
+    """
+
+    from ..preprocess.ants import run_ants_apply_transforms_to_points
+
+    rows = []
+    for streamline_index, streamline in enumerate(streamlines):
+        for point in np.asarray(streamline, dtype=float):
+            rows.append([-point[0], -point[1], point[2], streamline_index])
+    if not rows:
+        return []
+    with tempfile.TemporaryDirectory() as tmp:
+        input_csv = Path(tmp) / "points.csv"
+        output_csv = Path(tmp) / "points_out.csv"
+        np.savetxt(
+            input_csv,
+            np.asarray(rows, dtype=float),
+            delimiter=",",
+            header="x,y,z,t",
+            comments="",
+        )
+        run_ants_apply_transforms_to_points(
+            input_csv,
+            output_csv,
+            transforms,
+            use_inverse=use_inverse,
+        )
+        transformed_data = np.loadtxt(output_csv, delimiter=",", skiprows=1)
+        if transformed_data.ndim == 1:
+            transformed_data = transformed_data.reshape(1, -1)
+    transformed: list[np.ndarray] = []
+    for streamline_index in range(len(streamlines)):
+        points = transformed_data[transformed_data[:, 3] == streamline_index, :3].copy()
+        points[:, 0] *= -1.0
+        points[:, 1] *= -1.0
+        transformed.append(points)
+    return transformed
+
+
+__all__ = ["transform_streamlines_with_ants", "transform_streamlines_with_field"]

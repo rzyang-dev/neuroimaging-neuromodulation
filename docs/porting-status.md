@@ -69,6 +69,8 @@ noted limitations:
 - HTML/SVG streamline rendering with axial, coronal, and sagittal projections
 - Interactive HTML/WebGL 3D streamline viewer through `nm-diffusion
   render-tracts-3d`
+- ANTs point-based streamline transformation through `nm-diffusion
+  transform-tracts-ants`
 - AFQ-style group profile plots and per-node profile statistics
 - FSL/MRtrix command builders for BET, eddy correction, FA/T1 transforms,
   native/MNI transforms, topup, bedpostx, dtifit, probtrackx, and tckgen
@@ -82,8 +84,7 @@ noted limitations:
 
 ### White-matter and AFQ workflows
 
-- Validated ANTs integration and TrackQC statistical workflow integration for
-  AFQ segmentation
+- Full AFQ tract segmentation with validated ANTs SyN integration
 
 ### T1 target workflows
 
@@ -92,7 +93,7 @@ noted limitations:
 
 ### Diffusion preprocessing and full tractography workflow
 
-- Full AFQ tract segmentation with validated ANTs integration
+- Full AFQ tract segmentation with validated ANTs SyN integration
 
 ### SPM/DARTEL-equivalent preprocessing
 
@@ -123,7 +124,7 @@ noted limitations:
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 3/3 pass, including a
   real-template registration/apply integration test
-- Local test suite: `149 tests collected` and passing
+- Local test suite: `151 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently

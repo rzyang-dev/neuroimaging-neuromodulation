@@ -56,6 +56,8 @@ Tests are grouped by responsibility:
   deformation fields on real templates.
 - `test_fsl_normalization_execution.py` runs FSL FNIRT on real templates when
   FSL is installed.
+- `test_streamline_transform.py` and `test_ants_execution.py` verify ANTs
+  point-based streamline transformation.
 - `test_pipeline.py` verifies a config-driven real-data pipeline.
 - `test_validation.py` verifies image and deformation validation metrics.
 - `test_external.py` verifies FSL/MRtrix command builders and missing-binary
@@ -73,13 +75,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-149 tests collected and passing
+151 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-149 tests collected and passing
+151 tests collected and passing
 ```
 
 The test command is:
