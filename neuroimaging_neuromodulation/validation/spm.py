@@ -11,7 +11,8 @@ import nibabel as nib
 import numpy as np
 
 from ..io.deformations import apply_deformation
-from ..io.nifti import load_volume
+from ..io.nifti import load_volume, resample_to_grid
+from ..deformations.estimate import estimate_deformation
 from ..preprocess.motion import affine_registration_pipeline, affine_to_rp
 from ..preprocess.temporal import apply_motion_parameters
 from .metrics import compare_volumes
@@ -442,6 +443,73 @@ def validate_coreg_against_spm(
     }
 
 
+def _resample_deformation_field(
+    field_path: str | Path,
+    target_image: str | Path,
+) -> np.ndarray:
+    img, data = load_volume(field_path)
+    if data.ndim == 5:
+        data = data[..., 0, :]
+    if data.ndim != 4 or data.shape[3] != 3:
+        raise ValueError(f"Expected a deformation field: {field_path}")
+    target_img = nib.load(str(target_image))
+    channels = []
+    for channel in range(3):
+        volume = nib.Nifti1Image(data[..., channel].astype(np.float32), img.affine)
+        _resampled, resampled_data = resample_to_grid(volume, target_img, order=1)
+        channels.append(resampled_data)
+    return np.stack(channels, axis=-1)
+
+
+def validate_normalization_against_spm(
+    moving_image: str | Path,
+    static_image: str | Path,
+    output_dir: str | Path,
+    *,
+    spm_exe: Path | None = None,
+    timeout: int = 1800,
+) -> dict[str, object]:
+    """Compare SPM and DIPY normalization deformation fields on real data."""
+
+    output_dir = Path(output_dir)
+    spm_result = run_spm_segmentation(
+        moving_image,
+        output_dir / "spm",
+        spm_exe=spm_exe,
+        timeout=timeout,
+    )
+    dipy_result = estimate_deformation(
+        moving_image,
+        static_image,
+        output_dir / "dipy",
+        metric="CC",
+        level_iters=(2, 1, 1),
+        step_length=0.25,
+    )
+    spm_field = _resample_deformation_field(Path(spm_result["y_field"]), static_image)
+    dipy_field = _resample_deformation_field(Path(dipy_result["y_field"]), static_image)
+    columns = ["x", "y", "z"]
+    correlations: list[float] = []
+    mae: list[float] = []
+    rmse: list[float] = []
+    for channel in range(3):
+        reference = spm_field[..., channel].ravel()
+        test = dipy_field[..., channel].ravel()
+        mask = np.isfinite(reference) & np.isfinite(test)
+        correlations.append(float(np.corrcoef(reference[mask], test[mask])[0, 1]))
+        mae.append(float(np.mean(np.abs(reference[mask] - test[mask]))))
+        rmse.append(float(np.sqrt(np.mean((reference[mask] - test[mask]) ** 2))))
+    return {
+        "spm_y_field": spm_result["y_field"],
+        "dipy_y_field": dipy_result["y_field"],
+        "columns": columns,
+        "correlations": correlations,
+        "mae": mae,
+        "rmse": rmse,
+        "field_shape": dipy_field.shape,
+    }
+
+
 def run_spm_segmentation(
     t1_path: str | Path,
     output_dir: str | Path,
@@ -542,6 +610,7 @@ __all__ = [
     "run_spm_segmentation",
     "run_spm_realign",
     "validate_coreg_against_spm",
+    "validate_normalization_against_spm",
     "validate_spm_deformation_convention",
     "validate_motion_against_spm",
     "write_coreg_batch",

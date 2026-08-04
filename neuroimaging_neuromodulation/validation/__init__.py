@@ -7,6 +7,7 @@ from .spm import (
     run_spm_segmentation,
     run_spm_realign,
     validate_coreg_against_spm,
+    validate_normalization_against_spm,
     validate_spm_deformation_convention,
     validate_motion_against_spm,
 )
@@ -19,6 +20,7 @@ __all__ = [
     "run_spm_realign",
     "validate_coreg_against_spm",
     "validate_deformation",
+    "validate_normalization_against_spm",
     "validate_spm_deformation_convention",
     "validate_motion_against_spm",
 ]

@@ -97,7 +97,7 @@ noted limitations:
 ### SPM/DARTEL-equivalent preprocessing
 
 - DARTEL-grade segmentation
-- SPM/FSL normalization reference comparisons
+- FSL normalization reference comparisons
 
 ## Verification Evidence
 
@@ -117,10 +117,12 @@ noted limitations:
   column correlation > 0.59)
 - FSL Randomise execution test passes in the WSL dev environment on
   2026-08-04 with a small 4D input and analysis mask
+- SPM normalization reference validation on 2026-08-04: DIPY deformation
+  fields agree with SPM on real templates (minimum correlation > 0.99)
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 3/3 pass, including a
   real-template registration/apply integration test
-- Local test suite: `146 tests collected` and passing
+- Local test suite: `147 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently
@@ -133,9 +135,9 @@ complete.
 
 As of 2026-08-04 the external runtimes below are installed and usable for
 reference/comparison work. The execution tests were run for the first time on
-2026-08-04; SPM `y_`/`iy_` convention, realignment, and coregistration
-reference comparisons are now implemented, while DARTEL-grade normalization
-and FSL normalization comparisons are still not implemented:
+2026-08-04; SPM `y_`/`iy_` convention, realignment, coregistration, and
+normalization reference comparisons are now implemented, while DARTEL-grade
+parity and FSL normalization comparisons are still not implemented:
 
 - MATLAB R2015b and SPM standalone 25.01.02 are installed on Windows
   (`C:\Program Files\MATLAB\R2015b\bin`,
@@ -164,7 +166,7 @@ and FSL normalization comparisons are still not implemented:
   in any WebGL-capable browser.
 
 The Python-native port is substantially implemented, and SPM `y_`/`iy_`
-world-coordinate convention, realignment, and coregistration reference
-validation now pass against SPM25. DARTEL-grade normalization and FSL
+world-coordinate convention, realignment, coregistration, and normalization
+reference validation now pass against SPM25. DARTEL-grade parity and FSL
 normalization comparisons remain unproven. ANTs execution tests pass (3/3);
 FSL/MRtrix execution smoke tests pass (3/3) as of 2026-08-04.
