@@ -104,6 +104,22 @@ def test_fsl_transform_command_builders(tmp_path: Path) -> None:
     assert topup[0] == "topup"
 
 
+def test_fsl_randomise_command_builders(tmp_path: Path) -> None:
+    design = external.build_fsl_design_ttest2_command(tmp_path / "design", 3, 4)
+    assert design == ["design_ttest2", str(tmp_path / "design"), "3", "4"]
+    randomise = external.build_fsl_randomise_command(
+        tmp_path / "merged4d.nii.gz",
+        tmp_path / "diff",
+        tmp_path / "mask.nii.gz",
+        tmp_path / "design.mat",
+        tmp_path / "design.con",
+        n_permutations=100,
+    )
+    assert randomise[0] == "randomise"
+    assert "-T" in randomise
+    assert "-n" in randomise
+
+
 def test_missing_binary_raises(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setattr(external.shutil, "which", lambda _name: None)
     with pytest.raises(RuntimeError, match="not found"):

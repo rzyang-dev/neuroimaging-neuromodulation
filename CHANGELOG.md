@@ -54,6 +54,8 @@
   reports.
 - Added Python-native `nm-wm tract-ms2nii` for tract-measure NIfTI conversion,
   merged 4D images, and analysis masks.
+- Added FSL `design_ttest2`/`randomise` command builders and the `nm-wm
+  randomise` workflow.
 - Added FSL command pipelines for BET, eddy correction, FA/T1 transforms,
   native/MNI transforms, and topup.
 - Added group-statistics commands for correlation comparison, chi-square,
@@ -61,7 +63,7 @@
 - Added reslice, detrend, merge-images, concatenate-sessions, combine-images,
   timepoint-count, text-to-nifti, and directory-of-3D signal-extraction
   commands.
-- Expanded tests from 74 to 142 collected/passing tests.
+- Expanded tests from 74 to 144 collected/passing tests.
 
 ## 0.18.0 - 2026-08-03
 

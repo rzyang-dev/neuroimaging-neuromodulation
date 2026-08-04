@@ -614,6 +614,14 @@ directly.
   --subject-names subject1 subject2 \
   --n-tracts 18 \
   --output-dir <randomise-input>
+
+.venv/bin/nm-wm randomise \
+  --input <merged4d.nii.gz> \
+  --mask <mask.nii.gz> \
+  --output-prefix <diff> \
+  --n-group1 30 \
+  --n-group2 30 \
+  --n-permutations 5000
 ```
 
 ### Head-motion QC and c6 mask

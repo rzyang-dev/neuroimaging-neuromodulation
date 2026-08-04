@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from neuroimaging_neuromodulation.cli.wm import main
 from neuroimaging_neuromodulation.io.nifti import load_volume, resample_to_grid, save_volume
 from neuroimaging_neuromodulation.targets.roi import sphere_roi
 from neuroimaging_neuromodulation.wm.alff import compute_alff
@@ -140,3 +141,27 @@ def test_group_probability_maps(package_data_dir: Path, tmp_path: Path) -> None:
     )
     assert output.exists()
     assert set(np.unique(result)) <= {0.0, 1.0}
+
+
+def test_randomise_cli_dry_run(tmp_path: Path) -> None:
+    assert (
+        main(
+            [
+                "randomise",
+                "--input",
+                str(tmp_path / "merged4d.nii.gz"),
+                "--mask",
+                str(tmp_path / "mask.nii.gz"),
+                "--output-prefix",
+                str(tmp_path / "diff"),
+                "--n-group1",
+                "3",
+                "--n-group2",
+                "4",
+                "--n-permutations",
+                "100",
+                "--dry-run",
+            ]
+        )
+        == 0
+    )

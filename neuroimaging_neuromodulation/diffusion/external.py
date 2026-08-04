@@ -311,6 +311,53 @@ def build_fsl_applytopup_command(
     ]
 
 
+def build_fsl_design_ttest2_command(
+    output_prefix: str | Path,
+    n_group1: int,
+    n_group2: int,
+) -> list[str]:
+    """Build the FSL ``design_ttest2`` command for two-group Randomise."""
+
+    return [
+        "design_ttest2",
+        str(output_prefix),
+        str(n_group1),
+        str(n_group2),
+    ]
+
+
+def build_fsl_randomise_command(
+    input_4d: str | Path,
+    output_prefix: str | Path,
+    mask: str | Path,
+    design_mat: str | Path,
+    design_con: str | Path,
+    *,
+    n_permutations: int = 5000,
+    tfce: bool = True,
+) -> list[str]:
+    """Build an FSL Randomise command from the original two-sample workflow."""
+
+    cmd = [
+        "randomise",
+        "-i",
+        str(input_4d),
+        "-o",
+        str(output_prefix),
+        "-m",
+        str(mask),
+        "-d",
+        str(design_mat),
+        "-t",
+        str(design_con),
+        "-n",
+        str(n_permutations),
+    ]
+    if tfce:
+        cmd.append("-T")
+    return cmd
+
+
 def _run(cmd: list[str]) -> dict[str, object]:
     binary = cmd[0]
     require_binary(binary, f"Install {binary} and add it to PATH before using this command.")
@@ -446,6 +493,34 @@ def run_fsl_applytopup(
     return _run(build_fsl_applytopup_command(imain, inindex, datain, topup_prefix, output_image))
 
 
+def run_fsl_design_ttest2(
+    output_prefix: str | Path,
+    n_group1: int,
+    n_group2: int,
+) -> dict[str, object]:
+    return _run(build_fsl_design_ttest2_command(output_prefix, n_group1, n_group2))
+
+
+def run_fsl_randomise(
+    input_4d: str | Path,
+    output_prefix: str | Path,
+    mask: str | Path,
+    design_mat: str | Path,
+    design_con: str | Path,
+    **kwargs: object,
+) -> dict[str, object]:
+    return _run(
+        build_fsl_randomise_command(
+            input_4d,
+            output_prefix,
+            mask,
+            design_mat,
+            design_con,
+            **kwargs,
+        )
+    )
+
+
 __all__ = [
     "build_fsl_applytopup_command",
     "build_fsl_applywarp_command",
@@ -453,11 +528,13 @@ __all__ = [
     "build_fsl_bet_command",
     "build_fsl_convert_xfm_command",
     "build_fsl_dtifit_command",
+    "build_fsl_design_ttest2_command",
     "build_fsl_eddy_correct_command",
     "build_fsl_flirt_command",
     "build_fsl_fnirt_command",
     "build_fsl_invwarp_command",
     "build_fsl_probtrackx_command",
+    "build_fsl_randomise_command",
     "build_fsl_topup_command",
     "build_mrtrix_tckgen_command",
     "check_external_tools",
@@ -466,11 +543,13 @@ __all__ = [
     "run_fsl_applytopup",
     "run_fsl_applywarp",
     "run_fsl_dtifit",
+    "run_fsl_design_ttest2",
     "run_fsl_eddy_correct",
     "run_fsl_flirt",
     "run_fsl_fnirt",
     "run_fsl_invwarp",
     "run_fsl_probtrackx",
+    "run_fsl_randomise",
     "run_fsl_topup",
     "run_mrtrix_tckgen",
 ]

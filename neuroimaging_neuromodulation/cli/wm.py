@@ -120,6 +120,18 @@ def build_parser() -> argparse.ArgumentParser:
     ms2nii.add_argument("--output-dir", required=True)
     ms2nii.set_defaults(handler=run_tract_ms2nii)
 
+    randomise = subparsers.add_parser("randomise", help="Run FSL two-sample Randomise workflow")
+    randomise.add_argument("--input", required=True, help="Merged 4D NIfTI")
+    randomise.add_argument("--mask", required=True, help="Analysis mask NIfTI")
+    randomise.add_argument("--output-prefix", required=True)
+    randomise.add_argument("--n-group1", type=int, required=True)
+    randomise.add_argument("--n-group2", type=int, required=True)
+    randomise.add_argument("--design-prefix", default=None)
+    randomise.add_argument("--n-permutations", type=int, default=5000)
+    randomise.add_argument("--no-tfce", action="store_true")
+    randomise.add_argument("--dry-run", action="store_true")
+    randomise.set_defaults(handler=run_randomise)
+
     return parser
 
 
@@ -275,6 +287,49 @@ def run_tract_ms2nii(args: argparse.Namespace) -> int:
         print(subject_path)
     print(result["merged"])
     print(result["mask"])
+    return 0
+
+
+def run_randomise(args: argparse.Namespace) -> int:
+    from ..diffusion.external import (
+        build_fsl_design_ttest2_command,
+        build_fsl_randomise_command,
+        run_fsl_design_ttest2,
+        run_fsl_randomise,
+    )
+
+    design_prefix = args.design_prefix or str(Path(args.output_prefix).parent / "design")
+    design_mat = f"{design_prefix}.mat"
+    design_con = f"{design_prefix}.con"
+    design_cmd = build_fsl_design_ttest2_command(
+        design_prefix,
+        args.n_group1,
+        args.n_group2,
+    )
+    randomise_cmd = build_fsl_randomise_command(
+        args.input,
+        args.output_prefix,
+        args.mask,
+        design_mat,
+        design_con,
+        n_permutations=args.n_permutations,
+        tfce=not args.no_tfce,
+    )
+    if args.dry_run:
+        print(" ".join(design_cmd))
+        print(" ".join(randomise_cmd))
+        return 0
+    run_fsl_design_ttest2(design_prefix, args.n_group1, args.n_group2)
+    run_fsl_randomise(
+        args.input,
+        args.output_prefix,
+        args.mask,
+        design_mat,
+        design_con,
+        n_permutations=args.n_permutations,
+        tfce=not args.no_tfce,
+    )
+    print(args.output_prefix)
     return 0
 
 

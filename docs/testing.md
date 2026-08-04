@@ -48,6 +48,8 @@ Tests are grouped by responsibility:
   fiber viewer.
 - `test_tract_ms2nii.py` verifies per-subject NIfTI conversion, merged 4D
   output, and the analysis mask.
+- `test_external.py` and `test_wm.py` verify the FSL `design_ttest2`/Randomise
+  command builders and CLI dry-run path.
 - `test_pipeline.py` verifies a config-driven real-data pipeline.
 - `test_validation.py` verifies image and deformation validation metrics.
 - `test_external.py` verifies FSL/MRtrix command builders and missing-binary
@@ -65,13 +67,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-142 tests collected and passing
+144 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-142 tests collected and passing
+144 tests collected and passing
 ```
 
 The test command is:

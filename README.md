@@ -104,6 +104,8 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - HTML tract QC reports can embed the interactive 3D fiber viewer
 - Python-native tract-measure NIfTI conversion and Randomise-style merged 4D
   outputs through `nm-wm tract-ms2nii`
+- FSL `design_ttest2`/`randomise` workflow integration through `nm-wm
+  randomise`
 
 ## What Is Not Included
 
