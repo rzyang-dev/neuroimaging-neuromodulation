@@ -40,6 +40,8 @@ Tests are grouped by responsibility:
   20-channel JHU tract probability atlas.
 - `test_spm_motion_reference.py` verifies DIPY motion estimates against SPM25
   realignment on real fMRI.
+- `test_spm_coreg_reference.py` verifies DIPY rigid coregistration against
+  SPM25 on known real-image shifts.
 - `test_pipeline.py` verifies a config-driven real-data pipeline.
 - `test_validation.py` verifies image and deformation validation metrics.
 - `test_external.py` verifies FSL/MRtrix command builders and missing-binary
@@ -57,13 +59,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-137 tests collected and passing
+138 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-137 tests collected and passing
+138 tests collected and passing
 ```
 
 The test command is:
@@ -145,6 +147,9 @@ Verified against the installed binaries:
 - `tests/test_spm_motion_reference.py` (Windows, `.venv-win`, SPM25
   standalone): **1/1 pass**. DIPY motion estimates agree with SPM after
   sign-convention alignment.
+- `tests/test_spm_coreg_reference.py` (Windows, `.venv-win`, SPM25
+  standalone): **1/1 pass**. DIPY rigid coregistration agrees with SPM on
+  known real-image shifts.
 - `tests/test_external_execution.py` (WSL, `~/nm-dev-venv` on `~/nm-src`,
   with `fsl.sh` sourced): **3/3 pass**
   - `test_fsl_eddy_correct_execution`: pass.

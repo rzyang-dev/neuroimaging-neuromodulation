@@ -13,6 +13,7 @@ import numpy as np
 from ..io.deformations import apply_deformation
 from ..io.nifti import load_volume
 from ..preprocess.motion import affine_registration_pipeline, affine_to_rp
+from ..preprocess.temporal import apply_motion_parameters
 from .metrics import compare_volumes
 
 DEFAULT_SPM25_EXE = Path(
@@ -277,6 +278,170 @@ def validate_motion_against_spm(
     }
 
 
+def write_coreg_batch(
+    reference_path: Path,
+    moving_path: Path,
+    batch_path: Path,
+) -> Path:
+    """Write an SPM coregister-estimate batch."""
+
+    batch_path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        f"matlabbatch{{1}}.spm.spatial.coreg.estimate.ref = {{{_matlab_volume(reference_path, 1)}}};",
+        f"matlabbatch{{1}}.spm.spatial.coreg.estimate.source = {{{_matlab_volume(moving_path, 1)}}};",
+        "matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.cost_fun = 'nmi';",
+        "matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.sep = [4 2];",
+        "matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.tol = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.001 0.001];",
+        "matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.fwhm = [7 7];",
+    ]
+    batch_path.write_text("\n".join(lines) + "\n", encoding="ascii")
+    return batch_path
+
+
+def run_spm_coreg(
+    reference_path: str | Path,
+    moving_path: str | Path,
+    output_dir: str | Path,
+    *,
+    spm_exe: Path | None = None,
+    timeout: int = 1800,
+) -> dict[str, object]:
+    """Run SPM25 coregistration and recover the estimated affine matrix."""
+
+    exe = spm_exe or find_spm25()
+    if exe is None:
+        raise RuntimeError("SPM25 standalone executable not found")
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    work_ref = output_dir / "spm_ref.nii"
+    work_moving = output_dir / "spm_moving.nii"
+    ref_img = nib.load(str(reference_path))
+    moving_img = nib.load(str(moving_path))
+    old_affine = np.asarray(moving_img.affine, dtype=float).copy()
+    nib.save(ref_img, work_ref)
+    nib.save(moving_img, work_moving)
+    batch_path = write_coreg_batch(work_ref, work_moving, output_dir / "coreg_batch.m")
+    completed = subprocess.run(
+        [str(exe), "batch", str(batch_path), "--silent"],
+        cwd=str(output_dir),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=timeout,
+        check=False,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            f"SPM coreg failed with exit code {completed.returncode}:\n"
+            f"{completed.stdout}\n{completed.stderr}"
+        )
+    new_affine = np.asarray(nib.load(work_moving).affine, dtype=float)
+    matrix = old_affine @ np.linalg.inv(new_affine)
+    return {
+        "returncode": completed.returncode,
+        "stdout": completed.stdout,
+        "stderr": completed.stderr,
+        "output_dir": output_dir,
+        "reference": work_ref,
+        "moving": work_moving,
+        "old_affine": old_affine,
+        "new_affine": new_affine,
+        "matrix": matrix,
+    }
+
+
+def validate_coreg_against_spm(
+    static_image: str | Path,
+    output_dir: str | Path,
+    *,
+    shifts: tuple[tuple[float, float, float, float, float, float], ...] = (
+        (4.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+        (0.0, 5.0, 0.0, 0.0, 0.0, 0.0),
+        (0.0, 0.0, 3.0, 0.0, 0.0, 0.0),
+        (-2.0, 2.0, 1.0, 0.0, 0.0, 0.0),
+    ),
+    spm_exe: Path | None = None,
+    timeout: int = 1800,
+) -> dict[str, object]:
+    """Compare DIPY coregistration with SPM25 on known rigid shifts."""
+
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    img = nib.load(str(static_image))
+    data = np.asanyarray(img.dataobj)
+    if data.ndim == 4:
+        data = data[..., 0]
+    if data.ndim != 3:
+        raise ValueError("static_image must be 3D or a 4D series")
+    static = data.astype(np.float32)
+    spm_affines = []
+    dipy_affines = []
+    warped_correlations = []
+    for index, shift in enumerate(shifts):
+        case_dir = output_dir / f"case_{index + 1:02d}"
+        case_dir.mkdir(parents=True, exist_ok=True)
+        moving = apply_motion_parameters(
+            static[..., None],
+            np.array([shift], dtype=float),
+            img.affine,
+            inverse=False,
+        )[..., 0].astype(np.float32)
+        moving_path = case_dir / "moving.nii"
+        static_path = case_dir / "reference.nii"
+        nib.Nifti1Image(moving, img.affine).to_filename(moving_path)
+        nib.Nifti1Image(static, img.affine).to_filename(static_path)
+        spm_result = run_spm_coreg(static_path, moving_path, case_dir, spm_exe=spm_exe, timeout=timeout)
+        dipy_resampled, dipy_affine = affine_registration_pipeline(
+            moving,
+            static,
+            moving_affine=img.affine,
+            static_affine=img.affine,
+            pipeline=("translation", "rigid"),
+            level_iters=(5, 2, 1),
+            optimizer_options={"maxiter": 10},
+        )
+        spm_affines.append(np.asarray(spm_result["matrix"], dtype=float))
+        dipy_affines.append(np.asarray(dipy_affine, dtype=float))
+        correlation = np.corrcoef(dipy_resampled.ravel(), static.ravel())[0, 1]
+        warped_correlations.append(float(correlation))
+    spm_rp = np.vstack([affine_to_rp(affine) for affine in spm_affines])
+    dipy_rp = np.vstack([affine_to_rp(affine) for affine in dipy_affines])
+    columns = ["tx", "ty", "tz", "rx", "ry", "rz"]
+    correlations: list[float] = []
+    mae: list[float] = []
+    aligned_dipy_rp = dipy_rp.copy()
+    sign_flipped: list[bool] = []
+    for index in range(6):
+        correlation = float(np.corrcoef(dipy_rp[:, index], spm_rp[:, index])[0, 1])
+        if correlation < 0:
+            aligned_dipy_rp[:, index] *= -1.0
+            sign_flipped.append(True)
+            correlation = abs(correlation)
+        else:
+            sign_flipped.append(False)
+        correlations.append(correlation)
+        mae.append(float(np.mean(np.abs(dipy_rp[:, index] - spm_rp[:, index]))))
+    aligned_mae = [
+        float(np.mean(np.abs(aligned_dipy_rp[:, index] - spm_rp[:, index])))
+        for index in range(6)
+    ]
+    return {
+        "n_cases": len(shifts),
+        "shifts": list(shifts),
+        "columns": columns,
+        "spm_rp": spm_rp,
+        "dipy_rp": dipy_rp,
+        "aligned_dipy_rp": aligned_dipy_rp,
+        "correlations": correlations,
+        "aligned_correlations": correlations,
+        "mae": mae,
+        "aligned_mae": aligned_mae,
+        "sign_flipped": sign_flipped,
+        "warped_correlations": warped_correlations,
+    }
+
+
 def run_spm_segmentation(
     t1_path: str | Path,
     output_dir: str | Path,
@@ -373,10 +538,13 @@ def validate_spm_deformation_convention(
 __all__ = [
     "find_spm25",
     "find_tpm_dir",
+    "run_spm_coreg",
     "run_spm_segmentation",
     "run_spm_realign",
+    "validate_coreg_against_spm",
     "validate_spm_deformation_convention",
     "validate_motion_against_spm",
+    "write_coreg_batch",
     "write_segment_batch",
     "write_realign_batch",
 ]

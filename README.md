@@ -35,6 +35,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - Text-to-NIfTI conversion for tract-matrix output workflows
 - Rigid motion-parameter estimation through DIPY
 - SPM25-validated motion parameter reference comparison
+- SPM25-validated rigid coregistration reference comparison
 - DIPY-based volume coregistration
 - DTI fitting, deterministic tractography, and seed-target structural
   connectivity through `nm-diffusion`

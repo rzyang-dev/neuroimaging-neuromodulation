@@ -46,6 +46,8 @@
 - Added a real-template ANTs registration/apply integration execution test.
 - Added SPM25 realignment reference validation against the DIPY motion
   estimator.
+- Added SPM25 coregistration reference validation against DIPY rigid
+  registration.
 - Added FSL command pipelines for BET, eddy correction, FA/T1 transforms,
   native/MNI transforms, and topup.
 - Added group-statistics commands for correlation comparison, chi-square,
@@ -53,7 +55,7 @@
 - Added reslice, detrend, merge-images, concatenate-sessions, combine-images,
   timepoint-count, text-to-nifti, and directory-of-3D signal-extraction
   commands.
-- Expanded tests from 74 to 137 collected/passing tests.
+- Expanded tests from 74 to 138 collected/passing tests.
 
 ## 0.18.0 - 2026-08-03
 

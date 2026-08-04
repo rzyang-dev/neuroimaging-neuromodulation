@@ -28,8 +28,7 @@ and what remains before the package can be called production-ready.
 - [x] DICOM series selection by index in `nm-dicom` and `nm-pipeline`
 - [x] fMRI preprocessing primitives: slice timing, motion, coregistration,
   smoothing, filtering, left-right flipping
-- [x] SPM motion parameter reference comparison (coregistration comparison
-  remains pending)
+- [x] SPM motion and coregistration reference comparisons
 - [x] Seed-based FC, ALFF/fALFF, nuisance regression
 - [x] ROI, depth, target-site, largest-cluster target selection primitives
 - [x] Individualized target-mask workflow exposed through CLI and pipeline
@@ -48,7 +47,7 @@ and what remains before the package can be called production-ready.
 
 ## Verification
 
-- [x] `137` automated tests pass locally
+- [x] `138` automated tests pass locally
 - [ ] Tests prove numerical equivalence to original MATLAB/SPM/FSL workflows
 - [ ] Tests cover missing workflows listed in `docs/porting-status.md`
 - [x] Tests use real public fMRI, diffusion, DICOM, T1, template, and mask data
