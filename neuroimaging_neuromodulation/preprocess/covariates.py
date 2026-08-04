@@ -18,7 +18,11 @@ def friston24(motion_parameters: np.ndarray) -> np.ndarray:
 
 
 def extract_signal(data: np.ndarray, mask: np.ndarray) -> np.ndarray:
-    """Extract the mean signal inside ``mask`` from a voxel-by-time matrix."""
+    """Extract the mean nonzero signal inside ``mask`` from voxel-by-time data.
+
+    The original ``TMSextract.m`` computes ``mean(mask * signal)`` over
+    nonzero values, so zero-valued voxels inside the mask are excluded.
+    """
 
     data = np.asarray(data, dtype=float)
     mask = np.asarray(mask, dtype=bool).reshape(-1)
@@ -26,7 +30,12 @@ def extract_signal(data: np.ndarray, mask: np.ndarray) -> np.ndarray:
         raise ValueError("Mask length does not match the number of voxels")
     if not mask.any():
         raise ValueError("Mask is empty")
-    return np.nanmean(data[mask, :], axis=0)
+    selected = np.asarray(data[mask, :], dtype=float)
+    selected[selected == 0] = np.nan
+    valid = np.isfinite(selected)
+    counts = np.sum(valid, axis=0)
+    sums = np.nansum(selected, axis=0)
+    return np.where(counts > 0, sums / np.maximum(counts, 1), np.nan)
 
 
 def design_matrix(

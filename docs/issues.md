@@ -4,10 +4,9 @@
 
 1. SPM/DARTEL-compatible normalization is not fully reproduced.
 
-   This package can apply existing inverse deformation fields and estimate
-   nonlinear mappings with DIPY. It now emits SPM-style `y_ac_coT1.nii` and
-   `iy_ac_coT1.nii` fields in the documented 1-based convention, but exact
-   SPM/DARTEL numerical compatibility is not guaranteed.
+   This package can apply SPM world-coordinate `y_`/`iy_` fields and emits
+   matching DIPY-derived fields, but exact SPM/DARTEL numerical compatibility
+   is not guaranteed.
 
 2. Vendor-specific DICOM edge cases may require manual review.
 
@@ -18,8 +17,9 @@
 3. Tissue segmentation is approximate and not DARTEL-grade.
 
    Atlas-guided GM/WM/CSF probability estimation is implemented for common T1
-   data. Validated SPM/DARTEL segmentation remains recommended for clinical or
-   publication-grade normalization.
+   data. SPM25 standalone can be used optionally for SPM segmentation and
+   `y_`/`iy_` field generation, but the Python-native atlas path remains an
+   approximation.
 
 4. FSL BEDPOSTX-based probabilistic tractography is optional.
 
@@ -30,8 +30,36 @@
 
 5. The GUI is optional and not tested in headless CI.
 
-6. Deformation-field support currently targets SPM-style inverse fields
-   (`iy_*.nii`). Forward `y_*.nii` fields are not inverted automatically.
+6. Deformation fields use SPM's world-coordinate convention. `y_*.nii` is the
+   template-to-native pullback field, `iy_*.nii` is the native-to-template
+   forward field, and legacy 1-based voxel fields remain available through
+   `coordinate_system="voxel"`.
+
+7. The migration is partial, not a full port of the original MATLAB toolbox.
+
+   Missing workflows now include full AFQ tract profiles/plots/statistics,
+   TrackQC, and full SPM/DARTEL-compatible segmentation/normalization. See
+   `docs/porting-status.md`.
+
+8. The individualized target-mask path is exposed through `nm-tms seed-fc` and
+   `nm-pipeline`, but not yet integrated into the desktop apps.
+
+9. Fixed: `bandpass_filter` now disambiguates orientation from the supplied
+   mask length, with an explicit `voxel_major` override.
+
+10. Fixed: `extract_signal` now follows `TMSextract.m` by averaging only
+    nonzero masked signal values.
+
+11. Fixed: the end-user app's DICOM folder choice now changes Browse to a
+    directory picker.
+
+12. Fixed: `nm-pipeline` and `nm-dicom` now support selecting DICOM series by
+    index; the old first-NIfTI behavior remains only when no index is supplied.
+
+13. Fixed: external-execution tests for FSL/MRtrix now pass 3/3 against the
+    installed WSL binaries on 2026-08-04. FSL `eddy_correct` and BET pass on a
+    realistic ellipsoid fixture, and MRtrix `tckgen` passes with the required
+    `-seed_image` source. ANTs execution tests pass 2/2 on Windows.
 
 ## Data Issues
 
@@ -43,8 +71,5 @@
 
 ## Recommended Next Work
 
-- Validate estimated `y_*.nii` / `iy_*.nii` fields against SPM/DARTEL output on
-  a shared reference dataset.
 - Add validated DARTEL-compatible normalization integration.
-- Validate FSL/MRtrix wrapper commands against installed binary versions.
 - Add an HTML or web report for target coordinates and QC images.

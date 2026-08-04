@@ -31,7 +31,7 @@ def test_validate_deformation_real_data(tmp_path: Path) -> None:
     )
     result = validate_deformation(
         t1,
-        paths["iy_field"],
+        paths["y_field"],
         paths["warped_moving"],
         order=1,
         output_json=tmp_path / "validation.json",

@@ -18,10 +18,10 @@ def _coordinates_from_mapping(
     world2coord: np.ndarray,
     direction: str = "forward",
 ) -> np.ndarray:
-    """Sample DIPY mapping coordinates on a grid and make them 1-based."""
+    """Sample DIPY mapping coordinates on a grid and return voxel coordinates."""
 
     grid = np.indices(shape, dtype=np.float32)
-    points = np.moveaxis(grid, 0, -1).reshape(-1, 3)
+    points = grid.reshape(3, -1).T
     if direction == "forward":
         coords = mapping._warp_coordinates_forward(
             points,
@@ -36,7 +36,7 @@ def _coordinates_from_mapping(
         )
     else:
         raise ValueError("direction must be 'forward' or 'backward'")
-    return coords.reshape((*shape, 3)).astype(np.float32) + 1.0
+    return coords.reshape((*shape, 3)).astype(np.float32)
 
 
 def estimate_deformation(
@@ -50,9 +50,11 @@ def estimate_deformation(
 ) -> dict[str, Path]:
     """Estimate a nonlinear mapping and write DIPY + coordinate-field outputs.
 
-    The coordinate field is in the same 1-based SPM-style convention used by
-    ``apply_deformation``, so it can be passed directly to target and seed
-    resampling commands.
+    The coordinate field uses SPM's world-coordinate convention, so it can be
+    passed directly to ``apply_deformation`` and target/seed resampling
+    commands. ``y_ac_coT1.nii`` is the template-to-native pullback field used
+    by ``apply_deformation``; ``iy_ac_coT1.nii`` is the native-to-template
+    forward field used by streamline transforms.
     """
 
     try:
@@ -97,12 +99,19 @@ def estimate_deformation(
         np.linalg.inv(static_img.affine),
         direction="backward",
     )
+    def _to_world(coordinates: np.ndarray, affine: np.ndarray) -> np.ndarray:
+        flat = np.ascontiguousarray(coordinates).reshape(-1, 3)
+        hom = np.column_stack([flat, np.ones(len(flat), dtype=float)])
+        return (affine @ hom.T).T[:, :3].reshape((*coordinates.shape[:3], 3))
+
+    iy_world = _to_world(iy_coordinates, moving_img.affine)
+    y_world = _to_world(y_coordinates, static_img.affine)
     coordinate_path = output_dir / "coordinate_field.nii"
-    save_volume(iy_coordinates, static_img, coordinate_path)
-    iy_path = output_dir / "iy_ac_coT1.nii"
-    save_volume(iy_coordinates, static_img, iy_path)
+    save_volume(iy_world, static_img, coordinate_path)
     y_path = output_dir / "y_ac_coT1.nii"
-    save_volume(y_coordinates, moving_img, y_path)
+    save_volume(iy_world, static_img, y_path)
+    iy_path = output_dir / "iy_ac_coT1.nii"
+    save_volume(y_world, moving_img, iy_path)
     warped_path = output_dir / "warped_moving.nii"
     save_volume(np.asarray(warped, dtype=np.float32), static_img, warped_path)
     return {

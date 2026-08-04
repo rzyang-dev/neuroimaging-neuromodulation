@@ -40,6 +40,37 @@ def load_4d_matrix(path: ImageLike) -> tuple[nib.Nifti1Image, np.ndarray]:
     return img, matrix
 
 
+def load_4d_matrix_dir(directory: Union[str, Path]) -> tuple[nib.Nifti1Image, np.ndarray]:
+    """Load 3D NIfTI files from a directory and stack them into a matrix.
+
+    This mirrors the original ``TMSReadNii`` directory mode.
+    """
+
+    directory = Path(directory)
+    paths = sorted(
+        path
+        for path in directory.rglob("*.nii*")
+        if path.is_file()
+        and not path.name.startswith("._")
+        and "AppleDouble" not in str(path)
+    )
+    if not paths:
+        raise ValueError(f"No NIfTI files found in {directory}")
+    img = nib.load(str(paths[0]))
+    volumes = []
+    for path in paths:
+        data = np.asanyarray(nib.load(str(path)).dataobj)
+        if data.ndim == 4:
+            for t in range(data.shape[3]):
+                volumes.append(data[..., t])
+        elif data.ndim == 3:
+            volumes.append(data)
+        else:
+            raise ValueError(f"Expected 3D/4D NIfTI, got shape {data.shape}")
+    stacked = np.stack(volumes, axis=-1)
+    return img, stacked.reshape(-1, stacked.shape[-1])
+
+
 def _reference_for_3d_source(source: nib.Nifti1Image, target: nib.Nifti1Image) -> nib.Nifti1Image:
     """Return a 3D reference when a 3D source is resampled to a 4D target."""
 
@@ -99,3 +130,20 @@ def save_volume(
     img.set_data_dtype(np.float32 if dtype is None else dtype)
     img.to_filename(str(out_path))
     return out_path
+
+
+def write_text_as_nifti(
+    text_path: Union[str, Path],
+    output_path: Union[str, Path],
+    shape: tuple[int, int, int],
+    reference: ImageLike | None = None,
+    *,
+    dtype: np.dtype | type = np.int16,
+) -> Path:
+    """Write a text array as a NIfTI image, matching the original txt2nii flow."""
+
+    values = np.loadtxt(text_path).reshape(shape)
+    output_path = Path(output_path)
+    if reference is None:
+        reference = nib.Nifti1Image(np.zeros(shape, dtype=np.float32), np.eye(4))
+    return save_volume(values.astype(dtype), reference, output_path, dtype=dtype)

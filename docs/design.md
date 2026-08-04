@@ -26,10 +26,12 @@ original toolbox.
 
 ## Deformation Fields
 
-SPM inverse fields (`iy_*.nii`) are 4D images whose fourth axis stores 1-based
-voxel coordinates in the source image. `apply_deformation` samples the source
-at those coordinates and writes output on the deformation field's grid. This is
-the operation needed to move a target mask from MNI space into native T1 space.
+SPM deformation fields are 4D/5D images whose last axis stores world mm
+coordinates. `y_*.nii` is the template-to-native pullback field used by
+`apply_deformation` to move a target mask from MNI space into native T1 space;
+`iy_*.nii` is the native-to-template forward field used by streamline
+transforms. Legacy 1-based voxel fields remain supported through
+`coordinate_system="voxel"`.
 
 ## Temporal Processing
 
@@ -75,23 +77,25 @@ claimed to reproduce SPM/DARTEL.
 
 Nonlinear deformation estimation uses DIPY's symmetric diffeomorphic
 registration. The DIPY mapping is saved for reproducibility and also converted
-into a 1-based coordinate field that the package's `apply_deformation` can use
-directly. This is an approximate Python-native normalization path, not an SPM
-DARTEL clone.
+into SPM world-coordinate `y_ac_coT1.nii` and `iy_ac_coT1.nii` fields. This is
+an approximate Python-native normalization path, not an SPM DARTEL clone.
 
 ## Config-Driven Pipeline
 
 `nm-pipeline` reads a JSON config and executes the main data-oriented workflow:
 DICOM conversion (optional), slice timing (optional), motion estimation
 (optional), nuisance regression (optional), seed-based FC, target-site
-selection, and reporting. Output paths are recorded in the returned summary so
-the same workflow can be audited or re-run with changed parameters.
+selection, optional T1-space target generation, and reporting. Output paths are
+recorded in the returned summary so the same workflow can be audited or re-run
+with changed parameters.
 
 ## Validation
 
 The validation module computes correlation, RMSE, normalized RMSE, and MAE
 between aligned images. `validate-deformation` applies a field and compares it
 to a reference warped image, making SPM/DARTEL comparison workflows explicit.
+SPM25 standalone reference generation is also exposed through the validation
+module for convention checks and T1-space target workflows.
 
 ## Pipeline Design
 

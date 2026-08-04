@@ -1,59 +1,69 @@
 # Completion Audit
 
-Status date: 2026-08-03
+Status date: 2026-08-04
 
-This document maps the user's explicit requirements to current evidence in the
-workspace. It is intended to make the production readiness claim auditable.
+This document records the migration status requirement by requirement. The
+current conclusion is **partial / alpha**: the implemented subset works, but
+the full port and production-readiness claims are not met.
 
 ## Requirement Evidence
 
 | Requirement | Evidence | Status |
 | --- | --- | --- |
 | Use venv | `.venv/` exists and editable install uses it | Met |
-| Take the project seriously and be honest | `docs/issues.md`, `docs/decisions.md`, `docs/production-readiness.md` explicitly record limitations | Met |
-| Do not use mock data | `docs/data-sources.md` lists real DICOM, fMRI, diffusion, T1, template, and mask data | Met |
-| Keep comprehensive records | `docs/analysis.md`, `docs/requirements.md`, `docs/decisions.md`, `docs/design.md`, `docs/testing.md`, `docs/issues.md`, `docs/user-manual.md`, `docs/production-readiness.md` | Met |
-| Data-oriented mental model | `docs/design.md` and `docs/analysis.md` describe input-to-output transformations | Met |
-| Use source code and dependencies in workspace | Original MATLAB repository remains untouched and is referenced in `docs/analysis.md` | Met |
-| Avoid heavyweight external dependencies when possible | Core uses NumPy, SciPy, NiBabel, Nilearn, DIPY, and dicom2nifti; SPM/FSL are optional wrappers | Met |
-| No MATLAB | Package is Python-native; MATLAB source is preserved but not required | Met |
-| Limit system resources | Tests use modest 4 mm real fMRI and small real DICOM/diffusion datasets | Met |
-| Use Nilearn for real data | `data/real_development_fmri/` contains a real public subject fetched by Nilearn | Met |
-| Support mainland China network constraints | README and docs use Tsinghua PyPI mirror commands | Met |
-| Original algorithm contribution | Seed FC, target-site, depth, white-matter, ALFF/fALFF, GFC classification, and structural connectivity are implemented | Met |
-| User-friendly software | `nm-toolbox`, `nm-tms`, `nm-wm`, `nm-preprocess`, `nm-diffusion`, `nm-dicom`, `nm-pipeline`, and GUI | Met |
-| End-user desktop application | `nm-app` with guided Data, Settings, Run and Results workflow | Met |
-| Split into multiple programs | Seven installed CLI entry points plus optional GUI | Met |
-| Production package | Wheel build verified and CI workflow added | Met |
+| Be honest about limitations | `docs/issues.md`, `docs/decisions.md`, `docs/porting-status.md`, and this audit record known gaps | Met |
+| Do not use mock data | Real DICOM, fMRI, diffusion, T1, template, and mask data are used | Met |
+| Keep comprehensive records | Analysis, design, testing, issues, decisions, and status documents exist | Met |
+| Data-oriented mental model | `docs/design.md` and `docs/analysis.md` describe the implemented data flow | Met for implemented subset |
+| Use source code and dependencies in workspace | Original MATLAB source is present locally; it is not tracked in Git | Partial |
+| Avoid heavyweight external dependencies when possible | Core uses standard Python neuroimaging libraries | Met |
+| No MATLAB | Implemented commands are Python-native | Met for implemented subset |
+| Limit system resources | Tests use small real datasets | Met |
+| Use Nilearn for real data | One real public development-fMRI subject is used | Met |
+| Support mainland China network constraints | README and docs include Tsinghua PyPI mirror commands | Met |
+| Original algorithm contribution | Seed FC, target-site, depth, white-matter, ALFF/fALFF, GFC classification, and structural connectivity are partially implemented | Partial |
+| User-friendly software | CLI and GUI exist, but GUI is alpha and several workflows are not exposed | Partial |
+| End-user desktop application | `nm-app` exists; DICOM folder browsing is fixed, but several promised paths are incomplete | Partial |
+| Split into multiple programs | Nine entry points are defined in `pyproject.toml` | Met |
+| Production package | Wheel builds and tests pass, but package is Alpha, lacks full workflow coverage, and has no reference-parity validation | Not met |
 
 ## Verification Evidence
 
-- `74` automated tests pass on the local macOS environment for Python 3.10
-  and 3.14.
-- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.18.0-py3-none-any.whl`.
-- GitHub Actions matrix passes on Ubuntu, macOS, and Windows for Python
-  3.10, 3.11, and 3.12.
-- Real data used in tests includes:
-  - public development fMRI subject
-  - DIPY real diffusion dataset
-  - Stanford T1
-  - six DICOM vendors plus compressed/multiframe series
-  - bundled templates and masks
+- `130` automated tests are collected and pass locally.
+- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`.
+- `pip check` reports no broken requirements.
+- SPM25 reference validation confirms the package applies SPM `y_`/`iy_`
+  world-coordinate fields correctly and reproduces SPM's warped tissue output.
+- CI matrix results are recorded in `docs/ci-validation.md`; no run artifacts
+  are present in this workspace.
+- Tests are primarily smoke tests. They do not prove numerical equivalence
+  with MATLAB, SPM, FSL, or AFQ.
 
-## Remaining Honest Work
+## Remaining Work
 
-The following are optional hardening items outside the explicitly required
-Python-native scope:
+The remaining work is listed in `docs/porting-status.md` and `docs/issues.md`.
+It includes, but is not limited to:
 
-- SPM/DARTEL reference comparison for estimated `y_`/`iy_` fields
-- Actual execution of FSL/MRtrix wrappers against installed binaries
-- Additional unusual DICOM sequence coverage
-- Motion/coregistration comparison against SPM/FSL reference software
+- Porting missing white-matter/AFQ statistics, TrackQC, and DARTEL-grade
+  normalization workflows.
+- Integrating the individualized target-mask path into the desktop apps.
+- Adding reference comparisons against original MATLAB/SPM/FSL outputs.
+- Hardening the GUI, DICOM series selection, and production packaging.
+- Re-running the audit only after each missing item has implementation and
+  verification evidence.
 
 ## Audit Conclusion
 
-All explicit requirements are met: the package is Python-native, isolated in a
-venv, validated with real data, documented, packaged as a wheel, split into
-user-facing programs, and verified by a green cross-platform CI matrix. The
-goal is considered achieved within the documented Python-native scope; exact
-SPM/DARTEL or FSL parity is not claimed.
+The full migration is **not complete**. The implemented Python-native subset is
+a useful prototype, but it is not a production-ready replacement for the
+original MATLAB toolbox.
+
+## External Runtime Status
+
+MATLAB R2015b, SPM standalone, ANTs 2.6.5 (Windows) and FSL/MRtrix (WSL dev
+environment) are installed, so reference/parity execution is possible.
+SPM `y_`/`iy_` world-coordinate convention validation is implemented, while
+DARTEL-grade normalization and FSL reference comparisons remain unproven.
+External-execution smoke tests pass (FSL/MRtrix 3/3 in WSL, ANTs 2/2 on
+Windows). A 3D rendering runtime for interactive fiber visualization is still
+missing. See `docs/porting-status.md`.

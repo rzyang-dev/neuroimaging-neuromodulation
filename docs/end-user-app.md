@@ -3,6 +3,10 @@
 `nm-app` is the guided desktop application for end users. It wraps the Python
 package behind a simple workflow:
 
+**Status: alpha.** The app is not yet a production end-user tool. Known
+limitations are recorded in `docs/issues.md`, including the DICOM-folder
+browse path and missing individualized target-mask integration.
+
 1. Enter a subject ID.
 2. Choose functional data as a NIfTI file or DICOM folder.
 3. Choose a seed image and analysis mask.

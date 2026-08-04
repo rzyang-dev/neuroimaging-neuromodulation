@@ -6,6 +6,7 @@ import nibabel as nib
 import numpy as np
 import pytest
 
+from neuroimaging_neuromodulation.cli.tms import main as tms_main
 from neuroimaging_neuromodulation.io.deformations import identity_deformation
 from neuroimaging_neuromodulation.targets.cluster import largest_cluster
 from neuroimaging_neuromodulation.targets.pipeline import seed_based_fc, target_site
@@ -14,6 +15,10 @@ from neuroimaging_neuromodulation.targets.roi import (
     extend_roi,
     individual_target_mask,
     sphere_roi,
+)
+from neuroimaging_neuromodulation.targets.t1 import (
+    generate_t1_target,
+    individual_target_from_t1,
 )
 
 
@@ -71,6 +76,60 @@ def test_individual_target_mask_real_templates(package_data_dir: Path, tmp_path:
     assert img.shape == (61, 73, 61)
     assert result.sum() > 0
     assert (tmp_path / "targetmask.nii").exists()
+
+
+def test_individual_target_from_t1(package_data_dir: Path, tmp_path: Path) -> None:
+    _, _ = sphere_roi(
+        [0.0, 0.0, 0.0],
+        10.0,
+        package_data_dir / "grey333.nii",
+        tmp_path / "target.nii",
+    )
+    _, _ = identity_deformation(package_data_dir / "grey333.nii", tmp_path / "identity.nii")
+    path, data = individual_target_from_t1(
+        tmp_path / "target.nii",
+        tmp_path / "identity.nii",
+        package_data_dir / "grey333.nii",
+        tmp_path / "native-target.nii",
+    )
+    assert path.exists()
+    assert data.shape == (61, 73, 61)
+    assert (data > 0).sum() > 0
+
+
+def test_generate_t1_target_with_provided_field(package_data_dir: Path, tmp_path: Path) -> None:
+    _, _ = sphere_roi(
+        [0.0, 0.0, 0.0],
+        10.0,
+        package_data_dir / "grey333.nii",
+        tmp_path / "target.nii",
+    )
+    _, _ = identity_deformation(package_data_dir / "grey333.nii", tmp_path / "identity.nii")
+    result = generate_t1_target(
+        package_data_dir / "grey333.nii",
+        tmp_path / "target.nii",
+        tmp_path / "native-target.nii",
+        deformation_field=tmp_path / "identity.nii",
+    )
+    assert Path(result["output_path"]).exists()
+    assert result["target_data_shape"] == (61, 73, 61)
+    assert (
+        tms_main(
+            [
+                "t1-target",
+                "--target",
+                str(tmp_path / "target.nii"),
+                "--deformation",
+                str(tmp_path / "identity.nii"),
+                "--t1",
+                str(package_data_dir / "grey333.nii"),
+                "--output",
+                str(tmp_path / "cli-native-target.nii"),
+            ]
+        )
+        == 0
+    )
+    assert (tmp_path / "cli-native-target.nii").exists()
 
 
 def test_seed_fc_on_real_data(real_fmri_path: Path | None, real_fmri_available: bool, tmp_path: Path) -> None:
@@ -133,3 +192,30 @@ def test_target_site_on_real_fc(real_fmri_path: Path | None, real_fmri_available
         n_samples=168,
     )
     assert len(sites) == 2
+
+
+def test_target_site_native_deformation(real_fmri_path: Path | None, real_fmri_available: bool, tmp_path: Path) -> None:
+    if not real_fmri_available:
+        pytest.skip("real fMRI data not available")
+    func_img = nib.load(real_fmri_path)
+    _, seed = sphere_roi([0.0, 0.0, 0.0], 8.0, func_img, tmp_path / "seed.nii")
+    _, mask = sphere_roi([0.0, 0.0, 0.0], 18.0, func_img, tmp_path / "mask.nii")
+    result = seed_based_fc(
+        real_fmri_path,
+        tmp_path / "seed.nii",
+        tmp_path / "mask.nii",
+        tmp_path / "fc",
+        subject="test",
+    )
+    _, _ = identity_deformation(func_img, tmp_path / "identity_def.nii")
+    sites = target_site(
+        result["SeedFCinROI"],
+        tmp_path / "targets",
+        subject="test",
+        posneg=["Positive"],
+        p_value=0.05,
+        n_samples=168,
+        native_deformation=tmp_path / "identity_def.nii",
+    )
+    assert (tmp_path / "targets" / "test" / "StiTargetPosiPt_T1Sp.nii").exists()
+    assert sites[0]["native_target_path"] is not None

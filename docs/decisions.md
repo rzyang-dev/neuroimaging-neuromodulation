@@ -108,5 +108,6 @@ converter.
 
 Why: It closes the native-to-MNI workflow without installing SPM or ANTs.
 
-Consequence: Users get reproducible mapping and warped outputs, but must not
-assume exact SPM/DARTEL deformation conventions.
+Consequence: Users get reproducible mapping and warped outputs in SPM
+world-coordinate `y_`/`iy_` form. The convention is validated against SPM25,
+but users must not assume exact SPM/DARTEL numerical equivalence.

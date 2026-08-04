@@ -20,7 +20,7 @@
 - Estimate GM/WM/CSF tissue probability maps from a T1 image.
 - Estimate nonlinear deformation fields between two images.
 - Resample seed and mask images into the functional grid.
-- Apply SPM-style inverse deformation fields.
+- Apply SPM world-coordinate `y_`/`iy_` deformation fields.
 - Correct slice timing without MATLAB.
 - Resample functional volumes using existing realignment parameter files.
 - Estimate rigid motion parameters from a 4D functional series.

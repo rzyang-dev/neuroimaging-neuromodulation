@@ -27,8 +27,10 @@ def test_estimate_deformation_real_data(tmp_path: Path) -> None:
     assert all(path.exists() for path in paths.values())
     _, iy = load_volume(paths["iy_field"])
     _, y = load_volume(paths["y_field"])
-    assert iy.shape[:3] == (61, 73, 61)
-    assert y.shape[:3] == (81, 106, 76)
+    assert iy.shape[:3] == (81, 106, 76)
+    assert y.shape[:3] == (61, 73, 61)
+    assert iy.min() < 0 or iy.max() > max(iy.shape[:3])
+    assert y.min() < 0 or y.max() > max(y.shape[:3])
     _, warped = load_volume(paths["warped_moving"])
-    _, resampled = apply_deformation(t1, paths["iy_field"], order=1)
+    _, resampled = apply_deformation(t1, paths["y_field"], order=1)
     assert np.corrcoef(resampled.ravel(), warped.ravel())[0, 1] > 0.5

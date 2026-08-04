@@ -8,6 +8,7 @@ import json
 from ..io.dicom import (
     convert_dicom_directory,
     convert_dicom_series,
+    convert_dicom_series_by_index,
     inspect_dicom_directory,
     validate_dicom_series,
 )
@@ -25,6 +26,13 @@ def build_parser() -> argparse.ArgumentParser:
     series.add_argument("--output", required=True, help="Output NIfTI path")
     series.add_argument("--no-reorient", action="store_true")
     series.set_defaults(handler=run_series)
+
+    series_index = subparsers.add_parser("convert-series-index", help="Convert one DICOM series from a mixed directory")
+    series_index.add_argument("--dicom-dir", required=True)
+    series_index.add_argument("--index", type=int, required=True)
+    series_index.add_argument("--output", required=True, help="Output NIfTI path")
+    series_index.add_argument("--no-reorient", action="store_true")
+    series_index.set_defaults(handler=run_series_index)
 
     directory = subparsers.add_parser("convert-dir", help="Convert all DICOM series in a directory")
     directory.add_argument("--dicom-dir", required=True)
@@ -48,6 +56,17 @@ def build_parser() -> argparse.ArgumentParser:
 def run_series(args: argparse.Namespace) -> int:
     result = convert_dicom_series(
         args.dicom_dir,
+        args.output,
+        reorient=not args.no_reorient,
+    )
+    print(result.get("NII_FILE", args.output))
+    return 0
+
+
+def run_series_index(args: argparse.Namespace) -> int:
+    result = convert_dicom_series_by_index(
+        args.dicom_dir,
+        args.index,
         args.output,
         reorient=not args.no_reorient,
     )

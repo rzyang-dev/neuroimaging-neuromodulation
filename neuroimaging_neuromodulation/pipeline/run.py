@@ -8,7 +8,7 @@ from typing import Any
 
 import numpy as np
 
-from ..io.dicom import convert_dicom_directory
+from ..io.dicom import convert_dicom_directory, convert_dicom_series_by_index
 from ..io.nifti import load_volume, save_volume
 from ..preprocess.covariates import design_matrix, extract_signal, regress_out_nuisance
 from ..preprocess.motion import estimate_motion_parameters
@@ -45,15 +45,31 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
     functional_path = config.get("functional")
     dicom = config.get("dicom") or {}
     if not functional_path and dicom.get("functional"):
-        convert_dicom_directory(dicom["functional"], subject_dir / "FunImg")
-        functional_path = _first_nifti(subject_dir / "FunImg")
+        if dicom.get("functional_series_index") is not None:
+            functional_path = subject_dir / "FunImg" / "fundata.nii"
+            convert_dicom_series_by_index(
+                dicom["functional"],
+                int(dicom["functional_series_index"]),
+                functional_path,
+            )
+        else:
+            convert_dicom_directory(dicom["functional"], subject_dir / "FunImg")
+            functional_path = _first_nifti(subject_dir / "FunImg")
     if not functional_path:
         raise ValueError("Pipeline requires 'functional' or dicom.functional")
 
     t1_path = config.get("t1")
     if not t1_path and dicom.get("structural"):
-        convert_dicom_directory(dicom["structural"], subject_dir / "T1Img")
-        t1_path = _first_nifti(subject_dir / "T1Img")
+        if dicom.get("structural_series_index") is not None:
+            t1_path = subject_dir / "T1Img" / "t1.nii"
+            convert_dicom_series_by_index(
+                dicom["structural"],
+                int(dicom["structural_series_index"]),
+                t1_path,
+            )
+        else:
+            convert_dicom_directory(dicom["structural"], subject_dir / "T1Img")
+            t1_path = _first_nifti(subject_dir / "T1Img")
 
     img, data = load_volume(functional_path)
     if data.ndim != 4:
@@ -134,6 +150,11 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
         config["mask"],
         output_dir,
         subject=subject,
+        target_mask_image=config.get("target_mask"),
+        c6_image=config.get("c6"),
+        c1_image=config.get("c1"),
+        depth_mm=config.get("depth_mm"),
+        extend_iterations=int(config.get("extend_iterations", 15)),
         tr=tr,
         band=(float(config.get("low_cutoff", 0.01)), float(config.get("high_cutoff", 0.1)))
         if config.get("filter", False)
@@ -153,6 +174,29 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
             posneg=target_cfg.get("posneg", ["Positive", "Negative"]),
             p_value=float(target_cfg.get("p_value", 0.05)),
             n_samples=int(target_cfg.get("n_samples", 212)),
+            native_deformation=target_cfg.get("native_deformation"),
+        )
+
+    t1_target_result = None
+    t1_target_cfg = config.get("t1_target")
+    if t1_target_cfg:
+        if t1_target_cfg is True:
+            t1_target_cfg = {}
+        if not t1_path:
+            raise ValueError("t1_target requires a structural T1 path")
+        target_path = t1_target_cfg.get("target") or config.get("target_mask")
+        if not target_path:
+            raise ValueError("t1_target requires 'target' or top-level 'target_mask'")
+        from ..targets.t1 import generate_t1_target
+
+        t1_target_result = generate_t1_target(
+            t1_path,
+            target_path,
+            Path(t1_target_cfg.get("output") or subject_dir / "IndiTarget_T1Sp.nii"),
+            deformation_field=t1_target_cfg.get("deformation"),
+            spm_exe=t1_target_cfg.get("spm_exe"),
+            spm_output_dir=t1_target_cfg.get("spm_dir"),
+            timeout=int(t1_target_cfg.get("timeout", 1800)),
         )
 
     report_path = None
@@ -168,6 +212,12 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
         "regressed": str(regressed_path) if regressed_path else None,
         "seed_fc": {key: str(value) for key, value in fc_result.items() if hasattr(value, "__fspath__")},
         "target": target_result,
+        "t1_target": {
+            "output": str(t1_target_result["output_path"]),
+            "metrics": t1_target_result.get("metrics"),
+        }
+        if t1_target_result
+        else None,
         "report": str(report_path) if report_path else None,
     }
 

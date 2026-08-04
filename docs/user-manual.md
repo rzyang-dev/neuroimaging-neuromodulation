@@ -19,8 +19,12 @@ python3 -m venv .venv
   --functional <4D fMRI.nii> \
   --seed <seed.nii> \
   --mask <analysis-mask.nii> \
-  --seed-deformation <iy-field.nii> \
-  --mask-deformation <iy-field.nii> \
+  --seed-deformation <y-field.nii> \
+  --mask-deformation <y-field.nii> \
+  --target-mask <target-roi-mni.nii> \
+  --c6 <c6ac_coT1.nii> \
+  --c1 <c1ac_coT1.nii> \
+  --depth-mm <depth-in-mm> \
   --tr 2.0 \
   --low-cutoff 0.01 \
   --high-cutoff 0.1 \
@@ -38,9 +42,10 @@ Outputs:
 ```bash
 .venv/bin/nm-preprocess deform \
   --source <native-image.nii> \
-  --deformation <iy-field.nii> \
+  --deformation <y-field.nii> \
   --output <deformed.nii> \
-  --order 0
+  --order 0 \
+  --coordinate-system world
 ```
 
 ### Slice timing correction
@@ -202,6 +207,58 @@ Outputs:
   --count-output <count.json>
 ```
 
+### Tract profile extraction
+
+```bash
+.venv/bin/nm-diffusion tract-profile \
+  --tracks <tracks.trk> \
+  --scalar <ALFF.nii> \
+  --output <profile.npy> \
+  --output-csv <profile.csv> \
+  --n-points 100
+
+.venv/bin/nm-diffusion segment-tracts \
+  --tracks <tracks.trk> \
+  --atlas <JHUtractsThr25_3mm.nii> \
+  --output-json <segmentation.json> \
+  --n-samples 50
+
+.venv/bin/nm-diffusion segment-tracts-roi \
+  --tracks <tracks.trk> \
+  --output-json <roi-segmentation.json> \
+  --min-dist 2.0
+
+.venv/bin/nm-diffusion transform-tracts \
+  --tracks <native-tracks.trk> \
+  --field <iy_ac_coT1.nii> \
+  --source <native-T1.nii> \
+  --reference <MNI-template.nii> \
+  --output <mni-tracks.trk>
+
+.venv/bin/nm-diffusion render-tracts \
+  --tracks <tracks.trk> \
+  --atlas <JHUtractsThr25_3mm.nii> \
+  --output <tract-render.html> \
+  --title "Tract QC"
+
+.venv/bin/nm-diffusion clean-tracts \
+  --tracks <tracks.trk> \
+  --reference <T1.nii> \
+  --output <cleaned.trk> \
+  --keep-json <keep.json> \
+  --max-dist 4.0 \
+  --max-len 4.0
+
+.venv/bin/nm-diffusion afq-pipeline \
+  --tracks <tracks.trk> \
+  --atlas <JHUtractsThr25_3mm.nii> \
+  --scalar <ALFF.nii> \
+  --output-dir <subject-afq> \
+  --num-nodes 30 \
+  --method roi \
+  --min-dist 2.0
+```
+
 ### DICOM series conversion
 
 ```bash
@@ -254,14 +311,17 @@ Outputs `c1.nii`, `c2.nii`, `c3.nii`, and `SegLabel.nii`.
 ```
 
 Outputs include `dipy_mapping.nii.gz`, `coordinate_field.nii`, and
-`warped_moving.nii`, plus SPM-style `y_ac_coT1.nii` and `iy_ac_coT1.nii`.
+`warped_moving.nii`, plus SPM world-coordinate `y_ac_coT1.nii` and
+`iy_ac_coT1.nii` fields. `y_ac_coT1.nii` is the template-to-native pullback
+field for `apply_deformation`; `iy_ac_coT1.nii` is the native-to-template
+forward field for streamline transforms.
 
 ### Validate a deformation field
 
 ```bash
 .venv/bin/nm-preprocess validate-deformation \
   --moving <native-image.nii> \
-  --field <iy-field.nii> \
+  --field <y-field.nii> \
   --reference <reference-warped.nii> \
   --output-json <validation.json>
 ```
@@ -293,14 +353,28 @@ Add `--dry-run` to print the command without executing it.
 .venv/bin/nm-diffusion mrtrix-tckgen \
   --dwi <dwi.nii> \
   --mask <mask.nii> \
+  --seed-image <seed.nii> \
   --output <tracks.tck> \
   --num-tracks 100000
 ```
+
+`--seed-image` is required because MRtrix needs at least one streamline seeding
+source.
 
 ### Check external tool availability
 
 ```bash
 .venv/bin/nm-diffusion check-external
+```
+
+The command reports availability of `bedpostx`, `dtifit`, `probtrackx2`, and
+`tckgen` found on `PATH`. FSL binaries must be reachable on `PATH` (for
+example after `source $FSLDIR/etc/fslconf/fsl.sh`); MRtrix `tckgen` is found
+normally. On the development machine the FSL/MRtrix binaries are installed
+inside WSL, so run the check there, for example:
+
+```bash
+wsl bash -lc "source /home/dev/fsl/etc/fslconf/fsl.sh; ~/nm-dev-venv/bin/nm-diffusion check-external"
 ```
 
 ### End-to-end pipeline
@@ -334,6 +408,16 @@ with a SHA-256 manifest.
 
 This writes `report.html` and `manifest.json` under the subject directory.
 
+### Image QC viewer
+
+```bash
+.venv/bin/nm-tms view-report \
+  --reference <T1.nii> \
+  --target <StiTargetPosiPt_T1Sp.nii> \
+  --output <viewer.html> \
+  --slices 9
+```
+
 ### Target site
 
 ```bash
@@ -343,7 +427,8 @@ This writes `report.html` and `manifest.json` under the subject directory.
   --subject <subject-id> \
   --p 0.05 \
   --n 212 \
-  --posneg Positive Negative
+  --posneg Positive Negative \
+  --native-deformation <y-field.nii>
 ```
 
 Outputs:
@@ -352,6 +437,7 @@ Outputs:
 - 5 mm extremum sphere targets
 - largest-cluster masks
 - 8 mm cluster-center sphere targets
+- Optional `*_T1Sp.nii` target spheres when `--native-deformation` is supplied
 
 ### Sphere ROI
 
@@ -443,6 +529,212 @@ For a simpler guided workflow, run:
 
 The end-user app provides three steps: Data, Settings, and Run and Results.
 After analysis, it can open the HTML report and output folder directly.
+
+## Additional Ported Commands
+
+### White-matter seed FC
+
+```bash
+.venv/bin/nm-wm seed-fc \
+  --functional <4D fMRI.nii> \
+  --seed <seed.nii> \
+  --mask <mask.nii> \
+  --output <zFCmap.nii>
+
+.venv/bin/nm-wm multi-seed-fc \
+  --functional <4D fMRI.nii> \
+  --seeds <seed1.nii> <seed2.nii> \
+  --mask <mask.nii> \
+  --output-dir <output>
+```
+
+### Dynamic ALFF, group masks, and tract reporting
+
+```bash
+.venv/bin/nm-wm dynamic-alff \
+  --functional <4D fMRI.nii> \
+  --mask <mask.nii> \
+  --output-dir <output> \
+  --tr 2.0 \
+  --window-length 50 \
+  --step 5
+
+.venv/bin/nm-wm group-mask \
+  --segments <c2-subject1.nii> <c2-subject2.nii> \
+  --output <group-wm.nii> \
+  --threshold 0.9 \
+  --group-threshold 0.9
+
+.venv/bin/nm-wm cluster-report \
+  --result <statistic.nii> \
+  --output-dir <output>
+
+.venv/bin/nm-wm plot-profiles \
+  --profiles <profile1.npy> <profile2.npy> \
+  --n-group1 3 \
+  --output-dir <plots> \
+  --labels "Left Corticospinal" "Right Corticospinal"
+
+.venv/bin/nm-wm afq-stat \
+  --profiles <profile1.npy> <profile2.npy> \
+  --n-group1 3 \
+  --output-json <afq-stat.json>
+
+.venv/bin/nm-wm tract-qc \
+  --profiles <profile1.npy> <profile2.npy> \
+  --n-group1 3 \
+  --segmentation-json <segmentation.json> \
+  --output-dir <qc-report>
+```
+
+### Head-motion QC and c6 mask
+
+```bash
+.venv/bin/nm-preprocess motion-metrics \
+  --rp <rp.txt> \
+  --reference <mean-fundata.nii> \
+  --output-json <motion.json>
+
+.venv/bin/nm-preprocess make-c6 \
+  --t1 <ac_coT1.nii> \
+  --output <c6ac_coT1.nii>
+```
+
+### T1-space target image
+
+```bash
+.venv/bin/nm-tms t1-target \
+  --target <target-roi-mni.nii> \
+  --t1 <ac_coT1.nii> \
+  --output <IndiTarget_T1Sp.nii> \
+  --deformation <y-field.nii>
+```
+
+If `--deformation` is omitted, `nm-tms t1-target` runs SPM25 standalone
+segmentation automatically to generate the `y_` field, then writes the
+individualized target into T1 space. Use `--spm-exe` and `--spm-dir` to point
+to the standalone executable and segmentation output directory.
+
+### Group statistics
+
+```bash
+.venv/bin/nm-tms roi-fc \
+  --functional <4D fMRI.nii> \
+  --rois <roi1.nii> <roi2.nii> \
+  --output <roi-fc.txt>
+
+.venv/bin/nm-tms compare-correlations \
+  --r1 0.8 --r2 0.2 --n1 50 --n2 50 \
+  --tail both \
+  --output <comparison.txt>
+
+.venv/bin/nm-tms chi-square \
+  --matrix <contingency.txt> \
+  --output <pvalue.txt>
+
+.venv/bin/nm-tms ttest2-covariates \
+  --y <dependent.txt> \
+  --group <group-labels.txt> \
+  --covs <covariates.txt> \
+  --output-json <result.json>
+
+.venv/bin/nm-tms quantreg \
+  --x <predictor.txt> \
+  --y <response.txt> \
+  --tau 0.5 \
+  --order 1 \
+  --nboot 200 \
+  --output-json <quantreg.json>
+
+.venv/bin/nm-tms permutation-ttest \
+  --y <response.txt> \
+  --group <group-labels.txt> \
+  --n-permutations 5000 \
+  --output-json <permutation.json>
+```
+
+### Utility commands
+
+```bash
+.venv/bin/nm-preprocess combine-images \
+  --images <image1.nii> <image2.nii> \
+  --operation sum \
+  --output <combined.nii>
+
+.venv/bin/nm-preprocess concatenate-sessions \
+  --images <run1.nii> <run2.nii> \
+  --operation add \
+  --output <fundata.nii>
+
+.venv/bin/nm-preprocess merge-images \
+  --images <session1.nii> <session2.nii> \
+  --output <merged.nii>
+
+.venv/bin/nm-preprocess reslice \
+  --source <image-to-resample.nii> \
+  --sample <reference-grid.nii> \
+  --output <resliced.nii> \
+  --order 0
+
+.venv/bin/nm-preprocess extract-signal \
+  --functional <directory-of-3d-nifti-or-4d.nii> \
+  --mask <mask.nii> \
+  --output <signal.txt>
+
+.venv/bin/nm-preprocess timepoint-count \
+  --input <4D NIfTI or directory> \
+  --output <timepoints.tsv>
+
+.venv/bin/nm-preprocess detrend \
+  --functional <4D fMRI.nii> \
+  --output <detrended.nii>
+
+.venv/bin/nm-preprocess text-to-nifti \
+  --text <data.txt> \
+  --output <data.nii> \
+  --shape 100,100,100
+```
+
+### DICOM series selection
+
+```bash
+.venv/bin/nm-dicom inspect --dicom-dir <directory>
+.venv/bin/nm-dicom convert-series-index \
+  --dicom-dir <directory> \
+  --index 0 \
+  --output <series.nii>
+```
+
+### Additional FSL workflows
+
+```bash
+.venv/bin/nm-diffusion fsl-bet --input <data.nii> --output <dataB.nii>
+.venv/bin/nm-diffusion fsl-eddy-correct --input <dataB.nii> --output <dataBC.nii.gz>
+.venv/bin/nm-diffusion fsl-fa2t1 --fa <FA.nii> --ref <dataB.nii> --output <FAinT1.nii> --matrix <FA2T1.mat> --inverse-matrix <T12FA.mat>
+.venv/bin/nm-diffusion fsl-t12mni --t1 <dataB.nii> --mni <MNI.nii> --out-prefix <warp-prefix>
+.venv/bin/nm-diffusion fsl-mni2native --image <SeedImage.nii> --t1 <dataB.nii> --fa <FA.nii> --warp <MNI2T1transf.nii.gz> --premat <T12FA.mat> --output <SeedImage_NaSp.nii>
+.venv/bin/nm-diffusion fsl-native2mni --image <Fiber.nii> --t1 <dataB.nii> --fa <FA.nii> --matrix <FA2T1.mat> --warp <T12MNItransf.nii.gz> --mni <MNI.nii> --output <Fiber_MNISp.nii>
+.venv/bin/nm-diffusion fsl-topup --imain <data_appa_b0.nii> --pa-image <datapa.nii> --datain <para.txt> --config <b02b0.cnf> --output-prefix <Topup_Output> --output <my_hifi_data.nii>
+```
+
+All FSL commands support `--dry-run` to print the command without executing.
+
+### ANTs normalization
+
+```bash
+.venv/bin/nm-preprocess ants-register \
+  --moving <native-T1.nii> \
+  --fixed <MNI-template.nii> \
+  --output-prefix <warp-prefix>
+
+.venv/bin/nm-preprocess ants-apply-transform \
+  --input <native-image.nii> \
+  --reference <MNI-template.nii> \
+  --output <mni-image.nii> \
+  --transforms <warp-prefix1Warp.nii.gz> <warp-prefix0GenericAffine.mat>
+
+.venv/bin/nm-preprocess check-ants
+```
 
 ## Input Data Expectations
 

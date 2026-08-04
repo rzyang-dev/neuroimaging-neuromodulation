@@ -1,58 +1,56 @@
 # Production Readiness Checklist
 
-Status date: 2026-08-03
+Status date: 2026-08-04
+
+Current status: **not production-ready**. This checklist records what is true
+and what remains before the package can be called production-ready.
 
 ## Environment and Packaging
 
 - [x] Python package with `pyproject.toml`
-- [x] Isolated `.venv` used for all development
+- [x] Isolated `.venv` used for development
 - [x] Editable install works
 - [x] Wheel build verified with `pip wheel`
-- [x] GitHub Actions CI workflow for Python 3.10-3.12 on Ubuntu, macOS, and
-  Windows
-- [x] Full test suite verified locally on Python 3.10 and 3.14
-- [x] CLI entry points installed: `nm-toolbox`, `nm-tms`, `nm-wm`,
-  `nm-preprocess`, `nm-diffusion`, `nm-dicom`, `nm-pipeline`, `nm-app`,
-  `nm-gui`
+- [x] GitHub Actions workflow exists
+- [ ] CI matrix result independently reproducible from repository artifacts
+- [x] CLI entry points installed
 - [x] Optional Tkinter desktop GUI
-- [x] Guided end-user desktop app (`nm-app`)
+- [ ] GUI behavior verified outside config-construction tests
+- [ ] Direct runtime dependency declarations complete (for example, `pydicom`
+  is imported directly but only a transitive dependency)
 
 ## Data-Oriented Core
 
 - [x] NIfTI loading/saving and world-space resampling
-- [x] SPM-style inverse deformation-field application
-- [x] DICOM series/directory conversion
-- [x] DICOM inspection and single-series validation
-- [x] Six-vendor DICOM conversion coverage
-- [x] Compressed and enhanced multiframe DICOM conversion coverage
-- [x] DICOM validation with real Hitachi data
-- [x] fMRI preprocessing: slice timing, motion estimation/resampling,
-  coregistration, smoothing, filtering, left-right flipping
+- [x] SPM world-coordinate `y_`/`iy_` deformation application
+- [x] DICOM conversion and inspection through `dicom2nifti`
+- [x] Six-vendor and compressed DICOM fixture coverage
+- [x] DICOM series selection by index in `nm-dicom` and `nm-pipeline`
+- [x] fMRI preprocessing primitives: slice timing, motion, coregistration,
+  smoothing, filtering, left-right flipping
+- [ ] Motion/coregistration numerical comparison against SPM/FSL
 - [x] Seed-based FC, ALFF/fALFF, nuisance regression
-- [x] ROI, depth mask, target site, largest-cluster target selection
-- [x] DTI fitting, deterministic/probabilistic tensor tractography,
-  seed-target connectivity
+- [x] ROI, depth, target-site, largest-cluster target selection primitives
+- [x] Individualized target-mask workflow exposed through CLI and pipeline
+- [x] T1-based target generation workflow with optional SPM25 segmentation
+- [x] DTI fitting and tensor tractography primitives
+- [ ] Full AFQ tract segmentation and tract-profile workflow
 - [x] Approximate GM/WM/CSF tissue probability estimation
-- [x] DIPY nonlinear deformation estimation and SPM-style `y_`/`iy_` conversion
-- [x] Config-driven end-to-end pipeline (`nm-pipeline`)
+- [ ] SPM/DARTEL-compatible segmentation and normalization
+- [x] Exact `y_`/`iy_` deformation-convention validation against SPM25
+- [x] Config-driven pipeline for a subset of workflows
 - [x] Quantitative image/deformation validation commands
-- [x] Optional FSL/MRtrix wrappers with dry-run support
-- [x] FSL/MRtrix availability health check
+- [x] FSL/MRtrix command builders and availability check
+- [x] FSL/MRtrix execution smoke tests against installed binaries
+  (2026-08-04: 3/3 pass; ANTs execution tests pass 2/2)
 - [x] HTML reports and SHA-256 manifests
 
 ## Verification
 
-- [x] `74` automated tests pass on Python 3.10 and 3.14
-- [x] GitHub Actions matrix passes on Ubuntu, macOS, and Windows for Python
-  3.10-3.12
+- [x] `130` automated tests pass locally
+- [ ] Tests prove numerical equivalence to original MATLAB/SPM/FSL workflows
+- [ ] Tests cover missing workflows listed in `docs/porting-status.md`
 - [x] Tests use real public fMRI, diffusion, DICOM, T1, template, and mask data
-- [x] CLI smoke tests run on real data
 
-## Honest Remaining Work
-
-- Optional hardening: SPM/DARTEL reference comparison, FSL/MRtrix execution
-  against installed binaries, and more unusual DICOM sequences
-
-The full algorithm inventory and issue list are in `docs/analysis.md` and
-`docs/issues.md`. Requirement-by-requirement evidence is in
-`docs/completion-audit.md`.
+The current evidence supports an Alpha research migration, not a production
+release. See `docs/porting-status.md` for the authoritative status record.

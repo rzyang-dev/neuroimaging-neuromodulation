@@ -119,11 +119,13 @@ class EndUserApp(tk.Tk):
         filetypes: tuple[tuple[str, str], ...],
         *,
         directory: bool = False,
-    ) -> None:
+    ) -> ttk.Button:
         ttk.Label(parent, text=label, width=24).pack(side="left")
         ttk.Entry(parent, textvariable=variable).pack(side="left", fill="x", expand=True, padx=6)
         command = lambda: self._pick_directory(variable) if directory else self._pick_file(variable, filetypes)
-        ttk.Button(parent, text="Browse", command=command).pack(side="left")
+        button = ttk.Button(parent, text="Browse", command=command)
+        button.pack(side="left")
+        return button
 
     def _pick_file(self, variable: tk.StringVar, filetypes: tuple[tuple[str, str], ...]) -> None:
         path = filedialog.askopenfilename(filetypes=filetypes)
@@ -152,7 +154,7 @@ class EndUserApp(tk.Tk):
         ttk.Radiobutton(frame, text="DICOM folder", variable=self.functional_type_var, value="dicom", command=self._update_functional_browse).pack(side="left", padx=8)
 
         frame = self._row(self.data_page)
-        self._file_picker(
+        self.functional_browse_button = self._file_picker(
             frame,
             "Functional data",
             self.functional_var,
@@ -176,7 +178,19 @@ class EndUserApp(tk.Tk):
         ).pack(anchor="w", pady=(12, 0))
 
     def _update_functional_browse(self) -> None:
-        pass
+        if not hasattr(self, "functional_browse_button"):
+            return
+        if self.functional_type_var.get() == "dicom":
+            self.functional_browse_button.configure(
+                command=lambda: self._pick_directory(self.functional_var)
+            )
+        else:
+            self.functional_browse_button.configure(
+                command=lambda: self._pick_file(
+                    self.functional_var,
+                    (("NIfTI", "*.nii *.nii.gz"),),
+                )
+            )
 
     def _build_settings_page(self) -> None:
         self.output_var = tk.StringVar(value=str(Path.home() / "NeuroModulationResults"))

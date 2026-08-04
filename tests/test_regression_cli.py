@@ -46,6 +46,32 @@ def test_extract_signal_cli(real_fmri_path: Path | None, real_fmri_available: bo
     assert signal.shape == (5,)
 
 
+def test_extract_signal_cli_directory_of_3d_images(real_fmri_path: Path | None, real_fmri_available: bool, tmp_path: Path) -> None:
+    if not real_fmri_available:
+        pytest.skip("real fMRI data not available")
+    img = nib.load(real_fmri_path)
+    image_dir = tmp_path / "vols"
+    image_dir.mkdir()
+    for index in range(3):
+        nib.Nifti1Image(np.asanyarray(img.dataobj)[..., index], img.affine).to_filename(
+            image_dir / f"vol-{index:03d}.nii"
+        )
+    _, _ = sphere_roi([0.0, 0.0, 0.0], 10.0, img, tmp_path / "mask.nii")
+    output = tmp_path / "signal.txt"
+    assert main(
+        [
+            "extract-signal",
+            "--functional",
+            str(image_dir),
+            "--mask",
+            str(tmp_path / "mask.nii"),
+            "--output",
+            str(output),
+        ]
+    ) == 0
+    assert np.loadtxt(output).shape == (3,)
+
+
 def test_regress_covariates_cli(real_fmri_path: Path | None, real_fmri_available: bool, tmp_path: Path) -> None:
     if not real_fmri_available:
         pytest.skip("real fMRI data not available")

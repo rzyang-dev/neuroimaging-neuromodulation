@@ -88,21 +88,38 @@ def bandpass_filter(
     tr: float,
     band: tuple[float, float],
     mask: np.ndarray | None = None,
+    *,
+    voxel_major: bool | None = None,
 ) -> np.ndarray:
     """Band-pass filter a functional matrix and restore the voxel mean.
 
     ``data`` may be ``(n_voxels, n_timepoints)`` (toolbox convention) or
-    ``(n_timepoints, n_voxels)`` when ``mask`` is omitted. The output shape
-    matches the input shape.
+    ``(n_timepoints, n_voxels)``. When a mask is supplied, its length is used to
+    disambiguate the orientation unless ``voxel_major`` is set explicitly. The
+    output shape matches the input shape.
     """
 
     data = np.asarray(data, dtype=float)
-    voxel_major = data.shape[0] > data.shape[1]
-    matrix = data.T if voxel_major else data
     if mask is not None:
         mask = np.asarray(mask, dtype=bool).reshape(-1)
-        if mask.size != matrix.shape[1]:
+        if voxel_major is None:
+            if mask.size == data.shape[0] == data.shape[1]:
+                voxel_major = data.shape[0] > data.shape[1]
+            elif mask.size == data.shape[0]:
+                voxel_major = True
+            elif mask.size == data.shape[1]:
+                voxel_major = False
+            else:
+                raise ValueError(
+                    "Mask length does not match either matrix axis; pass voxel_major explicitly"
+                )
+        expected = data.shape[0] if voxel_major else data.shape[1]
+        if mask.size != expected:
             raise ValueError("Mask length does not match the number of voxels")
+    else:
+        voxel_major = data.shape[0] > data.shape[1] if voxel_major is None else voxel_major
+    matrix = data.T if voxel_major else data
+    if mask is not None:
         means = np.mean(matrix[:, mask], axis=0, keepdims=True)
         filtered = ideal_filter(matrix[:, mask], tr, band)
         out = np.zeros_like(matrix)
@@ -124,10 +141,47 @@ def detrend(data: np.ndarray, axis: int = 0) -> np.ndarray:
     return out
 
 
+def detrend_preserve_mean(data: np.ndarray) -> np.ndarray:
+    """Detrend voxel-by-time data and restore each voxel's original mean."""
+
+    data = np.asarray(data, dtype=float)
+    if data.ndim != 2:
+        raise ValueError("Expected voxel-by-time data")
+    means = np.mean(data, axis=1, keepdims=True)
+    detrended = detrend(data.T, axis=0).T
+    return detrended + means
+
+
+def roi_correlation_matrix(
+    data: np.ndarray,
+    roi_masks: list[np.ndarray],
+) -> np.ndarray:
+    """Return the Pearson correlation matrix between ROI mean time courses.
+
+    ``data`` has shape ``(n_voxels, n_timepoints)`` and each mask has the same
+    voxel count.
+    """
+
+    data = np.asarray(data, dtype=float)
+    if data.ndim != 2:
+        raise ValueError("data must be a voxel-by-time matrix")
+    timecourses = []
+    for mask in roi_masks:
+        mask = np.asarray(mask, dtype=bool).reshape(-1)
+        if mask.size != data.shape[0]:
+            raise ValueError("ROI mask length does not match voxel count")
+        if not mask.any():
+            raise ValueError("ROI mask is empty")
+        timecourses.append(np.mean(data[mask, :], axis=0))
+    return np.corrcoef(np.stack(timecourses, axis=0))
+
+
 __all__ = [
     "bandpass_filter",
     "detrend",
+    "detrend_preserve_mean",
     "fast_corr",
     "ideal_filter",
     "inverse_pearson",
+    "roi_correlation_matrix",
 ]

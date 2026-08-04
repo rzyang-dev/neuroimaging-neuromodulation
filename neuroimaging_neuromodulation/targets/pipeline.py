@@ -138,6 +138,7 @@ def _target_site_from_extremum(
     *,
     p_value: float,
     n_samples: int,
+    native_deformation: str | Path | None = None,
 ) -> dict[str, object]:
     positive = direction.lower().startswith("pos")
     if positive:
@@ -154,6 +155,15 @@ def _target_site_from_extremum(
         fc_img,
         output_dir / subject / f"StiTarget{prefix}_MNI.nii",
     )
+    native_path = None
+    if native_deformation is not None:
+        native_path = output_dir / subject / f"StiTarget{prefix}_T1Sp.nii"
+        apply_deformation(
+            output_dir / subject / f"StiTarget{prefix}_MNI.nii",
+            native_deformation,
+            native_path,
+            order=0,
+        )
     coord_path = _write_coordinate(np.hstack([mni, float(fc_data[tuple(mat)])]), output_dir, subject, prefix)
 
     cluster, size = largest_cluster(fc_data, p_value, n_samples, direction)
@@ -171,12 +181,20 @@ def _target_site_from_extremum(
                 fc_img,
                 output_dir / subject / f"StiTarget{direction[:4]}LCt_MNI.nii",
             )
+            if native_deformation is not None:
+                apply_deformation(
+                    output_dir / subject / f"StiTarget{direction[:4]}LCt_MNI.nii",
+                    native_deformation,
+                    output_dir / subject / f"StiTarget{direction[:4]}LCt_T1Sp.nii",
+                    order=0,
+                )
             cluster_result = {"center_mni": center_mni, "center_path": center_path}
     return {
         "direction": direction,
         "extremum_mni": mni,
         "extremum_value": float(fc_data[tuple(mat)]),
         "extremum_coordinate_path": coord_path,
+        "native_target_path": str(native_path) if native_path is not None else None,
         "largest_cluster_size": size,
         **cluster_result,
     }
@@ -190,6 +208,7 @@ def target_site(
     posneg: Iterable[str] = ("Positive", "Negative"),
     p_value: float = 0.05,
     n_samples: int = 212,
+    native_deformation: str | Path | None = None,
 ) -> list[dict[str, object]]:
     """Generate target candidates from an FC map."""
 
@@ -210,6 +229,7 @@ def target_site(
                 direction,
                 p_value=p_value,
                 n_samples=n_samples,
+                native_deformation=native_deformation,
             )
         )
     return results

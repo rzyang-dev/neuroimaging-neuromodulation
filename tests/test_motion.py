@@ -12,6 +12,11 @@ from neuroimaging_neuromodulation.preprocess.motion import (  # noqa: E402
     affine_to_rp,
     estimate_motion_parameters,
 )
+from neuroimaging_neuromodulation.preprocess.motion_metrics import (  # noqa: E402
+    fd_power,
+    fd_van_dijk,
+    head_motion_metrics,
+)
 
 
 def test_affine_to_rp_roundtrip() -> None:
@@ -43,3 +48,26 @@ def test_estimate_motion_real_subset(real_fmri_path: Path | None, real_fmri_avai
     assert np.isfinite(corrected).all()
     assert rp.shape == (4, 6)
     assert np.allclose(rp[0], 0.0, atol=1e-6)
+
+
+def test_head_motion_metrics_known_simple_series() -> None:
+    reference = nib.Nifti1Image(np.zeros((10, 10, 10)), np.eye(4))
+    rp = np.array(
+        [
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [2.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        ]
+    )
+    result = head_motion_metrics(rp, reference)
+    assert np.allclose(result["fd_van_dijk"], [0.0, 1.0, 1.0])
+    assert np.allclose(result["fd_power"], [0.0, 1.0, 1.0])
+    assert result["fd_jenkinson"][0] == 0.0
+    assert result["summary"].shape == (20,)
+
+
+def test_fd_series_helpers() -> None:
+    rp = np.zeros((4, 6))
+    rp[:, 0] = [0.0, 0.5, 1.0, 1.5]
+    assert np.allclose(fd_van_dijk(rp), [0.0, 0.5, 0.5, 0.5])
+    assert np.allclose(fd_power(rp), [0.0, 0.5, 0.5, 0.5])

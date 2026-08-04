@@ -9,17 +9,33 @@ from pathlib import Path
 import numpy as np
 
 from ..io.deformations import apply_deformation
-from ..io.nifti import load_4d_matrix, load_volume, save_volume
+from ..io.nifti import (
+    load_4d_matrix,
+    load_4d_matrix_dir,
+    load_volume,
+    resample_to_grid,
+    save_volume,
+    write_text_as_nifti,
+)
 from ..deformations.estimate import estimate_deformation
+from ..preprocess.ants import (
+    build_ants_apply_transform_command,
+    build_ants_registration_command,
+    check_ants_tools,
+    run_ants_apply_transform,
+    run_ants_registration,
+)
 from ..preprocess.covariates import design_matrix, extract_signal, friston24, regress_out_nuisance
 from ..preprocess.coregister import coregister_images
-from ..preprocess.imaging import flip_left_right
+from ..preprocess.imaging import combine_images, concatenate_sessions, flip_left_right, merge_images
 from ..preprocess.motion import estimate_motion_parameters
+from ..preprocess.motion_metrics import head_motion_metrics
 from ..preprocess.spatial import smooth_volume
 from ..preprocess.temporal import apply_motion_parameters, slice_timing_correct_volume
 from ..segmentation.tissue import segment_tissue
+from ..segmentation.c6 import make_c6_mask
 from ..validation.metrics import compare_volumes, validate_deformation
-from ..stats.functional import bandpass_filter
+from ..stats.functional import bandpass_filter, detrend_preserve_mean
 from ..stats.regression import regress
 
 
@@ -35,8 +51,16 @@ def build_parser() -> argparse.ArgumentParser:
     deform.add_argument("--deformation", required=True)
     deform.add_argument("--output", required=True)
     deform.add_argument("--order", type=int, default=1, choices=[0, 1, 2, 3])
+    deform.add_argument("--coordinate-system", choices=["voxel", "world"], default="world")
     deform.add_argument("--zero-based", action="store_true")
     deform.set_defaults(handler=run_deform)
+
+    reslice = subparsers.add_parser("reslice", help="Resample one image onto another image's grid")
+    reslice.add_argument("--source", required=True)
+    reslice.add_argument("--sample", required=True, help="Reference image providing the target grid")
+    reslice.add_argument("--output", required=True)
+    reslice.add_argument("--order", type=int, default=0, choices=[0, 1, 2, 3])
+    reslice.set_defaults(handler=run_reslice)
 
     st = subparsers.add_parser("slice-timing", help="Correct slice timing with Fourier interpolation")
     st.add_argument("--functional", required=True)
@@ -78,6 +102,11 @@ def build_parser() -> argparse.ArgumentParser:
     flt.add_argument("--high-cutoff", type=float, default=0.1)
     flt.set_defaults(handler=run_filter)
 
+    det = subparsers.add_parser("detrend", help="Linear detrend functional data and restore voxel means")
+    det.add_argument("--functional", required=True)
+    det.add_argument("--output", required=True)
+    det.set_defaults(handler=run_detrend)
+
     flip = subparsers.add_parser("flip-lr", help="Flip an image along the left-right axis")
     flip.add_argument("--image", required=True)
     flip.add_argument("--output", required=True)
@@ -103,6 +132,12 @@ def build_parser() -> argparse.ArgumentParser:
     seg.add_argument("--iterations", type=int, default=20)
     seg.set_defaults(handler=run_segment_tissue)
 
+    c6 = subparsers.add_parser("make-c6", help="Construct an approximate outer-brain c6 mask")
+    c6.add_argument("--t1", required=True)
+    c6.add_argument("--output", required=True)
+    c6.add_argument("--threshold", type=float, default=1000.0)
+    c6.set_defaults(handler=run_make_c6)
+
     est = subparsers.add_parser("estimate-deformation", help="Estimate a nonlinear deformation with DIPY")
     est.add_argument("--moving", required=True)
     est.add_argument("--static", required=True)
@@ -111,6 +146,26 @@ def build_parser() -> argparse.ArgumentParser:
     est.add_argument("--level-iters", default="10,10,5")
     est.add_argument("--step-length", type=float, default=0.25)
     est.set_defaults(handler=run_estimate_deformation)
+
+    ants = subparsers.add_parser("ants-register", help="Run ANTs registration (requires ANTs)")
+    ants.add_argument("--moving", required=True)
+    ants.add_argument("--fixed", required=True)
+    ants.add_argument("--output-prefix", required=True)
+    ants.add_argument("--stages", default="rigid,affine,syn")
+    ants.add_argument("--dry-run", action="store_true")
+    ants.set_defaults(handler=run_ants_register)
+
+    ants_apply = subparsers.add_parser("ants-apply-transform", help="Apply ANTs transforms (requires ANTs)")
+    ants_apply.add_argument("--input", required=True)
+    ants_apply.add_argument("--reference", required=True)
+    ants_apply.add_argument("--output", required=True)
+    ants_apply.add_argument("--transforms", nargs="+", required=True)
+    ants_apply.add_argument("--interpolation", default="Linear")
+    ants_apply.add_argument("--dry-run", action="store_true")
+    ants_apply.set_defaults(handler=run_ants_apply_transform)
+
+    ants_check = subparsers.add_parser("check-ants", help="Check ANTs binary availability")
+    ants_check.set_defaults(handler=run_check_ants)
 
     vd = subparsers.add_parser("validate-deformation", help="Apply a deformation field and compare to a reference warped image")
     vd.add_argument("--moving", required=True)
@@ -156,6 +211,42 @@ def build_parser() -> argparse.ArgumentParser:
     f24.add_argument("--output", required=True)
     f24.set_defaults(handler=run_friston24)
 
+    hm = subparsers.add_parser("motion-metrics", help="Compute head-motion QC metrics")
+    hm.add_argument("--rp", required=True, help="Six-column realignment parameters")
+    hm.add_argument("--reference", required=True, help="Reference NIfTI image")
+    hm.add_argument("--output-json", required=True)
+    hm.set_defaults(handler=run_motion_metrics)
+
+    combine = subparsers.add_parser("combine-images", help="Sum or multiply 3D images")
+    combine.add_argument("--images", nargs="+", required=True)
+    combine.add_argument("--output", required=True)
+    combine.add_argument("--operation", choices=["sum", "product"], default="sum")
+    combine.set_defaults(handler=run_combine_images)
+
+    sessions = subparsers.add_parser("concatenate-sessions", help="Combine functional sessions")
+    sessions.add_argument("--images", nargs="+", required=True)
+    sessions.add_argument("--output", required=True)
+    sessions.add_argument("--operation", choices=["add", "mean"], default="add")
+    sessions.add_argument("--no-demean", action="store_true")
+    sessions.set_defaults(handler=run_concatenate_sessions)
+
+    merge = subparsers.add_parser("merge-images", help="Merge NIfTI images along the time axis")
+    merge.add_argument("--images", nargs="+", required=True)
+    merge.add_argument("--output", required=True)
+    merge.set_defaults(handler=run_merge_images)
+
+    tp = subparsers.add_parser("timepoint-count", help="Count volumes in functional data")
+    tp.add_argument("--input", required=True, help="4D NIfTI or directory containing NIfTI files")
+    tp.add_argument("--output", required=True, help="Output TSV path")
+    tp.set_defaults(handler=run_timepoint_count)
+
+    txt2nii = subparsers.add_parser("text-to-nifti", help="Write a text array as NIfTI")
+    txt2nii.add_argument("--text", required=True)
+    txt2nii.add_argument("--output", required=True)
+    txt2nii.add_argument("--shape", required=True, help="Comma-separated x,y,z shape")
+    txt2nii.add_argument("--reference", help="Optional reference NIfTI for affine/header")
+    txt2nii.set_defaults(handler=run_text_to_nifti)
+
     return parser
 
 
@@ -166,8 +257,16 @@ def run_deform(args: argparse.Namespace) -> int:
         args.output,
         order=args.order,
         one_based=not args.zero_based,
+        coordinate_system=args.coordinate_system,
     )
     print(args.output, img.shape)
+    return 0
+
+
+def run_reslice(args: argparse.Namespace) -> int:
+    resampled, _ = resample_to_grid(args.source, args.sample, order=args.order)
+    save_volume(np.asanyarray(resampled.dataobj), resampled, args.output)
+    print(args.output)
     return 0
 
 
@@ -240,6 +339,14 @@ def run_filter(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_detrend(args: argparse.Namespace) -> int:
+    img, matrix = load_4d_matrix(args.functional)
+    detrended = detrend_preserve_mean(matrix)
+    save_volume(detrended.reshape(*img.shape[:3], -1), img, args.output)
+    print(args.output)
+    return 0
+
+
 def run_flip_lr(args: argparse.Namespace) -> int:
     img, data = load_volume(args.image)
     save_volume(flip_left_right(data), img, args.output)
@@ -289,6 +396,12 @@ def run_segment_tissue(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_make_c6(args: argparse.Namespace) -> int:
+    _, mask = make_c6_mask(args.t1, args.output, threshold=args.threshold)
+    print(args.output, int((mask > 0).sum()))
+    return 0
+
+
 def run_estimate_deformation(args: argparse.Namespace) -> int:
     level_iters = tuple(int(x) for x in args.level_iters.replace(" ", "").split(",") if x)
     paths = estimate_deformation(
@@ -301,6 +414,49 @@ def run_estimate_deformation(args: argparse.Namespace) -> int:
     )
     for key, path in paths.items():
         print(key, path)
+    return 0
+
+
+def run_ants_register(args: argparse.Namespace) -> int:
+    stages = tuple(x for x in args.stages.replace(" ", "").split(",") if x)
+    cmd = build_ants_registration_command(
+        args.moving,
+        args.fixed,
+        args.output_prefix,
+        stages=stages,
+    )
+    if args.dry_run:
+        print(" ".join(cmd))
+        return 0
+    result = run_ants_registration(args.moving, args.fixed, args.output_prefix, stages=stages)
+    print(result["returncode"])
+    return 0
+
+
+def run_ants_apply_transform(args: argparse.Namespace) -> int:
+    cmd = build_ants_apply_transform_command(
+        args.input,
+        args.reference,
+        args.output,
+        args.transforms,
+        interpolation=args.interpolation,
+    )
+    if args.dry_run:
+        print(" ".join(cmd))
+        return 0
+    result = run_ants_apply_transform(
+        args.input,
+        args.reference,
+        args.output,
+        args.transforms,
+        interpolation=args.interpolation,
+    )
+    print(result["returncode"])
+    return 0
+
+
+def run_check_ants(args: argparse.Namespace) -> int:
+    print(json.dumps(check_ants_tools(), indent=2))
     return 0
 
 
@@ -371,11 +527,16 @@ def run_regress_covariates(args: argparse.Namespace) -> int:
 
 
 def run_extract_signal(args: argparse.Namespace) -> int:
-    img, data = load_volume(args.functional)
-    if data.ndim != 4:
-        raise ValueError("extract-signal expects 4D functional data")
+    if Path(args.functional).is_dir():
+        img, matrix = load_4d_matrix_dir(args.functional)
+        data = matrix.reshape(*img.shape[:3], -1)
+    else:
+        img, data = load_volume(args.functional)
+        if data.ndim != 4:
+            raise ValueError("extract-signal expects a 4D functional image or a directory of 3D images")
+        matrix = data.reshape(-1, data.shape[3])
     _, mask_data = load_volume(args.mask)
-    signal = extract_signal(data.reshape(-1, data.shape[3]), mask_data.reshape(-1) > 0)
+    signal = extract_signal(matrix, mask_data.reshape(-1) > 0)
     np.savetxt(args.output, signal, fmt="%.10f")
     print(args.output)
     return 0
@@ -386,6 +547,80 @@ def run_friston24(args: argparse.Namespace) -> int:
     expanded = friston24(rp)
     np.savetxt(args.output, expanded, fmt="%.10f")
     print(args.output)
+    return 0
+
+
+def run_motion_metrics(args: argparse.Namespace) -> int:
+    rp = np.loadtxt(args.rp)
+    result = head_motion_metrics(rp, args.reference)
+    serializable = {
+        key: value.tolist() if isinstance(value, np.ndarray) else value
+        for key, value in result.items()
+    }
+    Path(args.output_json).write_text(json.dumps(serializable, indent=2), encoding="utf-8")
+    print(args.output_json)
+    return 0
+
+
+def run_combine_images(args: argparse.Namespace) -> int:
+    volumes = []
+    reference = None
+    for path in args.images:
+        img, data = load_volume(path)
+        if data.ndim != 3:
+            raise ValueError("combine-images expects 3D images")
+        volumes.append(data)
+        reference = img if reference is None else reference
+    combined = combine_images(volumes, args.operation)
+    save_volume(combined, reference, args.output)
+    print(args.output)
+    return 0
+
+
+def run_concatenate_sessions(args: argparse.Namespace) -> int:
+    img, matrix = concatenate_sessions(
+        args.images,
+        operation=args.operation,
+        demean=not args.no_demean,
+    )
+    save_volume(matrix.reshape(*img.shape[:3], -1), img, args.output)
+    print(args.output)
+    return 0
+
+
+def run_merge_images(args: argparse.Namespace) -> int:
+    img, matrix = merge_images(args.images)
+    save_volume(matrix.reshape(*img.shape[:3], -1), img, args.output)
+    print(args.output)
+    return 0
+
+
+def run_timepoint_count(args: argparse.Namespace) -> int:
+    input_path = Path(args.input)
+    if input_path.is_dir():
+        _img, matrix = load_4d_matrix_dir(input_path)
+        count = matrix.shape[1]
+        name = input_path.name
+    else:
+        _img, data = load_volume(input_path)
+        count = data.shape[-1] if data.ndim == 4 else 1
+        name = input_path.name
+    Path(args.output).write_text(f"subject\ttimepoints\n{name}\t{count}\n", encoding="utf-8")
+    print(args.output, count)
+    return 0
+
+
+def run_text_to_nifti(args: argparse.Namespace) -> int:
+    shape = tuple(int(x) for x in args.shape.replace(" ", "").split(","))
+    if len(shape) != 3:
+        raise ValueError("shape must contain exactly three dimensions")
+    path = write_text_as_nifti(
+        args.text,
+        args.output,
+        shape,
+        reference=args.reference,
+    )
+    print(path)
     return 0
 
 

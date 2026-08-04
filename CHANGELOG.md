@@ -1,5 +1,51 @@
 # Changelog
 
+## 0.19.0 - 2026-08-03
+
+- Corrected status records to describe the project as an Alpha partial
+  migration instead of a complete production port.
+- Fixed `bandpass_filter` matrix-orientation handling.
+- Fixed `extract_signal` to match the original nonzero-value mean behavior.
+- Fixed the end-user app's DICOM folder Browse action.
+- Added DICOM series selection by index in `nm-dicom` and `nm-pipeline`.
+- Exposed individualized target-mask and native target-site options in CLI and
+  pipeline config.
+- Added white-matter seed FC, multi-seed FC, dynamic ALFF, group masks, JHU
+  tract reporting, head-motion QC metrics, c6 mask construction,
+  tract-profile extraction, AFQ-style SVG profile plots, and per-node profile
+  statistics, atlas-based streamline tract segmentation, and HTML tract QC
+  reports, plus AFQ-style streamline outlier cleaning and a subject-level
+  AFQ pipeline, ROI-based tract segmentation with the original Mori/JHU
+  templates, ROI/atlas method selection in the AFQ pipeline, and an HTML/SVG
+  image QC viewer, plus deformation-field streamline transforms.
+- Added HTML/SVG streamline rendering with axial, coronal, and sagittal
+  projections.
+- Added a permutation two-sample t-test command.
+- Added optional ANTs registration and transform-application commands.
+- Added ANTs execution tests that skip when ANTs is unavailable.
+- Added independent numerical-reference tests for ideal filtering and
+  head-motion metrics.
+- Added external-execution tests for FSL BET, eddy_correct, and MRtrix
+  tckgen that skip when binaries are unavailable.
+- Added `--seed-image` to the MRtrix tckgen wrapper and replaced the degenerate
+  FSL BET execution fixture; FSL/MRtrix external-execution tests pass 3/3 on
+  2026-08-04.
+- Changed DIPY deformation output to SPM world-coordinate `y_`/`iy_` fields,
+  with `y_` as the template-to-native pullback field used by
+  `apply_deformation`.
+- Added SPM25 standalone reference validation for the SPM `y_`/`iy_`
+  world-coordinate convention.
+- Added optional SPM25 segmentation integration to `nm-tms t1-target` and
+  `nm-pipeline` for T1-space target image generation.
+- Added FSL command pipelines for BET, eddy correction, FA/T1 transforms,
+  native/MNI transforms, and topup.
+- Added group-statistics commands for correlation comparison, chi-square,
+  quantile regression, covariate-adjusted t-tests, and ROI-wise FC.
+- Added reslice, detrend, merge-images, concatenate-sessions, combine-images,
+  timepoint-count, text-to-nifti, and directory-of-3D signal-extraction
+  commands.
+- Expanded tests from 74 to 130 collected/passing tests.
+
 ## 0.18.0 - 2026-08-03
 
 - Added `regress`, `regress-covariates`, `extract-signal`, and `friston24` CLI

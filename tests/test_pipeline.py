@@ -9,7 +9,12 @@ from neuroimaging_neuromodulation.pipeline.run import run_pipeline
 from neuroimaging_neuromodulation.targets.roi import sphere_roi
 
 
-def test_pipeline_real_fmri_subset(real_fmri_path: Path | None, real_fmri_available: bool, tmp_path: Path) -> None:
+def test_pipeline_real_fmri_subset(
+    real_fmri_path: Path | None,
+    real_fmri_available: bool,
+    tmp_path: Path,
+    package_data_dir: Path,
+) -> None:
     if not real_fmri_available:
         pytest.skip("real fMRI data not available")
     img = nib.load(real_fmri_path)
@@ -19,12 +24,17 @@ def test_pipeline_real_fmri_subset(real_fmri_path: Path | None, real_fmri_availa
     _, _ = sphere_roi([0.0, 0.0, 0.0], 18.0, img, tmp_path / "mask.nii")
     _, _ = sphere_roi([0.0, 0.0, 0.0], 10.0, img, tmp_path / "wm.nii")
     _, _ = sphere_roi([0.0, 0.0, 0.0], 10.0, img, tmp_path / "csf.nii")
+    _, _ = sphere_roi([0.0, 0.0, 0.0], 10.0, package_data_dir / "grey333.nii", tmp_path / "t1target.nii")
+    from neuroimaging_neuromodulation.io.deformations import identity_deformation
+
+    _, _ = identity_deformation(package_data_dir / "grey333.nii", tmp_path / "identity_t1.nii")
     config = {
         "subject": "pipe-test",
         "output_dir": str(tmp_path / "out"),
         "functional": str(tmp_path / "fivevol.nii"),
         "seed": str(tmp_path / "seed.nii"),
         "mask": str(tmp_path / "mask.nii"),
+        "t1": str(package_data_dir / "grey333.nii"),
         "tr": 2.0,
         "estimate_motion": True,
         "motion": {"level_iters": [3, 2, 1], "maxiter": 5},
@@ -35,6 +45,11 @@ def test_pipeline_real_fmri_subset(real_fmri_path: Path | None, real_fmri_availa
             "global_mask": str(tmp_path / "mask.nii"),
         },
         "target": {"p_value": 0.05, "n_samples": 5},
+        "t1_target": {
+            "target": str(tmp_path / "t1target.nii"),
+            "deformation": str(tmp_path / "identity_t1.nii"),
+            "output": str(tmp_path / "out" / "pipe-test" / "IndiTarget_T1Sp.nii"),
+        },
         "report": True,
     }
     result = run_pipeline(config)
@@ -42,5 +57,7 @@ def test_pipeline_real_fmri_subset(real_fmri_path: Path | None, real_fmri_availa
     assert (tmp_path / "out" / "pipe-test" / "rp.txt").exists()
     assert (tmp_path / "out" / "pipe-test" / "regressed.nii").exists()
     assert (tmp_path / "out" / "pipe-test" / "SeedFCinROI.nii").exists()
+    assert (tmp_path / "out" / "pipe-test" / "IndiTarget_T1Sp.nii").exists()
     assert (tmp_path / "out" / "pipe-test" / "report.html").exists()
     assert result["report"] is not None
+    assert result["t1_target"]["output"] is not None

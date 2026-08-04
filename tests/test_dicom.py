@@ -10,6 +10,7 @@ pytest.importorskip("dicom2nifti")
 from neuroimaging_neuromodulation.io.dicom import (  # noqa: E402
     convert_dicom_directory,
     convert_dicom_series,
+    convert_dicom_series_by_index,
     inspect_dicom_directory,
     validate_dicom_series,
 )
@@ -30,6 +31,12 @@ def test_convert_real_dicom_directory(tmp_path: Path) -> None:
     files = convert_dicom_directory("data/real_dicom/hitachi", output_dir, compression=True)
     assert files
     assert any(path.suffix == ".gz" for path in files)
+
+
+def test_convert_dicom_series_by_index(tmp_path: Path) -> None:
+    output = tmp_path / "selected.nii"
+    result = convert_dicom_series_by_index("data/real_dicom/hitachi", 0, output)
+    assert Path(result["NII_FILE"]).exists()
 
 
 def test_inspect_real_dicom_directory(tmp_path: Path) -> None:

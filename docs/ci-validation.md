@@ -19,3 +19,10 @@ Observed final status:
 - Windows 3.10, 3.11, 3.12: pass
 
 All nine CI matrix jobs pass.
+
+## Verification Caveat
+
+This page records the observed status at the time of writing. The repository
+does not contain CI run artifacts or a workflow badge, so the result cannot be
+independently reproduced from files in this workspace. Local verification is
+documented separately in `docs/testing.md`.

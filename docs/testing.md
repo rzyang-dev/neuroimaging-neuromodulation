@@ -28,6 +28,10 @@ Tests are grouped by responsibility:
 - `test_diffusion.py` also verifies probabilistic tensor tractography.
 - `test_deformations_estimate.py` verifies DIPY deformation estimation and
   `y_`/`iy_` coordinate-field conversion on real data.
+- `test_spm_reference.py` verifies SPM world-coordinate `y_`/`iy_` handling
+  against SPM25 standalone output when SPM is installed.
+- `test_targets.py` and `test_pipeline.py` verify T1-space target generation
+  with a supplied SPM `y_` field.
 - `test_pipeline.py` verifies a config-driven real-data pipeline.
 - `test_validation.py` verifies image and deformation validation metrics.
 - `test_external.py` verifies FSL/MRtrix command builders and missing-binary
@@ -45,13 +49,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-74 passed
+130 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-74 passed in 13.59s
+130 tests collected and passing
 ```
 
 The test command is:
@@ -79,7 +83,7 @@ The CLI was exercised end to end on the real downloaded fMRI subject:
 `pip wheel` builds successfully:
 
 ```text
-neuroimaging_neuromodulation-0.18.0-py3-none-any.whl
+neuroimaging_neuromodulation-0.19.0-py3-none-any.whl
 ```
 
 The wheel contains the package modules, bundled real template/mask data, CLI
@@ -88,3 +92,55 @@ entry points, and license metadata.
 ## Known Issues
 
 See `docs/issues.md`.
+
+## Test Limitations
+
+The current suite is a smoke-test suite for the implemented Python subset. It
+does not prove migration completeness or numerical equivalence with the
+original MATLAB toolbox:
+
+- Several tests assert only that outputs exist, shapes are correct, or values
+  are finite.
+- Probabilistic tractography can pass with zero streamlines.
+- Motion, coregistration, segmentation, and tractography still lack full
+  reference comparison against MATLAB/SPM/FSL outputs.
+- GUI tests cover config construction only; the desktop UIs are not exercised.
+- Missing workflows listed in `docs/porting-status.md` have no coverage.
+
+These limitations must be resolved before the project can claim a complete
+migration or production readiness.
+
+External-execution tests for FSL BET, `eddy_correct`, and MRtrix `tckgen` are
+present and skip automatically when the corresponding binary is not installed.
+ANTs execution tests are also present and skip when ANTs is unavailable.
+The MRtrix `tckgen` wrapper now accepts `seed_image`; the execution test uses
+the `SeedTest` algorithm so it verifies binary/wrapper integration without
+requiring FOD generation.
+
+On this development machine the FSL/MRtrix binaries live inside WSL, so these
+tests can be run from the WSL dev environment (`~/nm-dev-venv`, editable
+install `~/nm-src`) with `source /home/dev/fsl/etc/fslconf/fsl.sh` so that
+`shutil.which` finds them. ANTs 2.6.5 is installed on Windows
+(`C:\Program Files\ants-2.6.5\bin`) and has been added to the user PATH
+(2026-08-04), so `shutil.which` finds its binaries in new processes.
+
+## External-Execution Results (2026-08-04)
+
+Verified against the installed binaries:
+
+- `tests/test_ants_execution.py` (Windows, `.venv-win`): **2/2 pass**
+  (`antsRegistration --version`, `antsApplyTransforms --help`).
+- `tests/test_spm_reference.py` (Windows, `.venv-win`, SPM25 standalone):
+  **1/1 pass**. Applying SPM's `y_T1.nii` with the package reproduces SPM's
+  `wc1T1.nii` warped tissue output with correlation > 0.99.
+- `tests/test_external_execution.py` (WSL, `~/nm-dev-venv` on `~/nm-src`,
+  with `fsl.sh` sourced): **3/3 pass**
+  - `test_fsl_eddy_correct_execution`: pass.
+  - `test_fsl_bet_execution`: pass on a realistic 32x32x32 ellipsoid fixture.
+    The previous constant 8x8x8 input segfaulted FSL `bet2`, so the fixture was
+    replaced with a non-degenerate input.
+  - `test_mrtrix_tckgen_execution`: pass with `-seed_image` and the
+    `SeedTest` algorithm.
+
+The external wrapper smoke coverage is complete for the installed binaries;
+reference parity against MATLAB/SPM/FSL remains a separate objective.

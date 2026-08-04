@@ -115,17 +115,199 @@ def build_mrtrix_tckgen_command(
     *,
     algorithm: str = "iFOD2",
     num_tracks: int = 100000,
+    seed_image: str | Path | None = None,
 ) -> list[str]:
-    return [
+    cmd = [
         "tckgen",
         "-algorithm",
         algorithm,
         "-select",
         str(num_tracks),
-        "-mask",
-        str(mask),
-        str(dwi),
-        str(output),
+    ]
+    if seed_image is not None:
+        cmd += ["-seed_image", str(seed_image)]
+    cmd += ["-mask", str(mask), str(dwi), str(output)]
+    return cmd
+
+
+def build_fsl_bet_command(
+    input_image: str | Path,
+    output_image: str | Path,
+    *,
+    robust: bool = True,
+    zero_gradient: bool = True,
+    no_ss: bool = True,
+    mask: bool = True,
+) -> list[str]:
+    """Build the FSL BET command used by the original ``TMSBET.sh``."""
+
+    cmd = ["bet", str(input_image), str(output_image)]
+    if robust:
+        cmd.append("-F")
+    if zero_gradient:
+        cmd.append("-g")
+        cmd.append("0")
+    if no_ss:
+        cmd.append("-n")
+    if mask:
+        cmd.append("-m")
+    return cmd
+
+
+def build_fsl_eddy_correct_command(
+    input_image: str | Path,
+    output_image: str | Path,
+    reference_volume: int = 0,
+) -> list[str]:
+    """Build the legacy FSL eddy_correct command from ``TMSEddyCorr.sh``."""
+
+    return ["eddy_correct", str(input_image), str(output_image), str(reference_volume)]
+
+
+def build_fsl_flirt_command(
+    input_image: str | Path,
+    reference_image: str | Path,
+    output_image: str | Path | None = None,
+    *,
+    init_matrix: str | Path | None = None,
+    apply_xfm: bool = False,
+    out_matrix: str | Path | None = None,
+) -> list[str]:
+    """Build an FSL FLIRT command for FA-to-T1 or native/MNI transforms."""
+
+    cmd = [
+        "flirt",
+        "-in",
+        str(input_image),
+        "-ref",
+        str(reference_image),
+    ]
+    if output_image is not None:
+        cmd += ["-out", str(output_image)]
+    if init_matrix is not None:
+        cmd += ["-init", str(init_matrix)]
+    if apply_xfm:
+        cmd.append("-applyxfm")
+    if out_matrix is not None:
+        cmd += ["-omat", str(out_matrix)]
+    return cmd
+
+
+def build_fsl_convert_xfm_command(
+    input_matrix: str | Path,
+    output_matrix: str | Path,
+    *,
+    inverse: bool = False,
+) -> list[str]:
+    cmd = ["convert_xfm"]
+    if inverse:
+        cmd.append("-inverse")
+    cmd += ["-omat", str(output_matrix), str(input_matrix)]
+    return cmd
+
+
+def build_fsl_applywarp_command(
+    input_image: str | Path,
+    reference_image: str | Path,
+    output_image: str | Path,
+    warp: str | Path,
+    *,
+    premat: str | Path | None = None,
+) -> list[str]:
+    cmd = [
+        "applywarp",
+        "--ref",
+        str(reference_image),
+        "--in",
+        str(input_image),
+        "--warp",
+        str(warp),
+        "--out",
+        str(output_image),
+    ]
+    if premat is not None:
+        cmd += ["--premat", str(premat)]
+    return cmd
+
+
+def build_fsl_fnirt_command(
+    input_image: str | Path,
+    reference_image: str | Path,
+    output_coeff: str | Path,
+    *,
+    affine: str | Path | None = None,
+    config: str | Path | None = None,
+) -> list[str]:
+    cmd = [
+        "fnirt",
+        "--in",
+        str(input_image),
+        "--ref",
+        str(reference_image),
+        "--cout",
+        str(output_coeff),
+    ]
+    if affine is not None:
+        cmd += ["--aff", str(affine)]
+    if config is not None:
+        cmd += ["--config", str(config)]
+    return cmd
+
+
+def build_fsl_invwarp_command(
+    warp: str | Path,
+    output_warp: str | Path,
+    reference_image: str | Path,
+) -> list[str]:
+    return [
+        "invwarp",
+        "-w",
+        str(warp),
+        "-o",
+        str(output_warp),
+        "-r",
+        str(reference_image),
+    ]
+
+
+def build_fsl_topup_command(
+    imain: str | Path,
+    datain: str | Path,
+    config: str | Path,
+    output_prefix: str | Path,
+) -> list[str]:
+    return [
+        "topup",
+        "--imain",
+        str(imain),
+        "--datain",
+        str(datain),
+        "--config",
+        str(config),
+        "--out",
+        str(output_prefix),
+    ]
+
+
+def build_fsl_applytopup_command(
+    imain: str | Path,
+    inindex: str,
+    datain: str | Path,
+    topup_prefix: str | Path,
+    output_image: str | Path,
+) -> list[str]:
+    return [
+        "applytopup",
+        "--imain",
+        str(imain),
+        "--inindex",
+        inindex,
+        "--datain",
+        str(datain),
+        "--topup",
+        str(topup_prefix),
+        "--out",
+        str(output_image),
     ]
 
 
@@ -179,18 +361,116 @@ def run_mrtrix_tckgen(
     *,
     algorithm: str = "iFOD2",
     num_tracks: int = 100000,
+    seed_image: str | Path | None = None,
 ) -> dict[str, object]:
-    return _run(build_mrtrix_tckgen_command(dwi, mask, output, algorithm=algorithm, num_tracks=num_tracks))
+    return _run(
+        build_mrtrix_tckgen_command(
+            dwi,
+            mask,
+            output,
+            algorithm=algorithm,
+            num_tracks=num_tracks,
+            seed_image=seed_image,
+        )
+    )
+
+
+def run_fsl_bet(
+    input_image: str | Path,
+    output_image: str | Path,
+    **kwargs: object,
+) -> dict[str, object]:
+    return _run(build_fsl_bet_command(input_image, output_image, **kwargs))
+
+
+def run_fsl_eddy_correct(
+    input_image: str | Path,
+    output_image: str | Path,
+    reference_volume: int = 0,
+) -> dict[str, object]:
+    return _run(build_fsl_eddy_correct_command(input_image, output_image, reference_volume))
+
+
+def run_fsl_flirt(
+    input_image: str | Path,
+    reference_image: str | Path,
+    output_image: str | Path | None = None,
+    **kwargs: object,
+) -> dict[str, object]:
+    return _run(build_fsl_flirt_command(input_image, reference_image, output_image, **kwargs))
+
+
+def run_fsl_applywarp(
+    input_image: str | Path,
+    reference_image: str | Path,
+    output_image: str | Path,
+    warp: str | Path,
+    **kwargs: object,
+) -> dict[str, object]:
+    return _run(build_fsl_applywarp_command(input_image, reference_image, output_image, warp, **kwargs))
+
+
+def run_fsl_fnirt(
+    input_image: str | Path,
+    reference_image: str | Path,
+    output_coeff: str | Path,
+    **kwargs: object,
+) -> dict[str, object]:
+    return _run(build_fsl_fnirt_command(input_image, reference_image, output_coeff, **kwargs))
+
+
+def run_fsl_invwarp(
+    warp: str | Path,
+    output_warp: str | Path,
+    reference_image: str | Path,
+) -> dict[str, object]:
+    return _run(build_fsl_invwarp_command(warp, output_warp, reference_image))
+
+
+def run_fsl_topup(
+    imain: str | Path,
+    datain: str | Path,
+    config: str | Path,
+    output_prefix: str | Path,
+) -> dict[str, object]:
+    return _run(build_fsl_topup_command(imain, datain, config, output_prefix))
+
+
+def run_fsl_applytopup(
+    imain: str | Path,
+    inindex: str,
+    datain: str | Path,
+    topup_prefix: str | Path,
+    output_image: str | Path,
+) -> dict[str, object]:
+    return _run(build_fsl_applytopup_command(imain, inindex, datain, topup_prefix, output_image))
 
 
 __all__ = [
+    "build_fsl_applytopup_command",
+    "build_fsl_applywarp_command",
     "build_fsl_bedpostx_command",
+    "build_fsl_bet_command",
+    "build_fsl_convert_xfm_command",
     "build_fsl_dtifit_command",
+    "build_fsl_eddy_correct_command",
+    "build_fsl_flirt_command",
+    "build_fsl_fnirt_command",
+    "build_fsl_invwarp_command",
     "build_fsl_probtrackx_command",
+    "build_fsl_topup_command",
     "build_mrtrix_tckgen_command",
     "check_external_tools",
     "run_fsl_bedpostx",
+    "run_fsl_bet",
+    "run_fsl_applytopup",
+    "run_fsl_applywarp",
     "run_fsl_dtifit",
+    "run_fsl_eddy_correct",
+    "run_fsl_flirt",
+    "run_fsl_fnirt",
+    "run_fsl_invwarp",
     "run_fsl_probtrackx",
+    "run_fsl_topup",
     "run_mrtrix_tckgen",
 ]

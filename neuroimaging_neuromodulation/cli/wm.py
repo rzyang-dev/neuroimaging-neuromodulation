@@ -3,9 +3,17 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
 from ..wm.alff import compute_alff
+from ..wm.dynamic import dynamic_alff
+from ..wm.group import group_probability_maps
 from ..wm.masks import make_gm_mask, make_wm_mask
+from ..wm.plots import plot_group_profiles
+from ..wm.seedfc import wm_multi_seed_fc, wm_seed_fc
+from ..wm.statistics import profile_group_statistics
+from ..wm.trackqc import tract_qc_report
+from ..wm.tracts import cluster_report_in_jhu
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -40,6 +48,68 @@ def build_parser() -> argparse.ArgumentParser:
     gm_mask.add_argument("--output-dir", required=True)
     gm_mask.add_argument("--threshold", type=float, default=0.1)
     gm_mask.set_defaults(handler=run_gm_mask)
+
+    seed_fc = subparsers.add_parser("seed-fc", help="Compute white-matter seed FC")
+    seed_fc.add_argument("--functional", required=True)
+    seed_fc.add_argument("--seed", required=True)
+    seed_fc.add_argument("--mask", required=True)
+    seed_fc.add_argument("--output", required=True, help="Output Fisher z FC map NIfTI")
+    seed_fc.set_defaults(handler=run_seed_fc)
+
+    multi_seed_fc = subparsers.add_parser("multi-seed-fc", help="Compute FC for multiple white-matter seeds")
+    multi_seed_fc.add_argument("--functional", required=True)
+    multi_seed_fc.add_argument("--seeds", nargs="+", required=True)
+    multi_seed_fc.add_argument("--mask", required=True)
+    multi_seed_fc.add_argument("--output-dir", required=True)
+    multi_seed_fc.set_defaults(handler=run_multi_seed_fc)
+
+    cluster = subparsers.add_parser("cluster-report", help="Report result overlap with JHU tracts")
+    cluster.add_argument("--result", required=True)
+    cluster.add_argument("--template", default=None, help="JHU tract label NIfTI")
+    cluster.add_argument("--output-dir", required=True)
+    cluster.add_argument("--labels", default=None, help="Optional JHU label text file")
+    cluster.set_defaults(handler=run_cluster_report)
+
+    d_alff = subparsers.add_parser("dynamic-alff", help="Compute dynamic ALFF maps")
+    d_alff.add_argument("--functional", required=True)
+    d_alff.add_argument("--mask", required=True)
+    d_alff.add_argument("--output-dir", required=True)
+    d_alff.add_argument("--tr", type=float, required=True)
+    d_alff.add_argument("--low-cutoff", type=float, default=0.01)
+    d_alff.add_argument("--high-cutoff", type=float, default=0.1)
+    d_alff.add_argument("--window-length", type=int, default=50)
+    d_alff.add_argument("--step", type=int, default=5)
+    d_alff.set_defaults(handler=run_dynamic_alff)
+
+    group = subparsers.add_parser("group-mask", help="Build a group GM/WM mask from segment maps")
+    group.add_argument("--segments", nargs="+", required=True)
+    group.add_argument("--output", required=True)
+    group.add_argument("--threshold", type=float, default=0.9)
+    group.add_argument("--group-threshold", type=float, default=None)
+    group.set_defaults(handler=run_group_mask)
+
+    plot = subparsers.add_parser("plot-profiles", help="Plot AFQ-style group tract profiles as SVG")
+    plot.add_argument("--profiles", nargs="+", required=True, help="Profile matrices (.npy or text)")
+    plot.add_argument("--n-group1", type=int, required=True)
+    plot.add_argument("--output-dir", required=True)
+    plot.add_argument("--labels", nargs="*", default=None)
+    plot.add_argument("--title-prefix", default="Tract")
+    plot.set_defaults(handler=run_plot_profiles)
+
+    afq_stat = subparsers.add_parser("afq-stat", help="Run AFQ-style group profile statistics")
+    afq_stat.add_argument("--profiles", nargs="+", required=True)
+    afq_stat.add_argument("--n-group1", type=int, required=True)
+    afq_stat.add_argument("--labels", nargs="*", default=None)
+    afq_stat.add_argument("--output-json", required=True)
+    afq_stat.set_defaults(handler=run_afq_stat)
+
+    qc = subparsers.add_parser("tract-qc", help="Generate an HTML tract QC report")
+    qc.add_argument("--profiles", nargs="+", required=True)
+    qc.add_argument("--n-group1", type=int, required=True)
+    qc.add_argument("--labels", nargs="*", default=None)
+    qc.add_argument("--segmentation-json")
+    qc.add_argument("--output-dir", required=True)
+    qc.set_defaults(handler=run_tract_qc)
 
     return parser
 
@@ -80,6 +150,107 @@ def run_gm_mask(args: argparse.Namespace) -> int:
         threshold=args.threshold,
     )
     print(path)
+    return 0
+
+
+def run_seed_fc(args: argparse.Namespace) -> int:
+    path, _ = wm_seed_fc(
+        args.functional,
+        args.seed,
+        args.mask,
+        output_path=args.output,
+    )
+    print(path)
+    return 0
+
+
+def run_multi_seed_fc(args: argparse.Namespace) -> int:
+    results = wm_multi_seed_fc(
+        args.functional,
+        [Path(seed) for seed in args.seeds],
+        args.mask,
+        output_dir=args.output_dir,
+    )
+    for name, (path, _) in results.items():
+        print(name, path)
+    return 0
+
+
+def run_cluster_report(args: argparse.Namespace) -> int:
+    package_data = Path(__file__).resolve().parents[1] / "data"
+    template = args.template or package_data / "JHUtractsThr25_3mm.nii"
+    report = cluster_report_in_jhu(
+        args.result,
+        template,
+        args.output_dir,
+        labels_file=args.labels,
+    )
+    print(report)
+    return 0
+
+
+def run_dynamic_alff(args: argparse.Namespace) -> int:
+    result = dynamic_alff(
+        args.functional,
+        args.mask,
+        args.output_dir,
+        tr=args.tr,
+        low_cutoff=args.low_cutoff,
+        high_cutoff=args.high_cutoff,
+        window_length=args.window_length,
+        step=args.step,
+    )
+    print(result["dALFF"])
+    print(len(result["windows"]))
+    return 0
+
+
+def run_group_mask(args: argparse.Namespace) -> int:
+    path, _ = group_probability_maps(
+        args.segments,
+        args.output,
+        threshold=args.threshold,
+        output_threshold=args.group_threshold,
+    )
+    print(path)
+    return 0
+
+
+def run_plot_profiles(args: argparse.Namespace) -> int:
+    paths = plot_group_profiles(
+        args.profiles,
+        args.output_dir,
+        n_group1=args.n_group1,
+        labels=args.labels,
+        title_prefix=args.title_prefix,
+    )
+    for path in paths:
+        print(path)
+    return 0
+
+
+def run_afq_stat(args: argparse.Namespace) -> int:
+    import json
+
+    result = profile_group_statistics(
+        args.profiles,
+        n_group1=args.n_group1,
+        labels=args.labels,
+    )
+    Path(args.output_json).write_text(json.dumps(result, indent=2), encoding="utf-8")
+    print(args.output_json)
+    return 0
+
+
+def run_tract_qc(args: argparse.Namespace) -> int:
+    report = tract_qc_report(
+        args.profiles,
+        args.output_dir,
+        n_group1=args.n_group1,
+        labels=args.labels,
+        segmentation_json=args.segmentation_json,
+    )
+    print(report)
     return 0
 
 

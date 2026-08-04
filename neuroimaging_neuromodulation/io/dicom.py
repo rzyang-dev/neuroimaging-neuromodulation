@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import shutil
+import tempfile
 from pathlib import Path
 
 from pydicom import dcmread
@@ -38,9 +40,11 @@ def inspect_dicom_directory(dicom_directory: str | Path) -> dict[str, object]:
                 "columns": dataset.get("Columns"),
                 "slice_thickness": dataset.get("SliceThickness"),
                 "pixel_spacing": list(dataset.get("PixelSpacing", [])) if dataset.get("PixelSpacing") else None,
+                "files": [],
             },
         )
         entry["number_of_files"] = int(entry["number_of_files"]) + 1
+        entry["files"].append(str(path))
     if total == 0:
         raise RuntimeError(f"No readable DICOM files found in {dicom_directory}")
     return {
@@ -117,9 +121,39 @@ def convert_dicom_series(
     return result
 
 
+def convert_dicom_series_by_index(
+    dicom_directory: str | Path,
+    series_index: int,
+    output_file: str | Path,
+    *,
+    reorient: bool = True,
+) -> dict[str, object]:
+    """Convert one DICOM series from a mixed directory by series index."""
+
+    summary = inspect_dicom_directory(dicom_directory)
+    series = summary["series"]
+    if not 0 <= int(series_index) < len(series):
+        raise ValueError(
+            f"series_index must be between 0 and {len(series) - 1}, got {series_index}"
+        )
+    files = [Path(path) for path in series[int(series_index)]["files"]]
+    if not files:
+        raise RuntimeError("Selected DICOM series contains no readable files")
+    output_file = Path(output_file)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="nm-dicom-series-") as temp_dir:
+        copied = []
+        for index, source in enumerate(sorted(files)):
+            target = Path(temp_dir) / f"{index:06d}.dcm"
+            shutil.copy2(source, target)
+            copied.append(target)
+        return convert_dicom_series(temp_dir, output_file, reorient=reorient)
+
+
 __all__ = [
     "convert_dicom_directory",
     "convert_dicom_series",
+    "convert_dicom_series_by_index",
     "inspect_dicom_directory",
     "validate_dicom_series",
 ]

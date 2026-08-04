@@ -2,8 +2,19 @@
   "subject": "subject",
   "output_dir": "data/pipeline",
   "functional": "path/to/preprocessed/4d_fmri.nii",
+  "dicom": {
+    "functional": null,
+    "functional_series_index": null,
+    "structural": null,
+    "structural_series_index": null
+  },
   "seed": "path/to/seed.nii",
   "mask": "path/to/mask.nii",
+  "target_mask": "path/to/target-roi-mni.nii",
+  "c6": "path/to/c6ac_coT1.nii",
+  "c1": "path/to/c1ac_coT1.nii",
+  "depth_mm": null,
+  "extend_iterations": 15,
   "tr": 2.0,
   "slice_order": [1, 2, 3, 4, 5],
   "ref_slice": 1,
@@ -24,7 +35,15 @@
   "target": {
     "posneg": ["Positive", "Negative"],
     "p_value": 0.05,
-    "n_samples": 212
+    "n_samples": 212,
+    "native_deformation": null
+  },
+  "t1_target": {
+    "target": null,
+    "deformation": null,
+    "output": null,
+    "spm_dir": null,
+    "timeout": 1800
   },
   "report": true
 }
