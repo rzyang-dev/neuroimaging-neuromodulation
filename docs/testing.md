@@ -42,6 +42,8 @@ Tests are grouped by responsibility:
   realignment on real fMRI.
 - `test_spm_coreg_reference.py` verifies DIPY rigid coregistration against
   SPM25 on known real-image shifts.
+- `test_render_tracts.py` verifies the interactive HTML/WebGL 3D streamline
+  viewer output.
 - `test_pipeline.py` verifies a config-driven real-data pipeline.
 - `test_validation.py` verifies image and deformation validation metrics.
 - `test_external.py` verifies FSL/MRtrix command builders and missing-binary
@@ -59,13 +61,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-138 tests collected and passing
+139 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-138 tests collected and passing
+139 tests collected and passing
 ```
 
 The test command is:

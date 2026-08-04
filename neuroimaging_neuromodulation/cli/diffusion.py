@@ -13,7 +13,7 @@ from ..diffusion.afq import afq_subject_pipeline
 from ..diffusion.connectivity import count_streamlines_between_masks
 from ..diffusion.dti import fit_tensor, load_dwi, write_tensor_metrics
 from ..diffusion.outliers import remove_fiber_outliers
-from ..diffusion.render import render_streamlines_html
+from ..diffusion.render import render_streamlines_3d_html, render_streamlines_html
 from ..diffusion.roi_segmentation import segment_streamlines_by_rois
 from ..diffusion.segmentation import segment_streamlines_by_atlas
 from ..diffusion.tracking import track_deterministic, track_probabilistic
@@ -160,6 +160,14 @@ def build_parser() -> argparse.ArgumentParser:
     render.add_argument("--n-samples", type=int, default=50)
     render.add_argument("--title", default="Tract render")
     render.set_defaults(handler=run_render_tracts)
+
+    render_3d = subparsers.add_parser("render-tracts-3d", help="Render streamlines as an interactive HTML/WebGL viewer")
+    render_3d.add_argument("--tracks", required=True)
+    render_3d.add_argument("--atlas", required=True)
+    render_3d.add_argument("--output", required=True)
+    render_3d.add_argument("--n-samples", type=int, default=50)
+    render_3d.add_argument("--title", default="Tract render 3D")
+    render_3d.set_defaults(handler=run_render_tracts_3d)
 
     afq = subparsers.add_parser("afq-pipeline", help="Run a subject-level AFQ-style tract analysis")
     afq.add_argument("--tracks", required=True)
@@ -467,6 +475,23 @@ def run_render_tracts(args: argparse.Namespace) -> int:
         n_samples=args.n_samples,
     )
     path = render_streamlines_html(
+        streamlines,
+        segmentation["labels"],
+        args.output,
+        title=args.title,
+    )
+    print(path)
+    return 0
+
+
+def run_render_tracts_3d(args: argparse.Namespace) -> int:
+    streamlines = load_tract_streamlines(args.tracks, args.atlas)
+    segmentation = segment_streamlines_by_atlas(
+        streamlines,
+        args.atlas,
+        n_samples=args.n_samples,
+    )
+    path = render_streamlines_3d_html(
         streamlines,
         segmentation["labels"],
         args.output,

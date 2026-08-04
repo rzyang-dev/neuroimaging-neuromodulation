@@ -48,6 +48,8 @@
   estimator.
 - Added SPM25 coregistration reference validation against DIPY rigid
   registration.
+- Added an interactive HTML/WebGL 3D streamline viewer and
+  `nm-diffusion render-tracts-3d`.
 - Added FSL command pipelines for BET, eddy correction, FA/T1 transforms,
   native/MNI transforms, and topup.
 - Added group-statistics commands for correlation comparison, chi-square,
@@ -55,7 +57,7 @@
 - Added reslice, detrend, merge-images, concatenate-sessions, combine-images,
   timepoint-count, text-to-nifti, and directory-of-3D signal-extraction
   commands.
-- Expanded tests from 74 to 138 collected/passing tests.
+- Expanded tests from 74 to 139 collected/passing tests.
 
 ## 0.18.0 - 2026-08-03
 

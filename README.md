@@ -99,6 +99,8 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - HTML target reports and SHA-256 output manifests for traceability
 - HTML/SVG image QC viewer with axial slices and target overlays
 - HTML/SVG streamline rendering with axial, coronal, and sagittal projections
+- Interactive HTML/WebGL 3D streamline viewer through `nm-diffusion
+  render-tracts-3d`
 
 ## What Is Not Included
 

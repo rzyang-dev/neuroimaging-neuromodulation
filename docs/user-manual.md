@@ -241,6 +241,12 @@ Outputs:
   --output <tract-render.html> \
   --title "Tract QC"
 
+.venv/bin/nm-diffusion render-tracts-3d \
+  --tracks <tracks.trk> \
+  --atlas <JHUtractsThr25_3mm.nii> \
+  --output <tract-render-3d.html> \
+  --title "Tract QC 3D"
+
 .venv/bin/nm-diffusion clean-tracts \
   --tracks <tracks.trk> \
   --reference <T1.nii> \

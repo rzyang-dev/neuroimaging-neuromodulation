@@ -62,6 +62,8 @@ noted limitations:
   counts
 - HTML/SVG image QC viewer with axial slices and target overlays
 - HTML/SVG streamline rendering with axial, coronal, and sagittal projections
+- Interactive HTML/WebGL 3D streamline viewer through `nm-diffusion
+  render-tracts-3d`
 - AFQ-style group profile plots and per-node profile statistics
 - FSL/MRtrix command builders for BET, eddy correction, FA/T1 transforms,
   native/MNI transforms, topup, bedpostx, dtifit, probtrackx, and tckgen
@@ -75,8 +77,8 @@ noted limitations:
 
 ### White-matter and AFQ workflows
 
-- Validated ANTs integration and interactive 3D fiber rendering for AFQ
-  segmentation
+- Validated ANTs integration and TrackQC statistical workflow integration for
+  AFQ segmentation
 - Full `TrackQC` fiber-rendering visualization and the
   `TractMS2Nii`/`TMSmerge.sh`/`TwoSamTTest.sh` statistical workflow
 
@@ -113,7 +115,7 @@ noted limitations:
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 3/3 pass, including a
   real-template registration/apply integration test
-- Local test suite: `138 tests collected` and passing
+- Local test suite: `139 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently
@@ -151,8 +153,8 @@ and FSL normalization comparisons are still not implemented:
   was run on 2026-08-04 with `.venv-win` (`antsRegistration --version`,
   `antsApplyTransforms --help`, and a real-template rigid/affine
   registration/apply workflow): 3/3 pass.
-- Interactive 3D fiber rendering still requires a rendering runtime that is
-  not part of this environment.
+- Interactive 3D fiber rendering is available as an HTML/WebGL viewer that runs
+  in any WebGL-capable browser.
 
 The Python-native port is substantially implemented, and SPM `y_`/`iy_`
 world-coordinate convention, realignment, and coregistration reference
