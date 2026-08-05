@@ -36,6 +36,11 @@ jobs:
             --collect-all neuroimaging_neuromodulation \
             --paths . \
             packaging/launch_nm_toolbox.py
+      - name: Smoke test packaged CLI
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then EXE=dist/nm-toolbox.exe; else EXE=dist/nm-toolbox; fi
+          "$EXE" doctor --json
       - name: Upload executables
         uses: actions/upload-artifact@v4
         with:
