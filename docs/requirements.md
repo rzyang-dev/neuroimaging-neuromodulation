@@ -59,3 +59,7 @@ resampling. Nonlinear deformation estimation is available through DIPY, but
 DARTEL-grade segmentation, SPM-compatible deformation conventions, and FSL
 BEDPOSTX tractography are outside this release because replacing SPM/FSL
 reliably is not feasible within the lightweight-dependency constraint.
+
+As of `0.20.0`, the normal runtime dependency budget is NumPy, SciPy, and
+NiBabel. DIPY, DICOM libraries, and Nilearn are optional extras, and SPM/FSL/
+ANTs/SimNIBS are optional runtime providers only.

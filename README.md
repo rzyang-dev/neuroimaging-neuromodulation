@@ -7,10 +7,11 @@ into connectivity maps, amplitude maps, ROIs, and TMS target candidates.
 
 ## Status
 
-**Alpha / partial migration.** This is not a complete port of the original
-MATLAB toolbox and is not production-ready. The repository contains a working
-Python-native subset that is useful for development and method comparison, but
-several original workflows are still missing or approximate. See
+**Production hardening in progress.** This is not yet a production release,
+but the normal analysis path is being moved to a minimal Python core without
+MATLAB, SPM, FSL, DARTEL, or ANTs requirements. The repository contains a
+working Python-native subset; several original workflows are still missing or
+approximate. See
 `docs/porting-status.md`, `docs/completion-audit.md`, and `docs/issues.md` for
 the current requirement-by-requirement status.
 
@@ -146,13 +147,13 @@ replacement for the original end-user application.
 ```bash
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -e ".[test]"
+.venv/bin/python -m pip install -e ".[test,diffusion,dicom,demo]"
 ```
 
 Use the Tsinghua PyPI mirror in mainland China when the default index is slow:
 
 ```bash
-.venv/bin/python -m pip install -e ".[test]" -i https://pypi.tuna.tsinghua.edu.cn/simple
+.venv/bin/python -m pip install -e ".[test,diffusion,dicom,demo]" -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ## Quick Start
@@ -190,6 +191,12 @@ Launch the guided end-user app:
 .venv/bin/nm-app
 ```
 
+Check the Python-native core and optional runtimes:
+
+```bash
+.venv/bin/nm-toolbox doctor
+```
+
 ## Tests
 
 ```bash
@@ -206,7 +213,8 @@ subject downloaded through Nilearn.
 .venv/bin/python -m pip wheel . --no-deps -w dist
 ```
 
-The verified wheel is `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`.
+The current version is `0.20.0`; the latest verified wheel in `dist/` may lag
+the source until the release pipeline is completed.
 
 ## Documentation
 

@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 
 from ..io.deformations import apply_deformation
-from ..io.nifti import load_4d_matrix, load_volume, save_volume
+from ..io.nifti import count_timepoints, load_4d_matrix, load_volume, save_volume
 from ..preprocess.spatial import smooth_volume
 from ..preprocess.temporal import apply_motion_parameters, slice_timing_correct_volume
 from ..reporting.html import render_target_report
@@ -23,6 +23,7 @@ from ..stats.group import (
     ttest2_with_covariates,
 )
 from ..stats.functional import roi_correlation_matrix
+from ..targets.center import image_region_centers
 from ..targets.pipeline import seed_based_fc, target_site
 from ..targets.roi import deep_target, sphere_roi
 from ..targets.t1 import generate_t1_target
@@ -183,6 +184,21 @@ def build_parser() -> argparse.ArgumentParser:
     perm.add_argument("--random-seed", type=int, default=0)
     perm.add_argument("--output-json", required=True)
     perm.set_defaults(handler=run_permutation_ttest)
+
+    mni_center = subparsers.add_parser(
+        "mni-center", help="Compute MNI centers of positive regions in an image"
+    )
+    mni_center.add_argument("--image", required=True)
+    mni_center.add_argument("--output-json", required=True)
+    mni_center.add_argument("--min-voxels", type=int, default=1)
+    mni_center.set_defaults(handler=run_mni_center)
+
+    tp_calc = subparsers.add_parser(
+        "tp-calc", help="Count timepoints in a functional NIfTI image"
+    )
+    tp_calc.add_argument("--functional", required=True)
+    tp_calc.add_argument("--output-json", required=True)
+    tp_calc.set_defaults(handler=run_tp_calc)
 
     return parser
 
@@ -417,6 +433,27 @@ def run_permutation_ttest(args: argparse.Namespace) -> int:
     )
     Path(args.output_json).write_text(json.dumps(result), encoding="utf-8")
     print(args.output_json)
+    return 0
+
+
+def run_mni_center(args: argparse.Namespace) -> int:
+    centers = image_region_centers(
+        args.image,
+        output_json=args.output_json,
+        min_voxels=args.min_voxels,
+    )
+    print(json.dumps(centers, indent=2))
+    return 0
+
+
+def run_tp_calc(args: argparse.Namespace) -> int:
+    count = count_timepoints(args.functional)
+    result = {
+        "functional": str(Path(args.functional)),
+        "timepoints": count,
+    }
+    Path(args.output_json).write_text(json.dumps(result, indent=2), encoding="utf-8")
+    print(json.dumps(result, indent=2))
     return 0
 
 

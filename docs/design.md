@@ -14,6 +14,13 @@ neuroimaging_neuromodulation/
   data/        real templates and masks bundled with the package
 ```
 
+## Runtime Boundary
+
+The normal analysis path depends only on NumPy, SciPy, and NiBabel. DIPY,
+pydicom/dicom2nifti, and Nilearn are optional extras. MATLAB, SPM, FSL, ANTs,
+and SimNIBS are never imported by core code; they are discovered through
+optional runtime providers and reported by `nm-toolbox doctor`.
+
 ## Core Data Structures
 
 Functional data are represented as `(n_voxels, n_timepoints)` matrices, the

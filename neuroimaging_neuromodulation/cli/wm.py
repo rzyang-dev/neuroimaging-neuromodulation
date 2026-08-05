@@ -3,17 +3,25 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 from ..wm.alff import compute_alff
+from ..wm.connectivity import (
+    fc_asymmetry_index,
+    fc_pattern_correlations,
+    functional_homotopic_connectivity,
+)
 from ..wm.dynamic import dynamic_alff
 from ..wm.design import write_two_group_design
 from ..wm.group import group_probability_maps
 from ..wm.masks import make_gm_mask, make_wm_mask
 from ..wm.ms2nii import tract_measures_to_nifti
+from ..wm.multirun import merge_runs
 from ..wm.plots import plot_group_profiles
 from ..wm.seedfc import wm_multi_seed_fc, wm_seed_fc
 from ..wm.statistics import profile_group_statistics
+from ..wm.subjects import compare_subject_names
 from ..wm.trackqc import tract_qc_report
 from ..wm.tracts import cluster_report_in_jhu
 
@@ -132,6 +140,57 @@ def build_parser() -> argparse.ArgumentParser:
     randomise.add_argument("--no-tfce", action="store_true")
     randomise.add_argument("--dry-run", action="store_true")
     randomise.set_defaults(handler=run_randomise)
+
+    conn_homo = subparsers.add_parser(
+        "conn-homo", help="Compute mirrored homotopic voxel-wise functional connectivity"
+    )
+    conn_homo.add_argument("--functional", required=True)
+    conn_homo.add_argument("--mask")
+    conn_homo.add_argument("--output", required=True)
+    conn_homo.add_argument("--axis", type=int, default=0, choices=[0, 1, 2])
+    conn_homo.add_argument("--left-first", action="store_true", default=True)
+    conn_homo.add_argument("--right-first", action="store_true")
+    conn_homo.add_argument("--r-threshold", type=float)
+    conn_homo.set_defaults(handler=run_conn_homo)
+
+    fc_asym = subparsers.add_parser(
+        "fc-asym", help="Compute thresholded left/right functional-connectivity asymmetry"
+    )
+    fc_asym.add_argument("--functional", required=True)
+    fc_asym.add_argument("--mask")
+    fc_asym.add_argument("--output", required=True)
+    fc_asym.add_argument("--axis", type=int, default=0, choices=[0, 1, 2])
+    fc_asym.add_argument("--left-first", action="store_true", default=True)
+    fc_asym.add_argument("--right-first", action="store_true")
+    fc_asym.add_argument("--r-threshold", type=float, default=0.25)
+    fc_asym.add_argument("--chunk-size", type=int, default=2000)
+    fc_asym.set_defaults(handler=run_fc_asym)
+
+    fc_pattern = subparsers.add_parser(
+        "fc-pattern", help="Correlate each FC map to a leave-one-out weighted reference"
+    )
+    fc_pattern.add_argument("--images", nargs="+", required=True)
+    fc_pattern.add_argument("--outcomes", required=True, help="Comma-separated outcome values")
+    fc_pattern.add_argument("--output-json", required=True)
+    fc_pattern.add_argument("--reference-output", help="Optional reference FC map NIfTI")
+    fc_pattern.set_defaults(handler=run_fc_pattern)
+
+    multi_run = subparsers.add_parser(
+        "multi-run", help="Merge repeated functional runs by concatenation or mean"
+    )
+    multi_run.add_argument("--input", nargs="+", required=True)
+    multi_run.add_argument("--output", required=True)
+    multi_run.add_argument("--mode", choices=["add", "mean"], default="add")
+    multi_run.add_argument("--no-demean", action="store_true")
+    multi_run.set_defaults(handler=run_multi_run)
+
+    validate_subjects = subparsers.add_parser(
+        "validate-subjects", help="Compare subject names between T1 and functional directories"
+    )
+    validate_subjects.add_argument("--t1-dir", required=True)
+    validate_subjects.add_argument("--functional-dir", required=True)
+    validate_subjects.add_argument("--output-json", required=True)
+    validate_subjects.set_defaults(handler=run_validate_subjects)
 
     return parser
 
@@ -327,6 +386,68 @@ def run_randomise(args: argparse.Namespace) -> int:
         tfce=not args.no_tfce,
     )
     print(args.output_prefix)
+    return 0
+
+
+def run_conn_homo(args: argparse.Namespace) -> int:
+    _map, summary = functional_homotopic_connectivity(
+        args.functional,
+        args.mask,
+        args.output,
+        axis=args.axis,
+        left_first=not args.right_first,
+        r_threshold=args.r_threshold,
+    )
+    print(json.dumps(summary, indent=2))
+    print(args.output)
+    return 0
+
+
+def run_fc_asym(args: argparse.Namespace) -> int:
+    _map, summary = fc_asymmetry_index(
+        args.functional,
+        args.mask,
+        args.output,
+        axis=args.axis,
+        left_first=not args.right_first,
+        r_threshold=args.r_threshold,
+        chunk_size=args.chunk_size,
+    )
+    print(json.dumps(summary, indent=2))
+    print(args.output)
+    return 0
+
+
+def run_fc_pattern(args: argparse.Namespace) -> int:
+    outcomes = [float(value) for value in args.outcomes.split(",") if value.strip()]
+    result = fc_pattern_correlations(
+        args.images,
+        outcomes,
+        output_json=args.output_json,
+        reference_output=args.reference_output,
+    )
+    print(json.dumps(result, indent=2))
+    return 0
+
+
+def run_multi_run(args: argparse.Namespace) -> int:
+    path = merge_runs(
+        args.input,
+        args.output,
+        mode=args.mode,
+        demean=not args.no_demean,
+    )
+    print(path)
+    return 0
+
+
+def run_validate_subjects(args: argparse.Namespace) -> int:
+    result = compare_subject_names(
+        args.t1_dir,
+        args.functional_dir,
+        output_json=args.output_json,
+    )
+    print(json.dumps(result, indent=2))
     return 0
 
 

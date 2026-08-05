@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
@@ -7,6 +8,12 @@ import pytest
 from neuroimaging_neuromodulation.validation.spm import (
     find_spm25,
     validate_normalization_against_spm,
+)
+
+_RUN_EXTERNAL = os.environ.get("NM_RUN_EXTERNAL") == "1"
+pytestmark = pytest.mark.skipif(
+    not _RUN_EXTERNAL,
+    reason="set NM_RUN_EXTERNAL=1 to run optional external-runtime tests",
 )
 
 

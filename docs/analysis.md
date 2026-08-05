@@ -86,23 +86,14 @@ they are available; the convention is validated against SPM25 output.
 
 ## Missing Source Inventory
 
-The original repository contains more than the algorithm table above. The
-following source groups are present in the local MATLAB workspace but have no
-equivalent Python implementation:
-
-- White-matter workflows: `TractMS2Nii.m`, `TMSmerge.sh`, `TwoSamTTest.sh`,
-  `txt2nii.sh`
-- T1 target workflows: `TMStargetT1.m`, `TMStargetT1_run.m`
-- Utility/QC workflows: `TMSSloverSPM.m`, `TMSwrite.m`, `TMSreslice_GUI.m`,
-  `TMSsphereROI_GUI.m`, `TMSUtility_GUI.m`, `TMSFC_GUI.m`, `WhiteFun.m`,
-  `WhiteMatter.m`, `WhiteMatterSF.m`
-
-The following originally missing items now have Python-native or wrapper
-implementations and should be treated as partial ports: `WMSeedFC`,
-`WMMultiSeedFC`, `HMCalc`, `y_FD_Jenkinson`, `dyALFF`, `TMSCluRep4WM`,
-`TMSmkC6`, `TMSBET.sh`, `TMSEddyCorr.sh`, `topup.sh`, `TMSFA2T1.sh`,
-`TMSMNI2Native.sh`, `TMSNative2MNI.sh`, `TMST12MNI.sh`, and
-`TMSimgcomp.m`.
+The original repository contains more than the algorithm table above,
+including third-party and GUI-scaffolding code. `docs/gap-matrix.md` is now
+the authoritative per-workflow status record. The meaningful remaining gaps
+are full AFQ/TrackQC numerical parity, DIPY-independent motion/coregistration/
+deformation/DTI paths, production GUI hardening, and larger clinical DARTEL
+parity. Several MATLAB functions are GUI orchestration only and are not cloned;
+their algorithmic content is exposed through CLI, pipeline, and Python-native
+GUI workflows instead.
 
 Status entries in this document that say "Implemented" should be read as
 "implemented in the Python subset" unless the table explicitly claims exact

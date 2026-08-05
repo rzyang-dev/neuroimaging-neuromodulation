@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "neuroimaging-neuromodulation"
-version = "0.19.0"
+version = "0.20.0"
 description = "Python-native tools for TMS target selection and white-matter fMRI analysis"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -22,14 +22,38 @@ dependencies = [
     "numpy>=1.24",
     "scipy>=1.10",
     "nibabel>=5.0",
+]
+
+[project.optional-dependencies]
+core = []
+dicom = [
+    "pydicom>=2.3",
+    "dicom2nifti>=2.6",
+]
+diffusion = [
+    "dipy>=1.10",
+]
+demo = [
+    "nilearn>=0.10",
+]
+all = [
     "nilearn>=0.10",
     "dipy>=1.10",
     "dicom2nifti>=2.6",
     "pydicom>=2.3",
 ]
-
-[project.optional-dependencies]
-test = ["pytest>=8"]
+test = [
+    "pytest>=8",
+    "nilearn>=0.10",
+    "dipy>=1.10",
+    "dicom2nifti>=2.6",
+    "pydicom>=2.3",
+]
+dev = [
+    "build>=1.0",
+    "wheel>=0.41",
+    "pytest>=8",
+]
 
 [project.scripts]
 nm-toolbox = "neuroimaging_neuromodulation.cli.main:main"
@@ -58,6 +82,7 @@ packages = [
     "neuroimaging_neuromodulation.deformations",
     "neuroimaging_neuromodulation.pipeline",
     "neuroimaging_neuromodulation.validation",
+    "neuroimaging_neuromodulation.runtime",
 ]
 
 [tool.setuptools.package-data]

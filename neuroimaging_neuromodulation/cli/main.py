@@ -12,7 +12,14 @@ from .. import __version__
 
 
 def _fetch_demo_data(output_dir: str) -> int:
-    from nilearn import datasets
+    try:
+        from nilearn import datasets
+    except ImportError:
+        print(
+            "demo-data requires the optional 'demo' extra: "
+            "`pip install neuroimaging-neuromodulation[demo]`."
+        )
+        return 1
 
     data = datasets.fetch_development_fmri(
         n_subjects=1,
@@ -45,6 +52,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     info = subparsers.add_parser("info", help="Print package and data information")
     info.set_defaults(handler=_run_info)
+
+    doctor = subparsers.add_parser("doctor", help="Check package health and optional runtimes")
+    doctor.add_argument("--json", action="store_true", help="Print a JSON report")
+    doctor.set_defaults(handler=_run_doctor)
 
     demo = subparsers.add_parser("demo-data", help="Download one real public fMRI subject")
     demo.add_argument("--output-dir", default="data/real_development_fmri")
@@ -80,6 +91,17 @@ def _run_info(_args: argparse.Namespace) -> int:
                 "nonzero": int((data > 0).sum()),
             }
     print(json.dumps(info, indent=2, default=str))
+    return 0
+
+
+def _run_doctor(args: argparse.Namespace) -> int:
+    from ..runtime.diagnostics import check_system, render_doctor_report
+
+    report = check_system()
+    if args.json:
+        print(json.dumps(report, indent=2, default=str))
+    else:
+        print(render_doctor_report(report))
     return 0
 
 

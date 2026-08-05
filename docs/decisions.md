@@ -1,5 +1,41 @@
 # Decision Record
 
+The following decisions update and, where needed, supersede earlier ADRs.
+
+## ADR-011: Minimal core dependency budget
+
+Decision: The normal analysis path must run with only NumPy, SciPy, and NiBabel.
+Nilearn, DIPY, pydicom, and dicom2nifti are optional extras.
+
+Why: The product is aimed at broad users, not only researchers with prebuilt
+academic environments. A small core install must work predictably.
+
+Consequence: Optional libraries are lazily imported and never required by
+`nm-toolbox`, `nm-tms`, `nm-wm`, or `nm-preprocess` core paths.
+
+## ADR-012: External academic runtimes are optional providers only
+
+Decision: MATLAB, SPM, FSL, DARTEL, ANTs, and SimNIBS are never required for
+normal use. They may be discovered through explicit runtime providers and may
+be bundled into installers only after license review.
+
+Why: The product must not depend on machine-specific academic software or
+implicitly assume a researcher workstation.
+
+Consequence: Core code never imports these runtimes. Optional provider checks
+are reported by `nm-toolbox doctor` and isolated behind a provider boundary.
+
+## ADR-013: Python-native algorithm implementation is the default
+
+Decision: The project reimplements the toolbox’s algorithmic contributions in
+Python rather than wrapping SPM/FSL workflows as the product path.
+
+Why: Academic toolchains are not a reliable runtime for general users, and
+their internal behavior should not be treated as unchangeable product code.
+
+Consequence: External binaries are used only for optional validation or
+advanced provider features, and every such use is documented as optional.
+
 ## ADR-001: Use a separate Python package instead of modifying MATLAB files
 
 Decision: Create `neuroimaging_neuromodulation/` as a new Python package and
@@ -13,6 +49,8 @@ in `docs/analysis.md`.
 
 ## ADR-002: Use NumPy, SciPy, NiBabel, and Nilearn
 
+Status: superseded by ADR-011 for the core dependency budget.
+
 Decision: Use these four scientific Python libraries.
 
 Why: They are standard, reasonably lightweight, available on PyPI mirrors, and
@@ -23,6 +61,9 @@ Consequence: The package cannot reproduce every SPM operation, but the core
 algorithm layer is fully Python-native.
 
 ## ADR-003: Keep preprocessing dependencies out of the core
+
+Status: superseded by ADR-013; external academic runtimes are optional
+providers rather than product dependencies.
 
 Decision: Do not reimplement SPM segmentation, DARTEL normalization, FSL eddy,
 or tractography in this release.
@@ -70,6 +111,9 @@ an explicit depth.
 
 ## ADR-007: Use DIPY for rigid motion estimation
 
+Status: superseded by ADR-011; DIPY is an optional diffusion extra until the
+needed algorithm is replaced internally.
+
 Decision: Add DIPY as a dependency for motion-parameter estimation.
 
 Why: DIPY is a Python-native neuroimaging library with a well-tested affine
@@ -102,6 +146,9 @@ Consequence: The package is more useful end to end while preserving honesty
 about its accuracy boundary.
 
 ## ADR-010: Use DIPY for nonlinear deformation estimation
+
+Status: superseded by ADR-011 and ADR-013; DIPY is an optional extra, not a
+core requirement.
 
 Decision: Add DIPY-based nonlinear registration and a coordinate-field
 converter.

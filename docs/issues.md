@@ -63,6 +63,12 @@
     realistic ellipsoid fixture, and MRtrix `tckgen` passes with the required
     `-seed_image` source. ANTs execution tests pass 4/4 on Windows.
 
+14. External-runtime tests are now optional and skipped by default. Set
+    `NM_RUN_EXTERNAL=1` to run SPM/FSL/ANTs execution tests.
+
+15. `0.20.0` introduces a minimal core dependency budget (NumPy/SciPy/NiBabel),
+    optional extras for DIPY/DICOM/demo, and `nm-toolbox doctor`.
+
 ## Data Issues
 
 1. `ExampleData.zip` contains zero-byte placeholder DICOMs and is not usable.
@@ -75,4 +81,6 @@
 
 - Extend DARTEL-compatible normalization parity to a larger clinical
   multi-subject dataset.
+- Replace remaining DIPY-dependent core paths with NumPy/SciPy implementations.
 - Complete AFQ/TrackQC numerical parity and harden desktop GUI workflows.
+- Add platform installers and reproducible release artifacts.

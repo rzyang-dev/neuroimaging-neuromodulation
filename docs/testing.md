@@ -80,6 +80,15 @@ Tests are grouped by responsibility:
 - `test_dicom.py` also verifies DICOM inspection and single-series validation.
 - `test_dicom.py` covers six real DICOM vendor series.
 - `test_dicom.py` covers compressed and enhanced multiframe DICOM variants.
+- `test_runtime_diagnostics.py` verifies `nm-toolbox doctor` and optional
+  runtime-provider discovery.
+- `test_wm_connectivity.py` verifies homotopic connectivity, FC asymmetry, and
+  FC pattern correlation on real fMRI.
+- `test_multirun_subjects.py` verifies multi-run merge and subject-name
+  validation.
+- `test_target_center.py` verifies MNI region centers and timepoint counting.
+- `test_packaging.py` verifies the minimal core dependency budget and optional
+  extras.
 
 Functional-data tests use one real adult subject from the Nilearn development
 fMRI dataset. Geometry tests use real bundled templates and masks.
@@ -87,13 +96,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-158 tests collected and passing
+171 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-158 tests collected and passing
+171 tests collected and passing
 ```
 
 The test command is:
@@ -121,7 +130,7 @@ The CLI was exercised end to end on the real downloaded fMRI subject:
 `pip wheel` builds successfully:
 
 ```text
-neuroimaging_neuromodulation-0.19.0-py3-none-any.whl
+neuroimaging_neuromodulation-0.20.0-py3-none-any.whl
 ```
 
 The wheel contains the package modules, bundled real template/mask data, CLI
@@ -149,9 +158,10 @@ original MATLAB toolbox:
 These limitations must be resolved before the project can claim a complete
 migration or production readiness.
 
-External-execution tests for FSL BET, `eddy_correct`, and MRtrix `tckgen` are
-present and skip automatically when the corresponding binary is not installed.
-ANTs execution tests are also present and skip when ANTs is unavailable.
+External-execution tests for FSL BET, `eddy_correct`, MRtrix `tckgen`, ANTs,
+SPM reference checks, Randomise, and FNIRT are optional. They skip by default
+and run when `NM_RUN_EXTERNAL=1` is set. They also skip automatically when the
+corresponding binary is unavailable.
 The MRtrix `tckgen` wrapper now accepts `seed_image`; the execution test uses
 the `SeedTest` algorithm so it verifies binary/wrapper integration without
 requiring FOD generation.

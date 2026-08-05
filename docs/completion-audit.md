@@ -29,8 +29,14 @@ the full port and production-readiness claims are not met.
 
 ## Verification Evidence
 
-- `158` automated tests are collected and pass locally.
-- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`.
+- `171` automated tests are collected and pass locally.
+- Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.20.0-py3-none-any.whl`.
+- `nm-toolbox doctor` validates the minimal core, optional extras, bundled
+  data, and optional runtime providers.
+- Python-native homotopic connectivity, FC asymmetry, FC pattern, multi-run
+  merge, subject validation, MNI center, and timepoint workflows are covered
+  by tests in `test_wm_connectivity.py`, `test_multirun_subjects.py`,
+  `test_target_center.py`, and `test_runtime_diagnostics.py`.
 - `pip check` reports no broken requirements.
 - SPM25 reference validation confirms the package applies SPM `y_`/`iy_`
   world-coordinate fields correctly and reproduces SPM's warped tissue output.

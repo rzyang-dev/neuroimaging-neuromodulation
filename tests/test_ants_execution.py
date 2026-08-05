@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 
@@ -11,6 +12,12 @@ from neuroimaging_neuromodulation.preprocess.ants import (
     run_ants_apply_transform,
     run_ants_apply_transforms_to_points,
     run_ants_registration,
+)
+
+_RUN_EXTERNAL = os.environ.get("NM_RUN_EXTERNAL") == "1"
+pytestmark = pytest.mark.skipif(
+    not _RUN_EXTERNAL,
+    reason="set NM_RUN_EXTERNAL=1 to run optional external-runtime tests",
 )
 
 

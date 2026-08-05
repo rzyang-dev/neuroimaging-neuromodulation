@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 
 import nibabel as nib
@@ -7,6 +8,12 @@ import numpy as np
 import pytest
 
 from neuroimaging_neuromodulation.diffusion import external
+
+_RUN_EXTERNAL = os.environ.get("NM_RUN_EXTERNAL") == "1"
+pytestmark = pytest.mark.skipif(
+    not _RUN_EXTERNAL,
+    reason="set NM_RUN_EXTERNAL=1 to run optional external-runtime tests",
+)
 
 
 @pytest.mark.skipif(shutil.which("bet") is None, reason="FSL BET not installed")

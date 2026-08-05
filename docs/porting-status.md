@@ -13,8 +13,8 @@ documentation change.
 | --- | --- | --- |
 | Use an isolated virtual environment | `.venv/` exists and the package is installed in it | Met |
 | Do not use mock data | Real DICOM, fMRI, diffusion, T1, template, and mask data are committed or fetched by dependency tests | Met |
-| Keep comprehensive records | `docs/analysis.md`, `docs/decisions.md`, `docs/issues.md`, `docs/testing.md`, `docs/design.md`, and this file | Met |
-| Prefer lightweight Python implementations where possible | Core uses NumPy, SciPy, NiBabel, Nilearn, DIPY, and dicom2nifti | Met |
+| Keep comprehensive records | `docs/analysis.md`, `docs/gap-matrix.md`, `docs/decisions.md`, `docs/issues.md`, `docs/testing.md`, `docs/design.md`, and this file | Met |
+| Prefer lightweight Python implementations where possible | Core uses NumPy, SciPy, and NiBabel; DIPY, DICOM, and demo libraries are optional extras | Met |
 | No MATLAB required for the implemented subset | The implemented commands are Python-native | Met for implemented subset |
 | Full source-to-Python port of the original algorithms | Only a subset is mapped in `docs/analysis.md`; many original `.m`/`.sh` workflows are absent | Not met |
 | Production-ready package | Wheel builds and tests pass, but package is classified Alpha, reference validation is partial, and full workflow coverage and production UI hardening are missing | Not met |
@@ -85,6 +85,14 @@ noted limitations:
   reslicing
 - HTML reports and SHA-256 manifests
 - CLI entry points and optional Tkinter interfaces
+- Minimal core dependency budget through NumPy/SciPy/NiBabel
+- `nm-toolbox doctor` for package, dependency, data, and optional runtime
+  provider health checks
+- Python-native mirrored homotopic functional connectivity
+- Python-native thresholded FC asymmetry
+- Python-native leave-one-out FC pattern correlation
+- Python-native multi-run merge and subject-name validation
+- Python-native MNI region-center and timepoint-count target utilities
 
 ## Not Yet Ported or Verified
 
@@ -130,9 +138,9 @@ noted limitations:
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 4/4 pass, including real-template
   registration/apply and SyN streamline transformation tests
-- Local test suite: `158 tests collected` and passing
+- Local test suite: `171 tests collected` and passing
 - `pip check`: no broken requirements
-- Wheel: `dist/neuroimaging_neuromodulation-0.19.0-py3-none-any.whl`
+- Wheel: `dist/neuroimaging_neuromodulation-0.20.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently
   reproducible from repository artifacts in this workspace
 
@@ -147,7 +155,8 @@ reference/comparison work. The execution tests were run for the first time on
 normalization, FSL FNIRT, and DARTEL reference comparisons are now implemented,
 while full numerical parity across a larger clinical multi-subject DARTEL
 dataset beyond the twenty-seven real template-derived subjects is not yet
-demonstrated:
+demonstrated. External-runtime tests are optional and skipped by default;
+set `NM_RUN_EXTERNAL=1` to run them:
 
 - MATLAB R2015b and SPM standalone 25.01.02 are installed on Windows
   (`C:\Program Files\MATLAB\R2015b\bin`,

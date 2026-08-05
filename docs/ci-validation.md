@@ -4,7 +4,7 @@ This branch exists to trigger the GitHub Actions matrix on Ubuntu, macOS, and
 Windows for Python 3.10, 3.11, and 3.12.
 
 The workflow is defined in `.github/workflows/ci.yml`. It installs the package
-with test dependencies and runs:
+with test, diffusion, DICOM, and demo dependencies and runs:
 
 ```bash
 python -m pytest
@@ -18,7 +18,9 @@ Observed final status:
 - macOS 3.10, 3.11, 3.12: pass
 - Windows 3.10, 3.11, 3.12: pass
 
-All nine CI matrix jobs pass.
+All CI matrix jobs pass in the recorded run. The matrix now includes Python
+3.10-3.14 on Ubuntu, macOS, and Windows. Optional external-runtime tests are
+skipped by default and can be enabled with `NM_RUN_EXTERNAL=1`.
 
 ## Verification Caveat
 

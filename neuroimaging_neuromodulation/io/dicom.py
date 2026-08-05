@@ -6,11 +6,18 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from pydicom import dcmread
-
 
 def inspect_dicom_directory(dicom_directory: str | Path) -> dict[str, object]:
     """Summarize DICOM series metadata without reading pixel data."""
+
+    try:
+        from pydicom import dcmread
+    except ImportError as exc:  # pragma: no cover
+        raise RuntimeError(
+            "pydicom is required for DICOM inspection. Install the optional "
+            "extra with `.venv/bin/python -m pip install "
+            "neuroimaging-neuromodulation[dicom]`."
+        ) from exc
 
     dicom_directory = Path(dicom_directory)
     series: dict[tuple[str, str], dict[str, object]] = {}

@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.20.0 - 2026-08-05
+
+- Moved the core dependency budget to NumPy, SciPy, and NiBabel.
+- Moved Nilearn, DIPY, pydicom, and dicom2nifti into optional extras.
+- Added `nm-toolbox doctor` for package, data, dependency, and optional
+  runtime-provider health checks.
+- Added a runtime provider boundary for SPM, FSL, ANTs, and SimNIBS so normal
+  use never requires an academic runtime.
+- Added Python-native homotopic connectivity, FC asymmetry, FC pattern,
+  multi-run merge, subject validation, MNI region center, and timepoint count
+  workflows.
+- Added `docs/gap-matrix.md` as the authoritative original-workflow mapping.
+- Updated CI to install optional extras explicitly and cover Python 3.10-3.14.
+
 ## 0.19.0 - 2026-08-03
 
 - Corrected status records to describe the project as an Alpha partial

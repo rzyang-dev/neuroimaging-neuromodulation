@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 
 import nibabel as nib
@@ -12,6 +13,12 @@ from neuroimaging_neuromodulation.diffusion.external import (
     run_fsl_fnirt,
 )
 from neuroimaging_neuromodulation.io.nifti import load_volume, resample_to_grid
+
+_RUN_EXTERNAL = os.environ.get("NM_RUN_EXTERNAL") == "1"
+pytestmark = pytest.mark.skipif(
+    not _RUN_EXTERNAL,
+    reason="set NM_RUN_EXTERNAL=1 to run optional external-runtime tests",
+)
 
 
 @pytest.mark.skipif(shutil.which("fnirt") is None, reason="FSL FNIRT not installed")

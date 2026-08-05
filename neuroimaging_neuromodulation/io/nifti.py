@@ -71,6 +71,17 @@ def load_4d_matrix_dir(directory: Union[str, Path]) -> tuple[nib.Nifti1Image, np
     return img, stacked.reshape(-1, stacked.shape[-1])
 
 
+def count_timepoints(path: ImageLike) -> int:
+    """Return the number of volumes in a NIfTI image."""
+
+    _img, data = load_volume(path)
+    if data.ndim == 4:
+        return int(data.shape[-1])
+    if data.ndim == 3:
+        return 1
+    raise ValueError(f"Expected a 3D or 4D NIfTI image, got shape {data.shape}")
+
+
 def _reference_for_3d_source(source: nib.Nifti1Image, target: nib.Nifti1Image) -> nib.Nifti1Image:
     """Return a 3D reference when a 3D source is resampled to a 4D target."""
 

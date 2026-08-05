@@ -7,10 +7,19 @@ Create and use the project virtual environment:
 ```bash
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -e ".[test]"
+.venv/bin/python -m pip install -e ".[test,diffusion,dicom,demo]"
 ```
 
 ## Command-Line Interface
+
+### Health check
+
+```bash
+.venv/bin/nm-toolbox doctor
+```
+
+This reports the installed core dependencies, optional extras, bundled data,
+output-directory permissions, and optional SPM/FSL/ANTs/SimNIBS providers.
 
 ### Seed-based FC
 
