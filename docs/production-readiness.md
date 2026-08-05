@@ -14,6 +14,7 @@ and what remains before the package can be called production-ready.
 - [x] GitHub Actions workflow exists
 - [x] Minimal-core CI job verifies installation without optional dependencies
 - [x] Tag-triggered wheel release workflow exists
+- [x] Cross-platform PyInstaller installer workflow exists
 - [ ] CI matrix result independently reproducible from repository artifacts
 - [x] CLI entry points installed
 - [x] Optional Tkinter desktop GUI

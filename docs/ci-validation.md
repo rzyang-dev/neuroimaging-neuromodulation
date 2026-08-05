@@ -26,6 +26,8 @@ skipped by default and can be enabled with `NM_RUN_EXTERNAL=1`.
 optional extras and verifies core motion, coregistration, DTI, tractography,
 and runtime diagnostics. Tagged releases are handled by
 `.github/workflows/release.yml`, which builds and uploads the wheel.
+`.github/workflows/installers.yml` builds standalone PyInstaller executables
+for the desktop apps and CLI on Ubuntu, macOS, and Windows.
 
 ## Verification Caveat
 

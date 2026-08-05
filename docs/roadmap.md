@@ -60,6 +60,7 @@ Target:
 Target:
 
 - Platform installers for Windows, macOS, and Linux where practical.
+- PyInstaller launcher entry points and a cross-platform installer workflow.
 - GUI behavior tests beyond launch/config construction.
 - Atomic output handling, crash recovery, and user-facing error reporting.
 - Signed or checksummed release artifacts.
