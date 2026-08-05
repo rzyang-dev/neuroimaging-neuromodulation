@@ -35,6 +35,8 @@
   engine.
 - Added `nm-preprocess compare-deformation-engines` to quantify agreement
   between the internal and optional DIPY deformation engines.
+- Added a release-gate checker for version consistency, minimal core
+  dependencies, and required documentation.
 - Added homotopic FC and FC asymmetry actions to the advanced `nm-gui`
   desktop interface.
 - Added guided `nm-app` options for homotopic FC and FC asymmetry.

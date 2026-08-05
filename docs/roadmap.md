@@ -65,6 +65,7 @@ Target:
 - Atomic output handling, crash recovery, and user-facing error reporting.
 - Signed or checksummed release artifacts.
 - Independent CI artifact reproducibility.
+- Automated release-gate checks for metadata, dependencies, and docs.
 
 ### 1.0.0: Production release
 

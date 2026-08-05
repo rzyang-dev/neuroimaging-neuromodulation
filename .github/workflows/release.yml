@@ -16,6 +16,7 @@ jobs:
       - name: Build wheel
         run: |
           python -m pip install --upgrade build
+          python scripts/check_release_gates.py
           python -m build --wheel
       - name: Upload wheel
         uses: actions/upload-artifact@v4
