@@ -25,7 +25,7 @@
 
 4. FSL BEDPOSTX-based probabilistic tractography is optional.
 
-   DIPY-based tensor fitting, deterministic and probabilistic tensor
+   NumPy/SciPy tensor fitting, deterministic and probabilistic tensor
    tractography, and seed-target connectivity are implemented. FSL
    BEDPOSTX/PROBTRACKX and MRtrix commands are available as optional wrappers
    when the external binaries are installed.
@@ -81,7 +81,7 @@
 
 - Extend DARTEL-compatible normalization parity to a larger clinical
   multi-subject dataset.
-- Replace remaining DIPY-dependent deformation/diffusion paths with
-  NumPy/SciPy implementations or keep them isolated in the `diffusion` extra.
+- Replace the remaining DIPY-dependent deformation path with a NumPy/SciPy
+  implementation or keep it isolated in the `diffusion` extra.
 - Complete AFQ/TrackQC numerical parity and harden desktop GUI workflows.
 - Add platform installers and reproducible release artifacts.

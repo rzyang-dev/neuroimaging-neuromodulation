@@ -46,8 +46,10 @@ noted limitations:
 - NumPy/SciPy motion estimation and coregistration
 - NumPy/SciPy diffusion tensor fitting
 - NumPy/SciPy deterministic tractography and connectivity
-- Optional DIPY nonlinear deformation estimation and probabilistic tensor
-  tractography through the `diffusion` extra
+- NumPy/SciPy deterministic and probabilistic tensor tractography and
+  streamline connectivity
+- Optional DIPY nonlinear deformation estimation through the `diffusion`
+  extra
 - SPM25 standalone segmentation through `nm-preprocess spm-segment`, including
   native `c*` maps, imported `rc*` DARTEL maps, and warped `wc*` maps
 - SPM DARTEL template runner through `nm-preprocess dartel-template`

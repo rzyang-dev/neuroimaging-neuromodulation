@@ -16,6 +16,7 @@ from ..diffusion.outliers import remove_fiber_outliers
 from ..diffusion.render import render_streamlines_3d_html, render_streamlines_html
 from ..diffusion.roi_segmentation import segment_streamlines_by_rois
 from ..diffusion.segmentation import segment_streamlines_by_atlas
+from ..diffusion.streamlines_io import save_tract_streamlines
 from ..diffusion.tracking import track_deterministic, track_probabilistic
 from ..diffusion.tract_profile import load_tract_streamlines, tract_profile
 from ..diffusion.transform import (
@@ -430,9 +431,6 @@ def run_segment_tracts_roi(args: argparse.Namespace) -> int:
 
 
 def run_clean_tracts(args: argparse.Namespace) -> int:
-    from dipy.io.stateful_tractogram import Space, StatefulTractogram
-    from dipy.io.streamline import save_tractogram
-
     reference = nib.load(args.reference)
     streamlines = load_tract_streamlines(args.tracks, reference)
     cleaned, keep = remove_fiber_outliers(
@@ -442,8 +440,7 @@ def run_clean_tracts(args: argparse.Namespace) -> int:
         num_nodes=args.num_nodes,
         max_iter=args.max_iter,
     )
-    sft = StatefulTractogram(cleaned, reference, Space.RASMM)
-    save_tractogram(sft, args.output, bbox_valid_check=False)
+    save_tract_streamlines(cleaned, reference, args.output)
     Path(args.keep_json).write_text(
         json.dumps(
             {
@@ -460,9 +457,6 @@ def run_clean_tracts(args: argparse.Namespace) -> int:
 
 
 def run_transform_tracts(args: argparse.Namespace) -> int:
-    from dipy.io.stateful_tractogram import Space, StatefulTractogram
-    from dipy.io.streamline import save_tractogram
-
     source = nib.load(args.source)
     reference = nib.load(args.reference)
     streamlines = load_tract_streamlines(args.tracks, source)
@@ -473,16 +467,12 @@ def run_transform_tracts(args: argparse.Namespace) -> int:
         reference,
         one_based=not args.zero_based,
     )
-    sft = StatefulTractogram(transformed, reference, Space.RASMM)
-    save_tractogram(sft, args.output, bbox_valid_check=False)
+    save_tract_streamlines(transformed, reference, args.output)
     print(args.output, len(transformed))
     return 0
 
 
 def run_transform_tracts_ants(args: argparse.Namespace) -> int:
-    from dipy.io.stateful_tractogram import Space, StatefulTractogram
-    from dipy.io.streamline import save_tractogram
-
     reference = nib.load(args.reference)
     streamlines = load_tract_streamlines(args.tracks, reference)
     transformed = transform_streamlines_with_ants(
@@ -495,8 +485,7 @@ def run_transform_tracts_ants(args: argparse.Namespace) -> int:
             else None
         ),
     )
-    sft = StatefulTractogram(transformed, reference, Space.RASMM)
-    save_tractogram(sft, args.output, bbox_valid_check=False)
+    save_tract_streamlines(transformed, reference, args.output)
     print(args.output, len(transformed))
     return 0
 

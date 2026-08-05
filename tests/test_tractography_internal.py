@@ -6,6 +6,7 @@ from neuroimaging_neuromodulation.diffusion.connectivity import (
     count_streamlines_between_masks,
 )
 from neuroimaging_neuromodulation.diffusion.dti import GradientTable
+from neuroimaging_neuromodulation.diffusion.streamlines_io import load_tract_streamlines
 from neuroimaging_neuromodulation.diffusion.tracking import track_deterministic
 
 
@@ -58,5 +59,7 @@ def test_deterministic_tracking_and_connectivity_without_dipy(tmp_path) -> None:
     )
     assert len(streamlines) > 0
     assert (tmp_path / "tracks.trk").exists()
+    loaded = load_tract_streamlines(tmp_path / "tracks.trk")
+    assert len(loaded) > 0
     result = count_streamlines_between_masks(streamlines, affine, seed, target)
     assert result["count"] > 0

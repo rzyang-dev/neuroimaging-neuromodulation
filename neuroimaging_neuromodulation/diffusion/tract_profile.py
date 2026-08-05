@@ -9,6 +9,7 @@ import numpy as np
 from scipy import ndimage
 
 from ..io.nifti import load_volume
+from .streamlines_io import load_tract_streamlines as _load_tract_streamlines
 
 
 def _resample_streamline(points: np.ndarray, n_points: int) -> np.ndarray | None:
@@ -76,18 +77,7 @@ def load_tract_streamlines(
 ) -> list[np.ndarray]:
     """Load TRK/TCK streamlines in the reference image's world space."""
 
-    try:
-        from dipy.io.stateful_tractogram import Space, StatefulTractogram
-        from dipy.io.streamline import load_tractogram
-    except ImportError as exc:  # pragma: no cover
-        raise RuntimeError("DIPY is required to load tractograms.") from exc
-    reference = reference_image if isinstance(reference_image, nib.Nifti1Image) else nib.load(str(reference_image))
-    sft = load_tractogram(
-        str(track_path),
-        reference,
-        bbox_valid_check=False,
-    )
-    return list(sft.streamlines)
+    return _load_tract_streamlines(track_path, reference_image)
 
 
 __all__ = ["load_tract_streamlines", "tract_profile"]

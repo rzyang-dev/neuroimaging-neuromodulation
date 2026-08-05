@@ -37,7 +37,7 @@ document records the mapping from MATLAB functions to Python modules.
 | `TMSSegDartel.m`, `TMSseg.m` | `segmentation/tissue.py` | Approximate atlas-guided GM/WM/CSF estimation; DARTEL normalization remains external |
 | `TMSwriteDTL.m` | `io/deformations.py`, `deformations/estimate.py` | SPM world-coordinate `y_`/`iy_` fields applied; DIPY nonlinear fields converted to matching `y_`/`iy_` fields |
 | `TMSDTIFIT.sh`, `TMSTargetSC.m` | `diffusion/` | Tensor fitting, deterministic tractography, and connectivity implemented with NumPy/SciPy; probabilistic FSL workflow not reproduced |
-| `TMSProbTrack.sh` | `diffusion/tracking.py` | DIPY-based probabilistic tensor tractography; FSL BEDPOSTX not reproduced |
+| `TMSProbTrack.sh` | `diffusion/tracking.py` | NumPy/SciPy probabilistic tensor tractography; FSL BEDPOSTX not reproduced |
 | `TMSProbTrack.sh`, `TMSBEDPOSTX.sh`, `TMSDTIFIT.sh` | `diffusion/external.py` | Optional FSL/MRtrix binary wrappers |
 | `TMSSmooth.m` | `preprocess/spatial.py` | Implemented as Gaussian smoothing |
 | `WMSeedFC.m`, `WMMultiSeedFC.m` | `wm/seedfc.py` | Implemented for Python-native FC workflows |
@@ -89,10 +89,9 @@ they are available; the convention is validated against SPM25 output.
 The original repository contains more than the algorithm table above,
 including third-party and GUI-scaffolding code. `docs/gap-matrix.md` is now
 the authoritative per-workflow status record. The meaningful remaining gaps
-are full AFQ/TrackQC numerical parity, DIPY-independent deformation and
-probabilistic-tractography paths, production GUI hardening, and larger
-clinical DARTEL parity. Several MATLAB functions are GUI orchestration only
-and are not cloned;
+are full AFQ/TrackQC numerical parity, an internal DIPY-free deformation
+path, production GUI hardening, and larger clinical DARTEL parity. Several
+MATLAB functions are GUI orchestration only and are not cloned;
 their algorithmic content is exposed through CLI, pipeline, and Python-native
 GUI workflows instead.
 

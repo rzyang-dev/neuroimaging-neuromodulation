@@ -66,7 +66,8 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
   counts
 - AFQ-style group profile plots and per-node profile statistics
 - NumPy/SciPy deterministic tensor tractography through `nm-diffusion`
-- Optional DIPY probabilistic tensor tractography through `nm-diffusion`
+- NumPy/SciPy deterministic and probabilistic tensor tractography through
+  `nm-diffusion`
 - DICOM-to-NIfTI conversion through `nm-dicom`
 - DICOM inspection and single-series validation through `nm-dicom`
 - Real DICOM vendor coverage for generic, GE, Philips, Siemens, Hyperfine, and

@@ -142,11 +142,112 @@ def _track_one(
     return world
 
 
-def _save_trk(streamlines: list[np.ndarray], affine: np.ndarray, out_trk: str | Path) -> None:
-    from nibabel.streamlines import Tractogram, save
+def _follow_probabilistic(
+    start: np.ndarray,
+    direction: np.ndarray,
+    tensors: np.ndarray,
+    fa: np.ndarray,
+    rng: np.random.Generator,
+    *,
+    step_size: float,
+    fa_threshold: float,
+    max_length: float,
+    max_angle: float,
+    noise_scale: float = 0.3,
+) -> list[np.ndarray]:
+    points = [start]
+    current = start.copy()
+    previous_direction = direction.copy()
+    max_angle = np.deg2rad(max_angle)
+    while len(points) * step_size <= max_length:
+        candidate = current + previous_direction * step_size
+        if _fa_at(fa, candidate) < fa_threshold:
+            break
+        tensor = _tensor_at(tensors, candidate)
+        if tensor is None:
+            break
+        principal = _principal_direction(tensor)
+        if np.dot(previous_direction, principal) < 0:
+            principal = -principal
+        auxiliary = np.array([1.0, 0.0, 0.0], dtype=float)
+        if abs(np.dot(principal, auxiliary)) > 0.9:
+            auxiliary = np.array([0.0, 1.0, 0.0], dtype=float)
+        basis_a = auxiliary - np.dot(auxiliary, principal) * principal
+        basis_a /= np.linalg.norm(basis_a)
+        basis_b = np.cross(principal, basis_a)
+        perturbation = (
+            basis_a * rng.normal(scale=noise_scale)
+            + basis_b * rng.normal(scale=noise_scale)
+        )
+        new_direction = principal + perturbation
+        norm = np.linalg.norm(new_direction)
+        if norm < 1e-12:
+            break
+        new_direction = new_direction / norm
+        if np.dot(previous_direction, new_direction) < 0:
+            new_direction = -new_direction
+        cosine = np.clip(np.dot(previous_direction, new_direction), -1.0, 1.0)
+        if np.arccos(cosine) > max_angle:
+            break
+        points.append(candidate)
+        previous_direction = new_direction
+        current = candidate
+    return points
 
-    tractogram = Tractogram(streamlines, affine_to_rasmm=np.asarray(affine, dtype=float))
-    save(tractogram, str(out_trk))
+
+def _track_probabilistic_one(
+    start: np.ndarray,
+    tensors: np.ndarray,
+    fa: np.ndarray,
+    affine: np.ndarray,
+    rng: np.random.Generator,
+    *,
+    step_size: float,
+    fa_threshold: float,
+    min_length: float,
+    max_length: float,
+    max_angle: float,
+) -> np.ndarray | None:
+    tensor = _tensor_at(tensors, start)
+    if tensor is None or _fa_at(fa, start) < fa_threshold:
+        return None
+    direction = _principal_direction(tensor)
+    forward = _follow_probabilistic(
+        start,
+        direction,
+        tensors,
+        fa,
+        rng,
+        step_size=step_size,
+        fa_threshold=fa_threshold,
+        max_length=max_length,
+        max_angle=max_angle,
+    )
+    backward = _follow_probabilistic(
+        start,
+        -direction,
+        tensors,
+        fa,
+        rng,
+        step_size=step_size,
+        fa_threshold=fa_threshold,
+        max_length=max_length,
+        max_angle=max_angle,
+    )
+    voxel_streamline = np.asarray(backward[::-1] + forward[1:], dtype=float)
+    if len(voxel_streamline) < 2:
+        return None
+    world = _voxel_to_world(voxel_streamline, affine)
+    length = float(np.sum(np.linalg.norm(np.diff(world, axis=0), axis=1)))
+    if length < min_length:
+        return None
+    return world
+
+
+def _save_trk(streamlines: list[np.ndarray], affine: np.ndarray, out_trk: str | Path) -> None:
+    from .streamlines_io import save_tract_streamlines
+
+    save_tract_streamlines(streamlines, _reference_image(np.zeros((1, 1, 1), dtype=np.uint8), affine), out_trk)
 
 
 def track_deterministic(
@@ -208,61 +309,33 @@ def track_probabilistic(
     random_seed: int = 1,
     out_trk: str | Path | None = None,
 ) -> list[np.ndarray]:
-    """Run probabilistic tractography using DIPY's probabilistic tracker."""
-
-    try:
-        from dipy.data import get_sphere
-        from dipy.direction import peaks_from_model
-        from dipy.io.stateful_tractogram import Space, StatefulTractogram
-        from dipy.io.streamline import save_tractogram
-        from dipy.reconst.dti import TensorModel
-        from dipy.tracking import utils
-        from dipy.tracking.stopping_criterion import ThresholdStoppingCriterion
-        from dipy.tracking.tracker import probabilistic_tracking
-    except ImportError as exc:  # pragma: no cover
-        raise RuntimeError("DIPY is required for probabilistic tractography.") from exc
+    """Run probabilistic tractography with the NumPy/SciPy tensor engine."""
 
     seed_mask = np.asarray(seed_mask, dtype=bool)
     stop_map = np.asarray(stop_map, dtype=float)
-    model = TensorModel(gtab, fit_method="WLS")
-    sphere = get_sphere(name="symmetric724")
-    peaks = peaks_from_model(
-        model,
-        data,
-        sphere,
-        0.5,
-        25,
-        mask=stop_map > 0,
-        return_sh=True,
-        normalize_peaks=False,
-        legacy=False,
-    )
-    stopping_criterion = ThresholdStoppingCriterion(stop_map, fa_threshold)
-    seeds = utils.seeds_from_mask(
-        seed_mask,
-        affine,
-        density=[seed_density, seed_density, seed_density],
-    )
-    streamlines = list(
-        probabilistic_tracking(
-            seeds,
-            stopping_criterion,
+    fit = fit_tensor(data, gtab, mask=stop_map > 0)
+    tensors = np.asarray(fit.tensors, dtype=float)
+    fa = np.nan_to_num(np.asarray(fit.fa, dtype=float))
+    seeds = _seed_points(seed_mask, affine, seed_density)
+    rng = np.random.default_rng(random_seed)
+    streamlines: list[np.ndarray] = []
+    for seed in seeds:
+        streamline = _track_probabilistic_one(
+            seed,
+            tensors,
+            fa,
             affine,
-            sh=peaks.shm_coeff,
-            sphere=sphere,
+            rng,
             step_size=step_size,
-            min_len=min_length,
-            max_len=max_length,
+            fa_threshold=fa_threshold,
+            min_length=min_length,
+            max_length=max_length,
             max_angle=max_angle,
-            nbr_threads=0,
-            random_seed=random_seed,
-            legacy=False,
         )
-    )
+        if streamline is not None:
+            streamlines.append(streamline)
     if out_trk is not None:
-        reference = _reference_image(seed_mask, affine)
-        sft = StatefulTractogram(streamlines, reference, Space.RASMM)
-        save_tractogram(sft, str(out_trk), bbox_valid_check=False)
+        _save_trk(streamlines, affine, out_trk)
     return streamlines
 
 
