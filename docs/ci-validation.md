@@ -22,6 +22,11 @@ All CI matrix jobs pass in the recorded run. The matrix now includes Python
 3.10-3.14 on Ubuntu, macOS, and Windows. Optional external-runtime tests are
 skipped by default and can be enabled with `NM_RUN_EXTERNAL=1`.
 
+`ci.yml` also includes a minimal-core job that installs the package without
+optional extras and verifies core motion, coregistration, DTI, tractography,
+and runtime diagnostics. Tagged releases are handled by
+`.github/workflows/release.yml`, which builds and uploads the wheel.
+
 ## Verification Caveat
 
 This page records the observed status at the time of writing. The repository

@@ -23,6 +23,10 @@
 - Added pipeline config validation before execution.
 - Added package-version/configuration metadata to reproducibility manifests.
 - Added desktop GUI launch smoke tests.
+- Added a minimal-install CI job that runs the core workflows without DIPY,
+  DICOM, Nilearn, or external providers.
+- Added a tag-triggered GitHub Release workflow that builds and uploads the
+  pure-Python wheel.
 - Added `docs/gap-matrix.md` as the authoritative original-workflow mapping.
 - Updated CI to install optional extras explicitly and cover Python 3.10-3.14.
 

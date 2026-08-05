@@ -12,6 +12,8 @@ and what remains before the package can be called production-ready.
 - [x] Editable install works
 - [x] Wheel build verified with `pip wheel`
 - [x] GitHub Actions workflow exists
+- [x] Minimal-core CI job verifies installation without optional dependencies
+- [x] Tag-triggered wheel release workflow exists
 - [ ] CI matrix result independently reproducible from repository artifacts
 - [x] CLI entry points installed
 - [x] Optional Tkinter desktop GUI
