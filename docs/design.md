@@ -61,8 +61,9 @@ relying on filenames alone.
 
 ## Diffusion and Structural Connectivity
 
-DTI fitting uses DIPY's weighted least-squares tensor model. Deterministic
-tractography uses tensor peaks and a threshold stopping criterion on FA.
+DTI fitting uses a NumPy/SciPy weighted least-squares tensor model.
+Deterministic tractography uses optional DIPY tensor peaks and a threshold
+stopping criterion on FA.
 Seed-target connectivity counts streamlines that pass through both ROIs, which
 approximates the structural-connectivity role of the original FSL-based
 workflow without requiring BEDPOSTX or PROBTRACKX.

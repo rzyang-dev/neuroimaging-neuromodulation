@@ -34,7 +34,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - Fourier slice-timing correction and motion-parameter-based resampling
 - Detrending and world-space image reslicing
 - Text-to-NIfTI conversion for tract-matrix output workflows
-- Rigid motion-parameter estimation through DIPY
+- NumPy/SciPy rigid motion-parameter estimation and coregistration
 - SPM25-validated motion parameter reference comparison
 - SPM25-validated rigid coregistration reference comparison
 - SPM25-validated normalization deformation-field reference comparison
@@ -50,8 +50,6 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - SPM DARTEL reference comparison against SPM unified normalization
 - Twenty-seven-subject SPM DARTEL reference comparison with real-data verification
 - Multi-subject DARTEL parity CLI through `nm-preprocess dartel-parity`
-- DIPY-based volume coregistration
-- NumPy/SciPy motion estimation and coregistration with no DIPY requirement
 - DTI fitting, deterministic tractography, and seed-target structural
   connectivity through `nm-diffusion`
 - Tract-profile extraction from TRK/TCK streamlines and scalar images
@@ -75,7 +73,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - Compressed and enhanced multiframe DICOM conversion coverage
 - Atlas-guided GM/WM/CSF tissue probability estimation (approximate, not a
   validated SPM/DARTEL replacement)
-- DIPY-based nonlinear deformation estimation with SPM world-coordinate
+- Optional DIPY nonlinear deformation estimation with SPM world-coordinate
   `y_`/`iy_` output
 - SPM25 standalone segmentation command through `nm-preprocess spm-segment`
 - SPM25-validated `y_`/`iy_` world-coordinate convention

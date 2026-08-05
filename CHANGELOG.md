@@ -14,6 +14,8 @@
 - Replaced the DIPY motion-estimation and coregistration paths with an internal
   NumPy/SciPy registration engine, so those workflows run without the
   `diffusion` extra.
+- Replaced DIPY tensor fitting with an internal NumPy/SciPy weighted
+  least-squares DTI implementation.
 - Added pipeline config validation before execution.
 - Added package-version/configuration metadata to reproducibility manifests.
 - Added desktop GUI launch smoke tests.

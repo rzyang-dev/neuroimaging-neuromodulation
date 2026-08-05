@@ -36,7 +36,7 @@ document records the mapping from MATLAB functions to Python modules.
 | `TMScoregister.m` | `preprocess/coregister.py`, `preprocess/_registration.py` | Implemented with NumPy/SciPy affine registration |
 | `TMSSegDartel.m`, `TMSseg.m` | `segmentation/tissue.py` | Approximate atlas-guided GM/WM/CSF estimation; DARTEL normalization remains external |
 | `TMSwriteDTL.m` | `io/deformations.py`, `deformations/estimate.py` | SPM world-coordinate `y_`/`iy_` fields applied; DIPY nonlinear fields converted to matching `y_`/`iy_` fields |
-| `TMSDTIFIT.sh`, `TMSTargetSC.m` | `diffusion/` | Tensor fitting, deterministic tractography, connectivity implemented with DIPY; probabilistic FSL workflow not reproduced |
+| `TMSDTIFIT.sh`, `TMSTargetSC.m` | `diffusion/` | Tensor fitting implemented with NumPy/SciPy; deterministic tractography/connectivity uses optional DIPY; probabilistic FSL workflow not reproduced |
 | `TMSProbTrack.sh` | `diffusion/tracking.py` | DIPY-based probabilistic tensor tractography; FSL BEDPOSTX not reproduced |
 | `TMSProbTrack.sh`, `TMSBEDPOSTX.sh`, `TMSDTIFIT.sh` | `diffusion/external.py` | Optional FSL/MRtrix binary wrappers |
 | `TMSSmooth.m` | `preprocess/spatial.py` | Implemented as Gaussian smoothing |
