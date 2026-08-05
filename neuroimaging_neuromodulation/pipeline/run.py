@@ -18,6 +18,10 @@ from ..preprocess.temporal import slice_timing_correct_volume
 from ..reporting.manifest import write_reproducibility_manifest
 from ..reporting.html import render_target_report
 from ..targets.pipeline import seed_based_fc, target_site
+from ..wm.connectivity import (
+    fc_asymmetry_index,
+    functional_homotopic_connectivity,
+)
 
 
 def _load_config(config: dict[str, Any] | str | Path) -> dict[str, Any]:
@@ -246,6 +250,48 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
     if config.get("report", True):
         report_path = render_target_report(output_dir, subject)
 
+    wm_analysis_cfg = config.get("wm_analysis") or {}
+    wm_analysis_results: dict[str, object] = {}
+    conn_homo_cfg = wm_analysis_cfg.get("conn_homo")
+    if conn_homo_cfg:
+        mask_path = conn_homo_cfg.get("mask") or config["mask"]
+        output_path = Path(
+            conn_homo_cfg.get("output")
+            or subject_dir / "conn_homo.nii"
+        )
+        _map, summary = functional_homotopic_connectivity(
+            current_path,
+            mask_path,
+            output_path,
+            axis=int(conn_homo_cfg.get("axis", 0)),
+            left_first=not bool(conn_homo_cfg.get("right_first", False)),
+            r_threshold=conn_homo_cfg.get("r_threshold"),
+        )
+        wm_analysis_results["conn_homo"] = {
+            "output": str(output_path),
+            "summary": summary,
+        }
+    fc_asym_cfg = wm_analysis_cfg.get("fc_asym")
+    if fc_asym_cfg:
+        mask_path = fc_asym_cfg.get("mask") or config["mask"]
+        output_path = Path(
+            fc_asym_cfg.get("output")
+            or subject_dir / "fc_asym.nii"
+        )
+        _map, summary = fc_asymmetry_index(
+            current_path,
+            mask_path,
+            output_path,
+            axis=int(fc_asym_cfg.get("axis", 0)),
+            left_first=not bool(fc_asym_cfg.get("right_first", False)),
+            r_threshold=float(fc_asym_cfg.get("r_threshold", 0.25)),
+            chunk_size=int(fc_asym_cfg.get("chunk_size", 2000)),
+        )
+        wm_analysis_results["fc_asym"] = {
+            "output": str(output_path),
+            "summary": summary,
+        }
+
     manifest_path = write_reproducibility_manifest(
         subject_dir,
         {
@@ -275,6 +321,7 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
         else None,
         "report": str(report_path) if report_path else None,
         "manifest": str(manifest_path),
+        "wm_analysis": wm_analysis_results,
     }
 
 

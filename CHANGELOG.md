@@ -21,6 +21,8 @@
   NumPy/SciPy tensor-perturbation tracker. DIPY remains optional only for
   nonlinear deformation estimation.
 - Added pipeline config validation before execution.
+- Added optional `wm_analysis` pipeline support for homotopic connectivity and
+  FC asymmetry outputs.
 - Added package-version/configuration metadata to reproducibility manifests.
 - Added desktop GUI launch smoke tests.
 - Added a minimal-install CI job that runs the core workflows without DIPY,

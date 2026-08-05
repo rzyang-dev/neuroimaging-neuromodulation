@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import nibabel as nib
+import numpy as np
 import pytest
 
 from neuroimaging_neuromodulation.pipeline.run import run_pipeline, validate_pipeline_config
@@ -79,3 +80,48 @@ def test_validate_pipeline_config_rejects_missing_required_input(tmp_path: Path)
                 "mask": str(tmp_path / "missing-mask.nii"),
             }
         )
+
+
+def test_pipeline_wm_analysis(
+    real_fmri_path: Path | None,
+    real_fmri_available: bool,
+    tmp_path: Path,
+) -> None:
+    if not real_fmri_available:
+        pytest.skip("real fMRI data not available")
+    img = nib.load(real_fmri_path)
+    subset = nib.Nifti1Image(np.asarray(img.dataobj[..., :10], dtype=np.float32), img.affine)
+    functional = tmp_path / "wm-func.nii"
+    subset.to_filename(functional)
+    _, _ = sphere_roi([0.0, 0.0, 0.0], 8.0, img, tmp_path / "wm-seed.nii")
+    mask = np.zeros(img.shape[:3], dtype=np.uint8)
+    left_x = 8
+    right_x = img.shape[0] - left_x - 3
+    mask[left_x : left_x + 3, 30:33, 30:33] = 1
+    mask[right_x : right_x + 3, 30:33, 30:33] = 1
+    mask_path = tmp_path / "wm-mask.nii"
+    nib.Nifti1Image(mask, img.affine).to_filename(mask_path)
+    result = run_pipeline(
+        {
+            "subject": "wm-test",
+            "output_dir": str(tmp_path / "out"),
+            "functional": str(functional),
+            "seed": str(tmp_path / "wm-seed.nii"),
+            "mask": str(mask_path),
+            "target": False,
+            "report": False,
+            "wm_analysis": {
+                "conn_homo": {
+                    "mask": str(mask_path),
+                    "r_threshold": 0.1,
+                },
+                "fc_asym": {
+                    "mask": str(mask_path),
+                    "r_threshold": 0.1,
+                    "chunk_size": 100,
+                },
+            },
+        }
+    )
+    assert Path(result["wm_analysis"]["conn_homo"]["output"]).exists()
+    assert Path(result["wm_analysis"]["fc_asym"]["output"]).exists()

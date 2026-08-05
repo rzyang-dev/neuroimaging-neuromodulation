@@ -45,5 +45,17 @@
     "spm_dir": null,
     "timeout": 1800
   },
+  "wm_analysis": {
+    "conn_homo": {
+      "mask": "path/to/analysis-mask.nii",
+      "axis": 0,
+      "r_threshold": null
+    },
+    "fc_asym": {
+      "mask": "path/to/analysis-mask.nii",
+      "axis": 0,
+      "r_threshold": 0.25
+    }
+  },
   "report": true
 }

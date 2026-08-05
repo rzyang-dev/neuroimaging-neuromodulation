@@ -97,6 +97,8 @@ noted limitations:
 - Python-native leave-one-out FC pattern correlation
 - Python-native multi-run merge and subject-name validation
 - Python-native MNI region-center and timepoint-count target utilities
+- Optional `wm_analysis` pipeline integration for homotopic connectivity and
+  FC asymmetry
 
 ## Not Yet Ported or Verified
 
@@ -142,7 +144,7 @@ noted limitations:
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 4/4 pass, including real-template
   registration/apply and SyN streamline transformation tests
-- Local test suite: `178 tests collected` and passing
+- Local test suite: `179 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.20.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently
