@@ -217,6 +217,16 @@ def build_parser() -> argparse.ArgumentParser:
     vi.add_argument("--output-json", required=True)
     vi.set_defaults(handler=run_validate_image)
 
+    def_compare = subparsers.add_parser(
+        "compare-deformation-engines",
+        help="Compare internal and optional DIPY deformation outputs",
+    )
+    def_compare.add_argument("--moving", required=True)
+    def_compare.add_argument("--static", required=True)
+    def_compare.add_argument("--output-dir", required=True)
+    def_compare.add_argument("--output-json", required=True)
+    def_compare.set_defaults(handler=run_compare_deformation_engines)
+
     reg = subparsers.add_parser("regress", help="Run generic linear regression on text matrices")
     reg.add_argument("--y", required=True, help="Nx1 response matrix")
     reg.add_argument("--x", required=True, help="NxK design matrix")
@@ -684,6 +694,21 @@ def run_motion_metrics(args: argparse.Namespace) -> int:
     }
     Path(args.output_json).write_text(json.dumps(serializable, indent=2), encoding="utf-8")
     print(args.output_json)
+    return 0
+
+
+def run_compare_deformation_engines(args: argparse.Namespace) -> int:
+    import json
+
+    from ..validation.deformation import compare_deformation_engines
+
+    result = compare_deformation_engines(
+        args.moving,
+        args.static,
+        args.output_dir,
+        output_json=args.output_json,
+    )
+    print(json.dumps(result, indent=2, default=str))
     return 0
 
 

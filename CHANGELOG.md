@@ -33,6 +33,8 @@
 - Added nonlinear-warp validation for the internal deformation engine.
 - Added real-template nonlinear-warp validation for the internal deformation
   engine.
+- Added `nm-preprocess compare-deformation-engines` to quantify agreement
+  between the internal and optional DIPY deformation engines.
 - Added homotopic FC and FC asymmetry actions to the advanced `nm-gui`
   desktop interface.
 - Added guided `nm-app` options for homotopic FC and FC asymmetry.

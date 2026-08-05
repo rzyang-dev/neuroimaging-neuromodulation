@@ -81,6 +81,8 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - SPM25 standalone segmentation command through `nm-preprocess spm-segment`
 - SPM25-validated `y_`/`iy_` world-coordinate convention
 - Quantitative deformation/image validation commands
+- Internal vs DIPY deformation-engine comparison through
+  `nm-preprocess compare-deformation-engines`
 - Optional FSL/MRtrix wrappers with clear missing-binary errors
 - External tool health check through `nm-diffusion check-external`
 - Verified test-suite execution on Python 3.10 and 3.14
