@@ -146,10 +146,12 @@ noted limitations:
   > 0.87)
 - Internal vs DIPY deformation-engine comparison on real bundled grey/white
   templates: warped-output correlation 0.854, MAE 0.057 (2026-08-05)
+- Multi-subject nonlinear-warp validation for the internal deformation engine
+  with three known warp patterns (2026-08-05)
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 4/4 pass, including real-template
   registration/apply and SyN streamline transformation tests
-- Local test suite: `188 tests collected` and passing
+- Local test suite: `189 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.20.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently

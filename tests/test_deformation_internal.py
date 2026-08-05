@@ -99,3 +99,40 @@ def test_internal_deformation_recovers_nonlinear_warp_on_real_template(
     _, warped = load_volume(result["warped_moving"])
     mask = np.isfinite(warped) & np.isfinite(static)
     assert np.corrcoef(warped[mask].ravel(), static[mask].ravel())[0, 1] > 0.9
+
+
+def test_internal_deformation_multi_subject_nonlinear_warps(tmp_path) -> None:
+    grid = np.indices((16, 16, 16), dtype=float)
+    center = np.array([8.0, 8.0, 8.0])
+    moving = np.exp(-np.sum((grid - center.reshape(3, 1, 1, 1)) ** 2, axis=0))
+    reference = __import__("nibabel").Nifti1Image(
+        np.zeros((16, 16, 16), dtype=np.float32),
+        np.eye(4),
+    )
+    moving_path = tmp_path / "moving-multi.nii"
+    save_volume(moving, reference, moving_path)
+    warps = (
+        lambda coords: coords[0] + 1.5 * np.sin(coords[1] / 4.0),
+        lambda coords: coords[1] + 1.0 * np.cos(coords[2] / 4.0),
+    )
+    for index, warp in enumerate(warps):
+        coordinates = grid.copy()
+        coordinates[index % 3] = warp(coordinates)
+        static = ndimage.map_coordinates(
+            moving,
+            coordinates,
+            order=1,
+            mode="constant",
+            cval=0.0,
+        )
+        static_path = tmp_path / f"static-{index}.nii"
+        save_volume(static, reference, static_path)
+        result = estimate_deformation(
+            moving_path,
+            static_path,
+            tmp_path / f"deform-{index}",
+            level_iters=(1, 1, 1),
+        )
+        _, warped = load_volume(result["warped_moving"])
+        mask = np.isfinite(warped) & np.isfinite(static)
+        assert np.corrcoef(warped[mask].ravel(), static[mask].ravel())[0, 1] > 0.75
