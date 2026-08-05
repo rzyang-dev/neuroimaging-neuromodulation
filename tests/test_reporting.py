@@ -7,7 +7,10 @@ import nibabel as nib
 import pytest
 
 from neuroimaging_neuromodulation.reporting.html import render_target_report
-from neuroimaging_neuromodulation.reporting.manifest import write_target_manifest
+from neuroimaging_neuromodulation.reporting.manifest import (
+    write_reproducibility_manifest,
+    write_target_manifest,
+)
 from neuroimaging_neuromodulation.targets.pipeline import seed_based_fc, target_site
 from neuroimaging_neuromodulation.targets.roi import sphere_roi
 
@@ -18,6 +21,20 @@ def test_manifest_real_files(package_data_dir: Path, tmp_path: Path) -> None:
     data = json.loads(manifest.read_text(encoding="utf-8"))
     assert data["file_count"] > 0
     assert any(entry["sha256"] for entry in data["files"])
+
+
+def test_reproducibility_manifest_includes_metadata(
+    package_data_dir: Path,
+    tmp_path: Path,
+) -> None:
+    manifest = write_reproducibility_manifest(
+        package_data_dir,
+        {"package_version": "0.20.0", "parameters": {"tr": 2.0}},
+        tmp_path / "repro.json",
+    )
+    data = json.loads(manifest.read_text(encoding="utf-8"))
+    assert data["metadata"]["package_version"] == "0.20.0"
+    assert data["metadata"]["parameters"]["tr"] == 2.0
 
 
 def test_report_real_target(real_fmri_path: Path | None, real_fmri_available: bool, tmp_path: Path) -> None:

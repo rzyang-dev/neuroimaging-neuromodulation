@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 
+from .. import __version__
 from ..io.dicom import convert_dicom_directory, convert_dicom_series_by_index
 from ..io.nifti import load_volume, save_volume
 from ..preprocess.covariates import design_matrix, extract_signal, regress_out_nuisance
 from ..preprocess.motion import estimate_motion_parameters
 from ..preprocess.temporal import slice_timing_correct_volume
+from ..reporting.manifest import write_reproducibility_manifest
 from ..reporting.html import render_target_report
 from ..targets.pipeline import seed_based_fc, target_site
 
@@ -33,10 +36,50 @@ def _first_nifti(directory: Path) -> Path:
     return candidates[0]
 
 
+def validate_pipeline_config(config: dict[str, Any]) -> dict[str, Any]:
+    """Validate the user-facing pipeline configuration before running."""
+
+    config = dict(config)
+    subject = config.get("subject", "subject")
+    if not isinstance(subject, str) or not subject.strip():
+        raise ValueError("Pipeline requires a non-empty string 'subject'")
+    output_dir = Path(config.get("output_dir", "data/pipeline"))
+    if not output_dir:
+        raise ValueError("Pipeline requires a non-empty 'output_dir'")
+
+    functional = config.get("functional")
+    dicom = config.get("dicom") or {}
+    if not functional and dicom.get("functional"):
+        dicom_path = Path(str(dicom["functional"]))
+        if not dicom_path.exists():
+            raise ValueError(f"DICOM directory does not exist: {dicom_path}")
+    if not functional and not dicom.get("functional"):
+        raise ValueError("Pipeline requires 'functional' or dicom.functional")
+    if functional:
+        functional_path = Path(os.path.expanduser(str(functional)))
+        if not functional_path.exists():
+            raise ValueError(f"Functional image does not exist: {functional_path}")
+
+    for key in ("seed", "mask"):
+        value = config.get(key)
+        if not value:
+            raise ValueError(f"Pipeline requires '{key}'")
+        path = Path(os.path.expanduser(str(value)))
+        if not path.exists():
+            raise ValueError(f"{key} image does not exist: {path}")
+
+    if config.get("tr") is not None and float(config["tr"]) <= 0:
+        raise ValueError("'tr' must be greater than zero")
+    if config.get("slice_order") and config.get("tr") is None:
+        raise ValueError("'tr' is required when 'slice_order' is set")
+    return config
+
+
 def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
     """Run an end-to-end workflow from a JSON/dict configuration."""
 
     config = _load_config(config)
+    config = validate_pipeline_config(config)
     subject = config.get("subject", "subject")
     output_dir = Path(config.get("output_dir", "data/pipeline"))
     subject_dir = output_dir / subject
@@ -203,6 +246,18 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
     if config.get("report", True):
         report_path = render_target_report(output_dir, subject)
 
+    manifest_path = write_reproducibility_manifest(
+        subject_dir,
+        {
+            "package_version": __version__,
+            "config": config,
+            "outputs": {
+                "report": str(report_path) if report_path else None,
+                "subject_dir": str(subject_dir),
+            },
+        },
+    )
+
     return {
         "subject": subject,
         "output_dir": str(output_dir),
@@ -219,7 +274,8 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
         if t1_target_result
         else None,
         "report": str(report_path) if report_path else None,
+        "manifest": str(manifest_path),
     }
 
 
-__all__ = ["run_pipeline"]
+__all__ = ["run_pipeline", "validate_pipeline_config"]

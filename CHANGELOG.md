@@ -14,6 +14,9 @@
 - Replaced the DIPY motion-estimation and coregistration paths with an internal
   NumPy/SciPy registration engine, so those workflows run without the
   `diffusion` extra.
+- Added pipeline config validation before execution.
+- Added package-version/configuration metadata to reproducibility manifests.
+- Added desktop GUI launch smoke tests.
 - Added `docs/gap-matrix.md` as the authoritative original-workflow mapping.
 - Updated CI to install optional extras explicitly and cover Python 3.10-3.14.
 

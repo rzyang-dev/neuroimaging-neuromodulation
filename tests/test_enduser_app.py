@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+from neuroimaging_neuromodulation.gui.app import ToolboxApp
 from neuroimaging_neuromodulation.gui.enduser import build_config
+from neuroimaging_neuromodulation.gui.enduser import EndUserApp
 
 
 def test_build_config_nifti(tmp_path: Path) -> None:
@@ -49,3 +53,27 @@ def test_build_config_t1_target(tmp_path: Path) -> None:
     assert config["t1_target"]["target"] == str(tmp_path / "target.nii")
     assert config["t1_target"]["deformation"] is None
     assert config["t1_target"]["output"].endswith("IndiTarget_T1Sp.nii")
+
+
+def test_enduser_app_smoke() -> None:
+    try:
+        app = EndUserApp()
+    except Exception as exc:  # pragma: no cover - depends on local display
+        pytest.skip(f"Tkinter display is not available: {exc}")
+    try:
+        app.withdraw()
+        app.update_idletasks()
+    finally:
+        app.destroy()
+
+
+def test_advanced_gui_smoke() -> None:
+    try:
+        app = ToolboxApp()
+    except Exception as exc:  # pragma: no cover - depends on local display
+        pytest.skip(f"Tkinter display is not available: {exc}")
+    try:
+        app.withdraw()
+        app.update_idletasks()
+    finally:
+        app.destroy()

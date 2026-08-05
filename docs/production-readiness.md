@@ -49,12 +49,14 @@ and what remains before the package can be called production-ready.
 - [x] FSL/MRtrix execution smoke tests against installed binaries
   (2026-08-04: FSL/MRtrix 3/3 pass; ANTs execution tests pass 4/4)
 - [x] HTML reports and SHA-256 manifests
+- [x] Pipeline config validation before execution
+- [x] Reproducibility metadata in output manifests
 - [x] Python-native homotopic connectivity, FC asymmetry, FC pattern,
   multi-run merge, subject validation, MNI center, and timepoint workflows
 
 ## Verification
 
-- [x] `171` automated tests pass locally
+- [x] `176` automated tests pass locally
 - [ ] Tests prove numerical equivalence to original MATLAB/SPM/FSL workflows
 - [ ] Tests cover missing workflows listed in `docs/porting-status.md`
 - [x] Tests use real public fMRI, diffusion, DICOM, T1, template, and mask data

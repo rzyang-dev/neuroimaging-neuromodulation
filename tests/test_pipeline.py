@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import nibabel as nib
 import pytest
 
-from neuroimaging_neuromodulation.pipeline.run import run_pipeline
+from neuroimaging_neuromodulation.pipeline.run import run_pipeline, validate_pipeline_config
 from neuroimaging_neuromodulation.targets.roi import sphere_roi
 
 
@@ -61,3 +62,20 @@ def test_pipeline_real_fmri_subset(
     assert (tmp_path / "out" / "pipe-test" / "report.html").exists()
     assert result["report"] is not None
     assert result["t1_target"]["output"] is not None
+    assert result["manifest"] is not None
+    manifest = json.loads(Path(result["manifest"]).read_text(encoding="utf-8"))
+    assert manifest["metadata"]["package_version"] == "0.20.0"
+
+
+def test_validate_pipeline_config_rejects_missing_required_input(tmp_path: Path) -> None:
+    functional = tmp_path / "func.nii"
+    functional.write_text("not-a-real-nifti", encoding="utf-8")
+    with pytest.raises(ValueError, match="seed"):
+        validate_pipeline_config(
+            {
+                "subject": "test",
+                "output_dir": str(tmp_path),
+                "functional": str(functional),
+                "mask": str(tmp_path / "missing-mask.nii"),
+            }
+        )
