@@ -6,7 +6,7 @@ on:
       - "v*"
 
 jobs:
-  wheel:
+  build-wheel:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,20 @@ jobs:
         with:
           name: wheel
           path: dist/*.whl
+  installers:
+    needs: build-wheel
+    uses: ./.github/workflows/installers.yml
+
+  release:
+    needs: [build-wheel, installers]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
       - name: Create GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "$GITHUB_REF_NAME" dist/*.whl --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" artifacts/* --generate-notes

@@ -42,6 +42,8 @@
   pure-Python wheel.
 - Added a cross-platform PyInstaller workflow and launcher entry points for
   standalone `nm-app`, `nm-gui`, and `nm-toolbox` executables.
+- Wired the installer workflow into tag releases so each release produces the
+  wheel plus standalone executables.
 - Added `docs/gap-matrix.md` as the authoritative original-workflow mapping.
 - Added `docs/roadmap.md` with release milestones and production gates.
 - Updated CI to install optional extras explicitly and cover Python 3.10-3.14.

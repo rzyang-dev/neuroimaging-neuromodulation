@@ -27,7 +27,9 @@ optional extras and verifies core motion, coregistration, DTI, tractography,
 and runtime diagnostics. Tagged releases are handled by
 `.github/workflows/release.yml`, which builds and uploads the wheel.
 `.github/workflows/installers.yml` builds standalone PyInstaller executables
-for the desktop apps and CLI on Ubuntu, macOS, and Windows.
+for the desktop apps and CLI on Ubuntu, macOS, and Windows. Tagged releases
+call that workflow and attach both the wheel and executables to the GitHub
+release.
 
 ## Verification Caveat
 
