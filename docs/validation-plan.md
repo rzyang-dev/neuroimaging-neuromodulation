@@ -5,6 +5,13 @@ Status date: 2026-08-05
 This document lists the remaining validation work and the exact commands and
 acceptance thresholds needed before a `1.0.0` production sign-off.
 
+## Current External Blocker
+
+The installer workflow was triggered from CI on 2026-08-05, but GitHub
+Actions could not start the jobs because the account has a billing or spending
+limit block. No installer artifacts were produced. Resume this section after
+GitHub Actions billing is restored.
+
 ## 1. Clinical-Scale Deformation Validation
 
 Run the internal engine and, when DIPY is installed, the optional DIPY engine
@@ -50,6 +57,9 @@ Acceptance:
 
 Trigger `.github/workflows/installers.yml` from the GitHub Actions UI or by
 creating a release tag after release gates pass.
+
+2026-08-05 result: workflow run `30981200366` failed before starting jobs due
+to the GitHub billing/spending-limit block described above.
 
 Acceptance:
 

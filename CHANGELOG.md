@@ -45,6 +45,8 @@
   engine.
 - Added `docs/validation-plan.md` with remaining validation commands and
   acceptance thresholds.
+- Recorded the GitHub Actions billing/spending-limit blocker that prevented
+  the installer workflow from starting.
 - Added homotopic FC and FC asymmetry actions to the advanced `nm-gui`
   desktop interface.
 - Added guided `nm-app` options for homotopic FC and FC asymmetry.
