@@ -30,6 +30,8 @@ def build_config(
     filter_data: bool = False,
     generate_target: bool = True,
     generate_t1_target: bool = False,
+    homotopic_fc: bool = False,
+    fc_asymmetry: bool = False,
     target_image: str | Path | None = None,
     report: bool = True,
 ) -> dict[str, object]:
@@ -68,6 +70,13 @@ def build_config(
             "spm_dir": None,
             "timeout": 1800,
         }
+    wm_analysis: dict[str, object] = {}
+    if homotopic_fc:
+        wm_analysis["conn_homo"] = {"mask": str(mask)}
+    if fc_asymmetry:
+        wm_analysis["fc_asym"] = {"mask": str(mask)}
+    if wm_analysis:
+        config["wm_analysis"] = wm_analysis
     return config
 
 
@@ -219,6 +228,8 @@ class EndUserApp(tk.Tk):
         self.filter_var = tk.BooleanVar(value=False)
         self.target_var = tk.BooleanVar(value=True)
         self.t1_target_var = tk.BooleanVar(value=False)
+        self.homotopic_fc_var = tk.BooleanVar(value=False)
+        self.fc_asymmetry_var = tk.BooleanVar(value=False)
         self.report_var = tk.BooleanVar(value=True)
 
         frame = self._row(self.settings_page)
@@ -246,6 +257,12 @@ class EndUserApp(tk.Tk):
 
         frame = self._row(self.settings_page)
         ttk.Checkbutton(frame, text="Generate T1-space target image", variable=self.t1_target_var).pack(anchor="w", padx=24)
+
+        frame = self._row(self.settings_page)
+        ttk.Checkbutton(frame, text="Compute homotopic FC", variable=self.homotopic_fc_var).pack(anchor="w", padx=24)
+
+        frame = self._row(self.settings_page)
+        ttk.Checkbutton(frame, text="Compute FC asymmetry", variable=self.fc_asymmetry_var).pack(anchor="w", padx=24)
 
         frame = self._row(self.settings_page)
         ttk.Checkbutton(frame, text="Create an HTML report", variable=self.report_var).pack(anchor="w", padx=24)
@@ -335,6 +352,8 @@ class EndUserApp(tk.Tk):
             filter_data=self.filter_var.get(),
             generate_target=self.target_var.get(),
             generate_t1_target=self.t1_target_var.get(),
+            homotopic_fc=self.homotopic_fc_var.get(),
+            fc_asymmetry=self.fc_asymmetry_var.get(),
             target_image=target_image,
             report=self.report_var.get(),
         )

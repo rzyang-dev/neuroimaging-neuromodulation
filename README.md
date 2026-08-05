@@ -108,6 +108,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - Correlation thresholding and largest-cluster target selection
 - CLI commands and an optional Tkinter desktop interface
 - Guided end-user desktop application via `nm-app`
+- `nm-app` can request homotopic FC and FC asymmetry outputs
 - Advanced desktop interface via `nm-gui`
 - Homotopic FC and FC asymmetry actions in the advanced desktop interface
 - Separate `nm-preprocess` program for deformation, slice timing, motion

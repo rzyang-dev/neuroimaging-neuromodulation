@@ -55,6 +55,22 @@ def test_build_config_t1_target(tmp_path: Path) -> None:
     assert config["t1_target"]["output"].endswith("IndiTarget_T1Sp.nii")
 
 
+def test_build_config_wm_analysis(tmp_path: Path) -> None:
+    config = build_config(
+        subject="test",
+        output_dir=tmp_path,
+        functional=tmp_path / "func.nii",
+        seed=tmp_path / "seed.nii",
+        mask=tmp_path / "mask.nii",
+        homotopic_fc=True,
+        fc_asymmetry=True,
+        input_type="nifti",
+        tr=2.0,
+    )
+    assert config["wm_analysis"]["conn_homo"]["mask"] == str(tmp_path / "mask.nii")
+    assert config["wm_analysis"]["fc_asym"]["mask"] == str(tmp_path / "mask.nii")
+
+
 def test_enduser_app_smoke() -> None:
     try:
         app = EndUserApp()

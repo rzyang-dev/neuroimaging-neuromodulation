@@ -25,6 +25,7 @@
   FC asymmetry outputs.
 - Added homotopic FC and FC asymmetry actions to the advanced `nm-gui`
   desktop interface.
+- Added guided `nm-app` options for homotopic FC and FC asymmetry.
 - Added package-version/configuration metadata to reproducibility manifests.
 - Added desktop GUI launch smoke tests.
 - Added a minimal-install CI job that runs the core workflows without DIPY,
