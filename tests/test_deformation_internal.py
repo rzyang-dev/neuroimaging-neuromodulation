@@ -67,3 +67,35 @@ def test_internal_deformation_recovers_smooth_nonlinear_warp(tmp_path) -> None:
     _, warped = load_volume(result["warped_moving"])
     mask = np.isfinite(warped) & np.isfinite(static)
     assert np.corrcoef(warped[mask].ravel(), static[mask].ravel())[0, 1] > 0.9
+
+
+def test_internal_deformation_recovers_nonlinear_warp_on_real_template(
+    tmp_path,
+    package_data_dir,
+) -> None:
+    from neuroimaging_neuromodulation.io.nifti import load_volume
+
+    img, data = load_volume(package_data_dir / "grey333.nii")
+    grid = np.indices(data.shape, dtype=float)
+    coordinates = grid.copy()
+    coordinates[0] = coordinates[0] + 1.5 * np.sin(grid[1] / 10.0)
+    static = ndimage.map_coordinates(
+        np.asarray(data, dtype=float),
+        coordinates,
+        order=1,
+        mode="constant",
+        cval=0.0,
+    )
+    moving_path = tmp_path / "real-moving.nii"
+    static_path = tmp_path / "real-static.nii"
+    save_volume(data, img, moving_path)
+    save_volume(static, img, static_path)
+    result = estimate_deformation(
+        moving_path,
+        static_path,
+        tmp_path / "real-deform",
+        level_iters=(1, 1, 1),
+    )
+    _, warped = load_volume(result["warped_moving"])
+    mask = np.isfinite(warped) & np.isfinite(static)
+    assert np.corrcoef(warped[mask].ravel(), static[mask].ravel())[0, 1] > 0.9
