@@ -144,6 +144,8 @@ noted limitations:
 - SPM DARTEL reference comparison on twenty-seven real template-derived subjects:
   tissue maps agree with SPM unified-normalization outputs (mean correlation
   > 0.87)
+- Internal vs DIPY deformation-engine comparison on real bundled grey/white
+  templates: warped-output correlation 0.854, MAE 0.057 (2026-08-05)
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 4/4 pass, including real-template
   registration/apply and SyN streamline transformation tests

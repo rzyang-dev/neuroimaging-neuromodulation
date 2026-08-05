@@ -8,6 +8,7 @@ build/
 dist/
 .DS_Store
 data/derived/
+data/validation/deformation-compare/
 AFQ/
 spm/
 vistasoft/

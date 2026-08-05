@@ -38,6 +38,9 @@
 - Added a release-gate checker for version consistency, minimal core
   dependencies, and required documentation.
 - Added packaged-CLI smoke testing to the installer workflow.
+- Recorded real-template deformation-engine comparison evidence: internal
+  warped output correlates 0.854 with the DIPY engine on bundled grey/white
+  templates.
 - Added homotopic FC and FC asymmetry actions to the advanced `nm-gui`
   desktop interface.
 - Added guided `nm-app` options for homotopic FC and FC asymmetry.

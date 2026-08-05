@@ -1,0 +1,11 @@
+{
+  "dipy_available": true,
+  "metrics": {
+    "correlation": 0.8543936325552155,
+    "rmse": 0.15420036164518777,
+    "normalized_rmse": 0.15437445278442574,
+    "mae": 0.056780794117292054
+  },
+  "dipy_warped": "data\\validation\\deformation-compare\\dipy\\warped_moving.nii",
+  "internal_warped": "data\\validation\\deformation-compare\\internal\\warped_moving.nii"
+}
