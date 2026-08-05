@@ -1,0 +1,36 @@
+{
+  "date": "2026-08-05",
+  "mode": "local-only",
+  "ci_used": false,
+  "seed_fc": {
+    "command": "nm-tms seed-fc",
+    "outputs": [
+      "data/validation/workflows/seedfc/local-validation/SeedFCinWB.nii",
+      "data/validation/workflows/seedfc/local-validation/SeedFCinROI.nii"
+    ]
+  },
+  "alff": {
+    "command": "nm-wm alff",
+    "outputs": [
+      "data/validation/workflows/alff/ALFF.nii",
+      "data/validation/workflows/alff/zALFF.nii",
+      "data/validation/workflows/alff/mALFF.nii",
+      "data/validation/workflows/alff/fALFF.nii",
+      "data/validation/workflows/alff/zfALFF.nii",
+      "data/validation/workflows/alff/mfALFF.nii"
+    ]
+  },
+  "estimate_motion": {
+    "command": "nm-preprocess estimate-motion",
+    "outputs": [
+      "data/validation/workflows/motion/motion_corrected.nii",
+      "data/validation/workflows/motion/rp.txt"
+    ]
+  },
+  "dicom_inspect": {
+    "command": "nm-dicom inspect",
+    "output": "data/validation/workflows/dicom-inspect.json",
+    "series_count": 9,
+    "file_count": 39
+  }
+}

@@ -53,6 +53,8 @@
   package data.
 - Built local `nm-toolbox`, `nm-app`, and `nm-gui` bundles under `release/`.
 - Verified locally that packaged `nm-app` and `nm-gui` executables launch.
+- Recorded local real-data workflow smoke results for seed FC, ALFF/fALFF,
+  motion estimation, and DICOM inspection.
 - Added homotopic FC and FC asymmetry actions to the advanced `nm-gui`
   desktop interface.
 - Added guided `nm-app` options for homotopic FC and FC asymmetry.

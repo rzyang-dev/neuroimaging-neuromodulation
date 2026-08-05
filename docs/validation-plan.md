@@ -108,6 +108,9 @@ Local-only validation completed on 2026-08-05 without GitHub Actions:
 - Local launch check: both `nm-app.exe` and `nm-gui.exe` started and remained
   running for 3 seconds before being closed.
 - Validation JSON records are copied to `release/validation/`.
+- Real-data workflow smoke run completed locally: seed FC, ALFF/fALFF,
+  motion estimation, and DICOM inspection. Results are recorded in
+  `data/validation/workflows-summary.json`.
 - Previous release output is archived under `release/archive/`, not deleted.
 - Reproducible build command:
   `python scripts/build_local.py --build-gui --run-tests`

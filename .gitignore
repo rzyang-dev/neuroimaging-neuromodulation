@@ -10,6 +10,7 @@ release/
 .DS_Store
 data/derived/
 data/validation/deformation-compare/
+data/validation/workflows/
 AFQ/
 spm/
 vistasoft/
