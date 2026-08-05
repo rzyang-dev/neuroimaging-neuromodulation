@@ -10,6 +10,8 @@ from typing import Any
 import numpy as np
 
 from .. import __version__
+from ..diffusion.afq import afq_subject_pipeline
+from ..diffusion.streamlines_io import load_tract_streamlines
 from ..io.dicom import convert_dicom_directory, convert_dicom_series_by_index
 from ..io.nifti import load_volume, save_volume
 from ..preprocess.covariates import design_matrix, extract_signal, regress_out_nuisance
@@ -38,6 +40,16 @@ def _first_nifti(directory: Path) -> Path:
     if not candidates:
         raise ValueError(f"No NIfTI file found in {directory}")
     return candidates[0]
+
+
+def _jsonable(value: Any) -> Any:
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, dict):
+        return {key: _jsonable(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonable(item) for item in value]
+    return value
 
 
 def validate_pipeline_config(config: dict[str, Any]) -> dict[str, Any]:
@@ -292,6 +304,40 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
             "summary": summary,
         }
 
+    afq_result = None
+    afq_cfg = config.get("afq")
+    if afq_cfg:
+        tracks = afq_cfg.get("tracks")
+        atlas = afq_cfg.get("atlas")
+        scalar = afq_cfg.get("scalar")
+        if not tracks or not atlas or not scalar:
+            raise ValueError("afq requires 'tracks', 'atlas', and 'scalar'")
+        streamlines = load_tract_streamlines(tracks)
+        result = afq_subject_pipeline(
+            streamlines,
+            atlas,
+            scalar,
+            n_samples=int(afq_cfg.get("n_samples", 50)),
+            num_nodes=int(afq_cfg.get("num_nodes", 30)),
+            max_dist=float(afq_cfg.get("max_dist", 4.0)),
+            max_len=float(afq_cfg.get("max_len", 4.0)),
+            segmentation=afq_cfg.get("segmentation", "atlas"),
+            roi_dir=afq_cfg.get("roi_dir"),
+            tract_atlas=afq_cfg.get("tract_atlas"),
+            min_dist=float(afq_cfg.get("min_dist", 2.0)),
+        )
+        afq_path = Path(afq_cfg.get("output") or subject_dir / "afq_summary.json")
+        afq_path.parent.mkdir(parents=True, exist_ok=True)
+        afq_path.write_text(
+            json.dumps(_jsonable(result), indent=2),
+            encoding="utf-8",
+        )
+        afq_result = {
+            "output": str(afq_path),
+            "n_streamlines": result["n_streamlines"],
+            "tracts": len(result["tracts"]),
+        }
+
     manifest_path = write_reproducibility_manifest(
         subject_dir,
         {
@@ -322,6 +368,7 @@ def run_pipeline(config: dict[str, Any] | str | Path) -> dict[str, Any]:
         "report": str(report_path) if report_path else None,
         "manifest": str(manifest_path),
         "wm_analysis": wm_analysis_results,
+        "afq": afq_result,
     }
 
 

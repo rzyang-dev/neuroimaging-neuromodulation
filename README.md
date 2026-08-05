@@ -84,6 +84,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - External tool health check through `nm-diffusion check-external`
 - Verified test-suite execution on Python 3.10 and 3.14
 - Config-driven end-to-end pipeline through `nm-pipeline`
+- Optional AFQ tract analysis through `nm-pipeline`
 - Standalone band-pass filtering command
 - Leave-one-out GFC classification and left-right image flipping
 - Correlation-comparison, chi-square, quantile-regression, and

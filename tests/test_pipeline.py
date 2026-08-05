@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 from neuroimaging_neuromodulation.pipeline.run import run_pipeline, validate_pipeline_config
+from neuroimaging_neuromodulation.diffusion.streamlines_io import save_tract_streamlines
 from neuroimaging_neuromodulation.targets.roi import sphere_roi
 
 
@@ -125,3 +126,59 @@ def test_pipeline_wm_analysis(
     )
     assert Path(result["wm_analysis"]["conn_homo"]["output"]).exists()
     assert Path(result["wm_analysis"]["fc_asym"]["output"]).exists()
+
+
+def test_pipeline_afq(
+    real_fmri_path: Path | None,
+    real_fmri_available: bool,
+    tmp_path: Path,
+) -> None:
+    if not real_fmri_available:
+        pytest.skip("real fMRI data not available")
+    img = nib.load(real_fmri_path)
+    subset = nib.Nifti1Image(np.asarray(img.dataobj[..., :5], dtype=np.float32), img.affine)
+    functional = tmp_path / "afq-func.nii"
+    subset.to_filename(functional)
+    _, _ = sphere_roi([0.0, 0.0, 0.0], 8.0, img, tmp_path / "afq-seed.nii")
+    _, _ = sphere_roi([0.0, 0.0, 0.0], 18.0, img, tmp_path / "afq-mask.nii")
+
+    atlas_data = np.zeros((20, 20, 20), dtype=np.uint8)
+    atlas_data[5:15, 5:15, 5:10] = 1
+    atlas_data[5:15, 5:15, 12:17] = 2
+    atlas = nib.Nifti1Image(atlas_data, np.eye(4))
+    atlas.to_filename(tmp_path / "atlas.nii")
+    scalar_data = np.broadcast_to(
+        np.arange(20, dtype=float).reshape(20, 1, 1),
+        (20, 20, 20),
+    ).copy()
+    scalar = nib.Nifti1Image(scalar_data, np.eye(4))
+    scalar.to_filename(tmp_path / "scalar.nii")
+    streamlines = [
+        np.array([[6.0, 6.0, 7.0], [8.0, 8.0, 7.0], [10.0, 10.0, 7.0]]),
+        np.array([[6.0, 6.0, 14.0], [8.0, 8.0, 14.0], [10.0, 10.0, 14.0]]),
+    ]
+    tracks = tmp_path / "afq-tracks.trk"
+    save_tract_streamlines(streamlines, scalar, tracks)
+
+    result = run_pipeline(
+        {
+            "subject": "afq-test",
+            "output_dir": str(tmp_path / "out"),
+            "functional": str(functional),
+            "seed": str(tmp_path / "afq-seed.nii"),
+            "mask": str(tmp_path / "afq-mask.nii"),
+            "target": False,
+            "report": False,
+            "afq": {
+                "tracks": str(tracks),
+                "atlas": str(tmp_path / "atlas.nii"),
+                "scalar": str(tmp_path / "scalar.nii"),
+                "n_samples": 8,
+                "num_nodes": 5,
+                "output": str(tmp_path / "out" / "afq-test" / "afq_summary.json"),
+            },
+        }
+    )
+    assert result["afq"] is not None
+    assert Path(result["afq"]["output"]).exists()
+    assert result["afq"]["tracts"] > 0

@@ -57,5 +57,13 @@
       "r_threshold": 0.25
     }
   },
+  "afq": {
+    "tracks": "path/to/tracks.trk",
+    "atlas": "path/to/tract-atlas.nii",
+    "scalar": "path/to/scalar.nii",
+    "n_samples": 50,
+    "num_nodes": 30,
+    "output": null
+  },
   "report": true
 }
