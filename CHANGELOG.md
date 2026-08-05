@@ -36,6 +36,7 @@
 - Added a tag-triggered GitHub Release workflow that builds and uploads the
   pure-Python wheel.
 - Added `docs/gap-matrix.md` as the authoritative original-workflow mapping.
+- Added `docs/roadmap.md` with release milestones and production gates.
 - Updated CI to install optional extras explicitly and cover Python 3.10-3.14.
 
 ## 0.19.0 - 2026-08-03

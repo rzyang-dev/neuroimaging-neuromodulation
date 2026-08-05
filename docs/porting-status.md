@@ -13,7 +13,7 @@ documentation change.
 | --- | --- | --- |
 | Use an isolated virtual environment | `.venv/` exists and the package is installed in it | Met |
 | Do not use mock data | Real DICOM, fMRI, diffusion, T1, template, and mask data are committed or fetched by dependency tests | Met |
-| Keep comprehensive records | `docs/analysis.md`, `docs/gap-matrix.md`, `docs/decisions.md`, `docs/issues.md`, `docs/testing.md`, `docs/design.md`, and this file | Met |
+| Keep comprehensive records | `docs/analysis.md`, `docs/gap-matrix.md`, `docs/roadmap.md`, `docs/decisions.md`, `docs/issues.md`, `docs/testing.md`, `docs/design.md`, and this file | Met |
 | Prefer lightweight Python implementations where possible | Core uses NumPy, SciPy, and NiBabel; DIPY, DICOM, and demo libraries are optional extras | Met |
 | No MATLAB required for the implemented subset | The implemented commands are Python-native | Met for implemented subset |
 | Full source-to-Python port of the original algorithms | Only a subset is mapped in `docs/analysis.md`; many original `.m`/`.sh` workflows are absent | Not met |
