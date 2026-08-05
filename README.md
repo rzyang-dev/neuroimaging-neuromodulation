@@ -65,6 +65,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - HTML tract QC reports combining profile statistics, plots, and segmentation
   counts, plus explicit QC warnings
 - AFQ-style group profile plots and per-node profile statistics
+- Tract-by-tract AFQ profile comparison through `nm-wm afq-validate`
 - NumPy/SciPy deterministic tensor tractography through `nm-diffusion`
 - NumPy/SciPy deterministic and probabilistic tensor tractography through
   `nm-diffusion`

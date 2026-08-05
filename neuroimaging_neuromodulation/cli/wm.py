@@ -19,6 +19,7 @@ from ..wm.masks import make_gm_mask, make_wm_mask
 from ..wm.ms2nii import tract_measures_to_nifti
 from ..wm.multirun import merge_runs
 from ..wm.plots import plot_group_profiles
+from ..wm.reference import compare_afq_profiles
 from ..wm.seedfc import wm_multi_seed_fc, wm_seed_fc
 from ..wm.statistics import profile_group_statistics
 from ..wm.subjects import compare_subject_names
@@ -191,6 +192,14 @@ def build_parser() -> argparse.ArgumentParser:
     validate_subjects.add_argument("--functional-dir", required=True)
     validate_subjects.add_argument("--output-json", required=True)
     validate_subjects.set_defaults(handler=run_validate_subjects)
+
+    afq_validate = subparsers.add_parser(
+        "afq-validate", help="Compare two AFQ profile JSON results by tract label"
+    )
+    afq_validate.add_argument("--reference", required=True)
+    afq_validate.add_argument("--candidate", required=True)
+    afq_validate.add_argument("--output-json", required=True)
+    afq_validate.set_defaults(handler=run_afq_validate)
 
     return parser
 
@@ -447,6 +456,13 @@ def run_validate_subjects(args: argparse.Namespace) -> int:
         args.functional_dir,
         output_json=args.output_json,
     )
+    print(json.dumps(result, indent=2))
+    return 0
+
+
+def run_afq_validate(args: argparse.Namespace) -> int:
+    result = compare_afq_profiles(args.reference, args.candidate)
+    Path(args.output_json).write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(json.dumps(result, indent=2))
     return 0
 

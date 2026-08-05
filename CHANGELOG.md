@@ -28,6 +28,8 @@
   FC asymmetry outputs.
 - Added optional `afq` pipeline support for subject-level tract analysis.
 - Added TrackQC warning reporting for empty tracts and non-finite statistics.
+- Added `nm-wm afq-validate` for tract-by-tract AFQ profile comparison and
+  numerical parity checks.
 - Added homotopic FC and FC asymmetry actions to the advanced `nm-gui`
   desktop interface.
 - Added guided `nm-app` options for homotopic FC and FC asymmetry.
