@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 from .. import __version__
+from ..paths import package_data_dir, package_dir
 
 
 def _fetch_demo_data(output_dir: str) -> int:
@@ -76,13 +77,14 @@ def _launch_gui() -> int:
 def _run_info(_args: argparse.Namespace) -> int:
     from ..io.nifti import load_volume
 
-    package_dir = Path(__file__).resolve().parents[1]
+    pkg_dir = package_dir()
+    data_dir = package_data_dir()
     info = {
         "version": __version__,
-        "package_dir": str(package_dir),
+        "package_dir": str(pkg_dir),
     }
     for name in ["BrainMask_05_61x73x61.nii", "WhiteMask_09_61x73x61.nii"]:
-        path = package_dir / "data" / name
+        path = data_dir / name
         if path.exists():
             img, data = load_volume(path)
             info[name] = {

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from neuroimaging_neuromodulation.cli.main import main as toolbox_main
+from neuroimaging_neuromodulation.paths import package_data_dir
 from neuroimaging_neuromodulation.runtime.diagnostics import (
     check_system,
     discover_optional_providers,
@@ -45,3 +46,7 @@ def test_doctor_report_text() -> None:
     text = render_doctor_report(check_system())
     assert "nm-toolbox doctor" in text
     assert "version: 0.20.0" in text
+
+
+def test_package_data_dir_resolves_bundled_data() -> None:
+    assert (package_data_dir() / "BrainMask_05_61x73x61.nii").exists()

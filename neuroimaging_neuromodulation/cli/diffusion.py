@@ -9,6 +9,7 @@ from pathlib import Path
 import nibabel as nib
 import numpy as np
 
+from ..paths import package_data_dir
 from ..diffusion.afq import afq_subject_pipeline
 from ..diffusion.connectivity import count_streamlines_between_masks
 from ..diffusion.dti import fit_tensor, load_dwi, write_tensor_metrics
@@ -414,7 +415,7 @@ def run_segment_tracts(args: argparse.Namespace) -> int:
 
 
 def run_segment_tracts_roi(args: argparse.Namespace) -> int:
-    package_data = Path(__file__).resolve().parents[1] / "data"
+    package_data = package_data_dir()
     roi_dir = args.roi_dir or package_data / "MNI_JHU_tracts_ROIs"
     atlas = args.atlas or package_data / "MNI_JHU_tracts_prob.nii.gz"
     streamlines = load_tract_streamlines(args.tracks, atlas)
@@ -525,7 +526,7 @@ def run_render_tracts_3d(args: argparse.Namespace) -> int:
 
 
 def run_afq_pipeline(args: argparse.Namespace) -> int:
-    package_data = Path(__file__).resolve().parents[1] / "data"
+    package_data = package_data_dir()
     roi_dir = args.roi_dir or package_data / "MNI_JHU_tracts_ROIs"
     tract_atlas = args.tract_atlas or package_data / "MNI_JHU_tracts_prob.nii.gz"
     streamlines = load_tract_streamlines(args.tracks, args.atlas)

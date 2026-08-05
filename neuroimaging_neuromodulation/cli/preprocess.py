@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 
+from ..paths import package_data_dir
 from ..io.deformations import apply_deformation
 from ..io.nifti import (
     load_4d_matrix,
@@ -428,7 +429,7 @@ def run_coregister(args: argparse.Namespace) -> int:
 
 
 def run_segment_tissue(args: argparse.Namespace) -> int:
-    package_data = Path(__file__).resolve().parents[1] / "data"
+    package_data = package_data_dir()
     paths = segment_tissue(
         args.t1,
         args.output_dir,

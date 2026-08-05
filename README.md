@@ -86,6 +86,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - Optional FSL/MRtrix wrappers with clear missing-binary errors
 - External tool health check through `nm-diffusion check-external`
 - Release-gate checks through `scripts/check_release_gates.py`
+- Local release builds through `scripts/build_local.py`
 - Verified test-suite execution on Python 3.10 and 3.14
 - Config-driven end-to-end pipeline through `nm-pipeline`
 - Optional AFQ tract analysis through `nm-pipeline`

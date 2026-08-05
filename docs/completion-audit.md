@@ -29,7 +29,7 @@ the full port and production-readiness claims are not met.
 
 ## Verification Evidence
 
-- `189` automated tests are collected and pass locally.
+- `190` automated tests are collected and pass locally.
 - Wheel build succeeds: `dist/neuroimaging_neuromodulation-0.20.0-py3-none-any.whl`.
 - `nm-toolbox doctor` validates the minimal core, optional extras, bundled
   data, and optional runtime providers.

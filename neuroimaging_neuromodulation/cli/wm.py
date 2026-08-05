@@ -6,6 +6,7 @@ import argparse
 import json
 from pathlib import Path
 
+from ..paths import package_data_dir
 from ..wm.alff import compute_alff
 from ..wm.connectivity import (
     fc_asymmetry_index,
@@ -267,7 +268,7 @@ def run_multi_seed_fc(args: argparse.Namespace) -> int:
 
 
 def run_cluster_report(args: argparse.Namespace) -> int:
-    package_data = Path(__file__).resolve().parents[1] / "data"
+    package_data = package_data_dir()
     template = args.template or package_data / "JHUtractsThr25_3mm.nii"
     report = cluster_report_in_jhu(
         args.result,

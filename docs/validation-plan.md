@@ -93,3 +93,19 @@ Acceptance:
 Do not tag `1.0.0` until the validation above is recorded in this repository
 and all acceptance thresholds pass. Until then, the package remains in active
 development.
+
+## Local Results
+
+Local-only validation completed on 2026-08-05 without GitHub Actions:
+
+- Full local test suite passes (`190` tests).
+- Release gates pass.
+- Wheel builds locally under `release/wheels/`.
+- Packaged `nm-toolbox` CLI runs `doctor --json` from
+  `release/binaries/nm-toolbox/`.
+- `nm-app` and `nm-gui` bundles built locally under
+  `release/binaries/`.
+- Validation JSON records are copied to `release/validation/`.
+- Previous release output is archived under `release/archive/`, not deleted.
+- Reproducible build command:
+  `python scripts/build_local.py --build-gui --run-tests`

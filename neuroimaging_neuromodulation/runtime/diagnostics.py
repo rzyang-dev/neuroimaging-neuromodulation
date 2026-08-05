@@ -16,6 +16,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from .. import __version__
+from ..paths import package_data_dir, package_dir
 
 CORE_DEPENDENCIES = ("numpy", "scipy", "nibabel")
 
@@ -130,14 +131,14 @@ def discover_optional_providers() -> list[dict[str, object]]:
 def check_system() -> dict[str, object]:
     """Return a JSON-friendly production health report."""
 
-    package_dir = Path(__file__).resolve().parents[1]
-    data_dir = package_dir / "data"
+    pkg_dir = package_dir()
+    data_dir = package_data_dir()
     data_files = sorted(path.name for path in data_dir.glob("*.nii*")) if data_dir.exists() else []
     return {
         "package": {
             "name": "neuroimaging-neuromodulation",
             "version": __version__,
-            "package_dir": str(package_dir),
+            "package_dir": str(pkg_dir),
         },
         "platform": {
             "system": platform.system(),

@@ -47,6 +47,11 @@
   acceptance thresholds.
 - Recorded the GitHub Actions billing/spending-limit blocker that prevented
   the installer workflow from starting.
+- Added `scripts/build_local.py` for local wheel, CLI, and GUI builds without
+  GitHub Actions.
+- Added frozen-app package path handling so bundled executables can find
+  package data.
+- Built local `nm-toolbox`, `nm-app`, and `nm-gui` bundles under `release/`.
 - Added homotopic FC and FC asymmetry actions to the advanced `nm-gui`
   desktop interface.
 - Added guided `nm-app` options for homotopic FC and FC asymmetry.

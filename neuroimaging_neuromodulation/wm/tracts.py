@@ -6,6 +6,8 @@ from pathlib import Path
 
 import numpy as np
 
+from ..paths import package_data_dir
+
 from ..io.nifti import load_volume, resample_to_grid
 
 
@@ -44,7 +46,7 @@ def cluster_report_in_jhu(
     )
 
     if labels_file is None:
-        labels_file = Path(__file__).resolve().parents[1] / "data" / "JHUtractsLabel.txt"
+        labels_file = package_data_dir() / "JHUtractsLabel.txt"
     labels = Path(labels_file).read_text(encoding="utf-8").splitlines()
     labels = [label.strip() for label in labels if label.strip()]
     labels = labels[:n_tracts] + [f"Tract {i}" for i in range(len(labels) + 1, n_tracts + 1)]
