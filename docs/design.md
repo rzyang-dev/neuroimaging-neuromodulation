@@ -47,10 +47,10 @@ time and preserving signal shape for periodic resting-state signals. Motion
 correction is implemented as affine voxel resampling from existing SPM-style
 realignment parameters.
 
-Motion parameter estimation is implemented through DIPY's affine registration
-API. The default pipeline starts with translation and then fits a rigid
-transform for each volume. DIPY affines are converted to SPM-style
-`[tx, ty, tz, rx, ry, rz]` text output.
+Motion parameter estimation is implemented through the internal NumPy/SciPy
+affine registration engine. The default pipeline starts with translation and
+then fits a rigid transform for each volume. The resulting transforms are
+converted to SPM-style `[tx, ty, tz, rx, ry, rz]` text output.
 
 ## Reporting and Traceability
 

@@ -32,8 +32,8 @@ document records the mapping from MATLAB functions to Python modules.
 | `TMSTargetSite.m` | `targets/pipeline.py` | Implemented |
 | `mkWMmask.m`, `mkGMmask.m` | `wm/masks.py` | Implemented |
 | `TMSSliceTiming.m` | `preprocess/temporal.py` | Implemented with Fourier interpolation |
-| `TMSRealign.m`, `TMSRealignEW.m` | `preprocess/motion.py`, `preprocess/temporal.py` | Rigid motion estimation and resampling implemented through DIPY |
-| `TMScoregister.m` | `preprocess/coregister.py` | Implemented with DIPY affine registration |
+| `TMSRealign.m`, `TMSRealignEW.m` | `preprocess/motion.py`, `preprocess/_registration.py`, `preprocess/temporal.py` | Rigid motion estimation and resampling implemented with NumPy/SciPy |
+| `TMScoregister.m` | `preprocess/coregister.py`, `preprocess/_registration.py` | Implemented with NumPy/SciPy affine registration |
 | `TMSSegDartel.m`, `TMSseg.m` | `segmentation/tissue.py` | Approximate atlas-guided GM/WM/CSF estimation; DARTEL normalization remains external |
 | `TMSwriteDTL.m` | `io/deformations.py`, `deformations/estimate.py` | SPM world-coordinate `y_`/`iy_` fields applied; DIPY nonlinear fields converted to matching `y_`/`iy_` fields |
 | `TMSDTIFIT.sh`, `TMSTargetSC.m` | `diffusion/` | Tensor fitting, deterministic tractography, connectivity implemented with DIPY; probabilistic FSL workflow not reproduced |
@@ -89,9 +89,9 @@ they are available; the convention is validated against SPM25 output.
 The original repository contains more than the algorithm table above,
 including third-party and GUI-scaffolding code. `docs/gap-matrix.md` is now
 the authoritative per-workflow status record. The meaningful remaining gaps
-are full AFQ/TrackQC numerical parity, DIPY-independent motion/coregistration/
-deformation/DTI paths, production GUI hardening, and larger clinical DARTEL
-parity. Several MATLAB functions are GUI orchestration only and are not cloned;
+are full AFQ/TrackQC numerical parity, DIPY-independent deformation/diffusion
+paths, production GUI hardening, and larger clinical DARTEL parity. Several
+MATLAB functions are GUI orchestration only and are not cloned;
 their algorithmic content is exposed through CLI, pipeline, and Python-native
 GUI workflows instead.
 

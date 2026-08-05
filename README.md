@@ -51,6 +51,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - Twenty-seven-subject SPM DARTEL reference comparison with real-data verification
 - Multi-subject DARTEL parity CLI through `nm-preprocess dartel-parity`
 - DIPY-based volume coregistration
+- NumPy/SciPy motion estimation and coregistration with no DIPY requirement
 - DTI fitting, deterministic tractography, and seed-target structural
   connectivity through `nm-diffusion`
 - Tract-profile extraction from TRK/TCK streamlines and scalar images

@@ -28,6 +28,7 @@ required by the Python implementation:
 | `TMSwriteDTL.m`, deformation application | `io/deformations.py`, `deformations/estimate.py` | core | `test_deformations.py` |
 | `TMSDicomConvert.m`, `DCM2NII` | `io/dicom.py` | dicom | `test_dicom.py` |
 | `TMSDTIFIT.sh`, `TMSProbTrack.sh`, `TMSTargetSC.m` | `diffusion/dti.py`, `diffusion/tracking.py`, `diffusion/connectivity.py` | diffusion | `test_diffusion.py` |
+| `TMSRealign.m`, `TMSRealignEW.m`, `TMScoregister.m` | `preprocess/_registration.py`, `preprocess/motion.py`, `preprocess/coregister.py` | core | `test_motion.py`, `test_coregister.py` |
 
 ## Implemented Partial
 
@@ -57,7 +58,7 @@ required by the Python implementation:
 | --- | --- | --- |
 | Full original GUI orchestration (`WhiteFun`, `WhiteMatter`, `WhiteMatterSF`, `TSA`, `TMStargetFC`) | core | Expose equivalent guided workflows in `nm-app`/`nm-gui`, not GUI clones |
 | Full AFQ/TrackQC numerical parity | core/diffusion | Add reference tests and complete subject-level pipeline |
-| DIPY-independent motion/coregistration/deformation/DTI paths | core | Replace optional diffusion extra with internal implementations |
+| DIPY-independent deformation and diffusion paths | core | Replace optional diffusion extra with internal implementations |
 | DARTEL-grade normalization parity | external | Keep optional provider only; not required for normal use |
 | SimNIBS field simulation | external | Optional provider integration only |
 

@@ -1,8 +1,15 @@
-"""Shared low-level DIPY affine registration pipeline."""
+"""Shared low-level affine registration pipeline.
+
+The default engine is a NumPy/SciPy implementation so motion estimation and
+coregistration do not require DIPY. DIPY remains available as an optional
+engine for users who install the ``diffusion`` extra.
+"""
 
 from __future__ import annotations
 
 import numpy as np
+
+from ._registration import internal_affine_registration
 
 
 _TRANSFORMS = {
@@ -23,16 +30,29 @@ def affine_registration_pipeline(
     pipeline: tuple[str, ...] = ("translation", "rigid"),
     level_iters: tuple[int, ...] = (20, 10, 5),
     optimizer_options: dict | None = None,
+    engine: str = "internal",
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Run a DIPY affine pipeline and return resampled data plus the affine."""
-
-    from dipy.align.imaffine import AffineMap, AffineRegistration, MutualInformationMetric
-    from dipy.align import transforms as dipy_transforms
+    """Run an affine registration pipeline and return resampled data + affine."""
 
     moving = np.asarray(moving, dtype=float)
     static = np.asarray(static, dtype=float)
     moving_affine = np.asarray(moving_affine, dtype=float)
     static_affine = np.asarray(static_affine, dtype=float)
+    if engine == "internal":
+        return internal_affine_registration(
+            moving,
+            static,
+            moving_affine=moving_affine,
+            static_affine=static_affine,
+            pipeline=pipeline,
+            optimizer_options=optimizer_options,
+        )
+    if engine != "dipy":
+        raise ValueError("engine must be 'internal' or 'dipy'")
+
+    from dipy.align.imaffine import AffineMap, AffineRegistration, MutualInformationMetric
+    from dipy.align import transforms as dipy_transforms
+
     affreg = AffineRegistration(
         metric=MutualInformationMetric(),
         level_iters=list(level_iters),

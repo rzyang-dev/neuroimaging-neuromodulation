@@ -11,6 +11,9 @@
 - Added Python-native homotopic connectivity, FC asymmetry, FC pattern,
   multi-run merge, subject validation, MNI region center, and timepoint count
   workflows.
+- Replaced the DIPY motion-estimation and coregistration paths with an internal
+  NumPy/SciPy registration engine, so those workflows run without the
+  `diffusion` extra.
 - Added `docs/gap-matrix.md` as the authoritative original-workflow mapping.
 - Updated CI to install optional extras explicitly and cover Python 3.10-3.14.
 

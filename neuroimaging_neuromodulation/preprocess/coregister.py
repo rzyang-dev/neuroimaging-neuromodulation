@@ -1,4 +1,4 @@
-"""Coregistration between two 3D volumes using DIPY."""
+"""Coregistration between two 3D volumes using the minimal core."""
 
 from __future__ import annotations
 
@@ -19,9 +19,8 @@ def coregister_images(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Register ``moving`` to ``static`` and return the resampled volume + affine.
 
-    This uses DIPY's mutual-information affine registration with a rigid
-    pipeline. The returned affine maps moving-world coordinates to
-    static-world coordinates.
+    This uses the internal NumPy/SciPy affine registration engine. The
+    returned affine maps moving-world coordinates to static-world coordinates.
     """
 
     moving = np.asarray(moving, dtype=float)

@@ -6,8 +6,6 @@ import nibabel as nib
 import numpy as np
 import pytest
 
-pytest.importorskip("dipy")
-
 from neuroimaging_neuromodulation.preprocess.motion import (  # noqa: E402
     affine_to_rp,
     estimate_motion_parameters,

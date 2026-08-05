@@ -81,6 +81,7 @@
 
 - Extend DARTEL-compatible normalization parity to a larger clinical
   multi-subject dataset.
-- Replace remaining DIPY-dependent core paths with NumPy/SciPy implementations.
+- Replace remaining DIPY-dependent deformation/diffusion paths with
+  NumPy/SciPy implementations or keep them isolated in the `diffusion` extra.
 - Complete AFQ/TrackQC numerical parity and harden desktop GUI workflows.
 - Add platform installers and reproducible release artifacts.

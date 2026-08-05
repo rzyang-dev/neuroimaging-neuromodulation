@@ -1,4 +1,4 @@
-"""Optional motion-parameter estimation using DIPY registration."""
+"""Motion-parameter estimation using the minimal NumPy/SciPy core."""
 
 from __future__ import annotations
 
@@ -35,9 +35,9 @@ def estimate_motion_parameters(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Estimate rigid motion parameters for a 4D series and reslice it.
 
-    This uses DIPY's native affine registration. The returned first array is
-    the motion-corrected 4D data; the second is ``(n_time, 6)`` SPM-style
-    realignment parameters derived from the DIPY affines.
+    This uses the internal NumPy/SciPy affine registration engine. The
+    returned first array is the motion-corrected 4D data; the second is
+    ``(n_time, 6)`` SPM-style realignment parameters.
     """
 
     data = np.asarray(data, dtype=float)

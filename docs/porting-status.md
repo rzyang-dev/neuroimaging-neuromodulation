@@ -43,9 +43,10 @@ noted limitations:
 - Approximate outer-brain c6 mask construction
 - DICOM inspection and conversion through `dicom2nifti`
 - DICOM series selection by index in `nm-dicom` and `nm-pipeline`
-- DIPY-based motion estimation, coregistration, nonlinear deformation
-  estimation with SPM world-coordinate `y_`/`iy_` output, DTI fitting, and
-  deterministic/probabilistic tensor tractography
+- NumPy/SciPy motion estimation and coregistration
+- Optional DIPY nonlinear deformation estimation, DTI fitting, and
+  deterministic/probabilistic tensor tractography through the `diffusion`
+  extra
 - SPM25 standalone segmentation through `nm-preprocess spm-segment`, including
   native `c*` maps, imported `rc*` DARTEL maps, and warped `wc*` maps
 - SPM DARTEL template runner through `nm-preprocess dartel-template`
