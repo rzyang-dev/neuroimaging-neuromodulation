@@ -61,7 +61,7 @@ Tests are grouped by responsibility:
 - `test_spm_dartel_batch.py` and `test_preprocess.py` also verify the DARTEL
   Normalise-to-MNI batch and CLI parser.
 - Manual SPM DARTEL reference verification compares DARTEL and SPM unified
-  normalization outputs on twenty-three real template-derived subjects (mean
+  normalization outputs on twenty-five real template-derived subjects (mean
   correlation > 0.87).
 - `test_preprocess.py` verifies the multi-subject `dartel-parity` CLI parser.
 - `test_fsl_normalization_execution.py` runs FSL FNIRT on real templates when
