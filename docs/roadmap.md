@@ -67,6 +67,7 @@ Target:
 - Signed or checksummed release artifacts.
 - Independent CI artifact reproducibility.
 - Automated release-gate checks for metadata, dependencies, and docs.
+- Recorded clinical-scale validation results from `docs/validation-plan.md`.
 
 ### 1.0.0: Production release
 

@@ -35,6 +35,7 @@ def main() -> int:
     required_docs = (
         "docs/gap-matrix.md",
         "docs/roadmap.md",
+        "docs/validation-plan.md",
         "docs/production-readiness.md",
         "docs/porting-status.md",
         "docs/testing.md",

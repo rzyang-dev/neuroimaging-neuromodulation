@@ -229,6 +229,8 @@ the source until the release pipeline is completed.
 - `docs/analysis.md` - source-code inventory and algorithm mapping
 - `docs/production-readiness.md` - production readiness checklist
 - `docs/roadmap.md` - release milestones and production gates
+- `docs/validation-plan.md` - remaining validation commands and acceptance
+  thresholds
 - `docs/completion-audit.md` - requirement-by-requirement audit
 - `docs/source-repository.md` - source repository and redistribution note
 - `docs/ci-validation.md` - CI validation branch notes

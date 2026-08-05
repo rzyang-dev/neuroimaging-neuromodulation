@@ -43,6 +43,8 @@
   templates.
 - Added multi-subject nonlinear-warp validation for the internal deformation
   engine.
+- Added `docs/validation-plan.md` with remaining validation commands and
+  acceptance thresholds.
 - Added homotopic FC and FC asymmetry actions to the advanced `nm-gui`
   desktop interface.
 - Added guided `nm-app` options for homotopic FC and FC asymmetry.
