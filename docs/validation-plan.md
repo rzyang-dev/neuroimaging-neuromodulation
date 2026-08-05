@@ -105,6 +105,8 @@ Local-only validation completed on 2026-08-05 without GitHub Actions:
   `release/binaries/nm-toolbox/`.
 - `nm-app` and `nm-gui` bundles built locally under
   `release/binaries/`.
+- Local launch check: both `nm-app.exe` and `nm-gui.exe` started and remained
+  running for 3 seconds before being closed.
 - Validation JSON records are copied to `release/validation/`.
 - Previous release output is archived under `release/archive/`, not deleted.
 - Reproducible build command:
