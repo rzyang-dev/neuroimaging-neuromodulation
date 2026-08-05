@@ -35,11 +35,12 @@ def tract_qc_report(
     )
 
     segmentation_counts = ""
+    segmentation_data: dict[str, object] | None = None
     if segmentation_json is not None:
-        data = json.loads(Path(segmentation_json).read_text(encoding="utf-8"))
+        segmentation_data = json.loads(Path(segmentation_json).read_text(encoding="utf-8"))
         count_rows = "".join(
             f"<tr><td>{html.escape(label)}</td><td>{count}</td></tr>"
-            for label, count in data.get("counts", {}).items()
+            for label, count in segmentation_data.get("counts", {}).items()
         )
         segmentation_counts = (
             "<h2>Tract segmentation counts</h2><table>"
@@ -55,9 +56,20 @@ def tract_qc_report(
         )
 
     rows = []
+    qc_warnings: list[str] = []
     for index, (profile, plot_path) in enumerate(zip(stats["profiles"], plots)):
         p_values = np.asarray(profile["p"])
         mean_diff = float(np.mean(np.asarray(profile["group2_mean"]) - np.asarray(profile["group1_mean"])))
+        if not np.isfinite(p_values).all():
+            qc_warnings.append(
+                f"Tract {profile['label']} contains non-finite group statistics."
+            )
+        if np.any(~np.isfinite(np.asarray(profile["group1_mean"]))) or np.any(
+            ~np.isfinite(np.asarray(profile["group2_mean"]))
+        ):
+            qc_warnings.append(
+                f"Tract {profile['label']} contains non-finite profile means."
+            )
         rows.append(
             "<tr>"
             f"<td>{html.escape(str(profile['label']))}</td>"
@@ -65,6 +77,17 @@ def tract_qc_report(
             f"<td>{float(np.min(p_values)):.6g}</td>"
             f'<td><a href="{html.escape(plot_path.name)}">SVG</a></td>'
             "</tr>"
+        )
+    if segmentation_data is not None:
+        for label, count in segmentation_data.get("counts", {}).items():
+            if int(count) == 0:
+                qc_warnings.append(f"Tract label {label} has zero streamlines.")
+    warnings_html = ""
+    if qc_warnings:
+        warning_items = "".join(f"<li>{html.escape(warning)}</li>" for warning in qc_warnings)
+        warnings_html = (
+            "<h2>QC warnings</h2><ul>"
+            f"{warning_items}</ul>"
         )
     content = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -79,6 +102,7 @@ th, td {{ border: 1px solid #d2d6dc; padding: 0.5rem; text-align: left; }}
 {''.join(rows)}</table>
 {segmentation_counts}
 {render_link}
+{warnings_html}
 </body></html>
 """
     report_path = output_dir / "qc.html"

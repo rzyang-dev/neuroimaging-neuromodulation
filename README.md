@@ -63,7 +63,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - Subject-level AFQ pipeline combining atlas segmentation, cleaning, and
   tract-profile extraction, with atlas- or ROI-based segmentation methods
 - HTML tract QC reports combining profile statistics, plots, and segmentation
-  counts
+  counts, plus explicit QC warnings
 - AFQ-style group profile plots and per-node profile statistics
 - NumPy/SciPy deterministic tensor tractography through `nm-diffusion`
 - NumPy/SciPy deterministic and probabilistic tensor tractography through
