@@ -140,8 +140,9 @@ original MATLAB toolbox:
 - Several tests assert only that outputs exist, shapes are correct, or values
   are finite.
 - Probabilistic tractography can pass with zero streamlines.
-- Motion, coregistration, segmentation, and tractography still lack full
-  reference comparison against MATLAB/SPM/FSL outputs.
+- Motion, coregistration, and normalization now have SPM/FSL reference
+  comparisons; segmentation and tractography still lack full reference
+  comparison against MATLAB/SPM/FSL/AFQ outputs.
 - GUI tests cover config construction only; the desktop UIs are not exercised.
 - Missing workflows listed in `docs/porting-status.md` have no coverage.
 

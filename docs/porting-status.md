@@ -1,6 +1,6 @@
 # Porting Status
 
-Status date: 2026-08-04
+Status date: 2026-08-05
 
 This document is the authoritative status record for the migration from the
 original `Neuroimaging-and-Neuromodulation` MATLAB toolbox to the Python
@@ -17,7 +17,7 @@ documentation change.
 | Prefer lightweight Python implementations where possible | Core uses NumPy, SciPy, NiBabel, Nilearn, DIPY, and dicom2nifti | Met |
 | No MATLAB required for the implemented subset | The implemented commands are Python-native | Met for implemented subset |
 | Full source-to-Python port of the original algorithms | Only a subset is mapped in `docs/analysis.md`; many original `.m`/`.sh` workflows are absent | Not met |
-| Production-ready package | Wheel builds and tests pass, but package is classified Alpha and lacks reference validation, full workflow coverage, and production UI hardening | Not met |
+| Production-ready package | Wheel builds and tests pass, but package is classified Alpha, reference validation is partial, and full workflow coverage and production UI hardening are missing | Not met |
 
 ## Implemented Subset
 
@@ -141,17 +141,20 @@ complete.
 
 ## External Runtime Environment
 
-As of 2026-08-04 the external runtimes below are installed and usable for
+As of 2026-08-05 the external runtimes below are installed and usable for
 reference/comparison work. The execution tests were run for the first time on
 2026-08-04; SPM `y_`/`iy_` convention, realignment, coregistration,
-normalization, and FSL FNIRT execution comparisons are now implemented, while
-full numerical parity across a larger clinical multi-subject DARTEL dataset
-beyond the twenty-seven real template-derived subjects is not yet demonstrated:
+normalization, FSL FNIRT, and DARTEL reference comparisons are now implemented,
+while full numerical parity across a larger clinical multi-subject DARTEL
+dataset beyond the twenty-seven real template-derived subjects is not yet
+demonstrated:
 
 - MATLAB R2015b and SPM standalone 25.01.02 are installed on Windows
   (`C:\Program Files\MATLAB\R2015b\bin`,
-  `C:\Users\ginger\spm_standalone_25.01.02_Windows`); SPM/DARTEL parity
-  comparisons can be executed but are not yet implemented.
+  `C:\Users\ginger\spm_standalone_25.01.02_Windows`); SPM/DARTEL template,
+  Normalise-to-MNI, and parity comparisons are implemented and have been run
+  through twenty-seven real template-derived subjects; larger clinical parity
+  remains to be demonstrated.
 - FSL 6.0.7.23 and MRtrix 3.0.4 are installed inside WSL (Ubuntu). FSL
   binaries (`bet`, `dtifit`, `probtrackx2`, `bedpostx`) require
   `source /home/dev/fsl/etc/fslconf/fsl.sh`; MRtrix `tckgen` is on the default

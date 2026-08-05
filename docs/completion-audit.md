@@ -1,6 +1,6 @@
 # Completion Audit
 
-Status date: 2026-08-04
+Status date: 2026-08-05
 
 This document records the migration status requirement by requirement. The
 current conclusion is **partial / alpha**: the implemented subset works, but
@@ -25,7 +25,7 @@ the full port and production-readiness claims are not met.
 | User-friendly software | CLI and GUI exist, but GUI is alpha and several workflows are not exposed | Partial |
 | End-user desktop application | `nm-app` exists; DICOM folder browsing is fixed, but several promised paths are incomplete | Partial |
 | Split into multiple programs | Nine entry points are defined in `pyproject.toml` | Met |
-| Production package | Wheel builds and tests pass, but package is Alpha, lacks full workflow coverage, and has no reference-parity validation | Not met |
+| Production package | Wheel builds and tests pass, but package is Alpha, lacks full workflow coverage, and has partial reference-parity validation | Not met |
 
 ## Verification Evidence
 
@@ -58,7 +58,8 @@ It includes, but is not limited to:
 
 - Porting missing white-matter/AFQ statistics and TrackQC workflows.
 - Integrating the individualized target-mask path into the desktop apps.
-- Adding reference comparisons against original MATLAB/SPM/FSL outputs.
+- Extending reference comparisons to remaining MATLAB/SPM/FSL/AFQ workflows
+  and larger datasets.
 - Hardening the GUI, DICOM series selection, and production packaging.
 - Re-running the audit only after each missing item has implementation and
   verification evidence.
@@ -79,5 +80,6 @@ while full numerical parity across a larger clinical multi-subject DARTEL
 dataset beyond the twenty-seven real template-derived subjects remains to be
 demonstrated.
 External-execution smoke tests pass
-(FSL/MRtrix 3/3 in WSL, ANTs 4/4 on Windows). A 3D rendering runtime for
-interactive fiber visualization is still missing. See `docs/porting-status.md`.
+(FSL/MRtrix 3/3 in WSL, ANTs 4/4 on Windows). Interactive 3D fiber
+visualization is available through the HTML/WebGL viewer. See
+`docs/porting-status.md`.

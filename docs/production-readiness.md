@@ -1,6 +1,6 @@
 # Production Readiness Checklist
 
-Status date: 2026-08-04
+Status date: 2026-08-05
 
 Current status: **not production-ready**. This checklist records what is true
 and what remains before the package can be called production-ready.
@@ -16,8 +16,7 @@ and what remains before the package can be called production-ready.
 - [x] CLI entry points installed
 - [x] Optional Tkinter desktop GUI
 - [ ] GUI behavior verified outside config-construction tests
-- [ ] Direct runtime dependency declarations complete (for example, `pydicom`
-  is imported directly but only a transitive dependency)
+- [x] Direct runtime dependency declarations complete (including `pydicom`)
 
 ## Data-Oriented Core
 
@@ -38,13 +37,14 @@ and what remains before the package can be called production-ready.
 - [x] DTI fitting and tensor tractography primitives
 - [ ] Full AFQ tract segmentation and tract-profile workflow
 - [x] Approximate GM/WM/CSF tissue probability estimation
-- [ ] SPM/DARTEL-compatible segmentation and normalization
+- [x] SPM/DARTEL-compatible segmentation and normalization through optional
+  SPM25 runners (larger clinical parity remains unproven)
 - [x] Exact `y_`/`iy_` deformation-convention validation against SPM25
 - [x] Config-driven pipeline for a subset of workflows
 - [x] Quantitative image/deformation validation commands
 - [x] FSL/MRtrix command builders and availability check
 - [x] FSL/MRtrix execution smoke tests against installed binaries
-  (2026-08-04: 3/3 pass; ANTs execution tests pass 3/3)
+  (2026-08-04: FSL/MRtrix 3/3 pass; ANTs execution tests pass 4/4)
 - [x] HTML reports and SHA-256 manifests
 
 ## Verification
@@ -53,6 +53,10 @@ and what remains before the package can be called production-ready.
 - [ ] Tests prove numerical equivalence to original MATLAB/SPM/FSL workflows
 - [ ] Tests cover missing workflows listed in `docs/porting-status.md`
 - [x] Tests use real public fMRI, diffusion, DICOM, T1, template, and mask data
+- [x] SPM DARTEL template, Normalise-to-MNI, and multi-subject reference
+  comparison (mean correlation > 0.87 on 27 real template-derived subjects)
+- [x] FSL Randomise execution coverage
+- [x] Interactive HTML/WebGL 3D fiber viewer
 
 The current evidence supports an Alpha research migration, not a production
 release. See `docs/porting-status.md` for the authoritative status record.

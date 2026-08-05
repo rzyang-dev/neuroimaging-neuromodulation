@@ -39,8 +39,8 @@
 
 7. The migration is partial, not a full port of the original MATLAB toolbox.
 
-   Missing workflows now include validated AFQ/ANTs integration and
-   DARTEL-grade parity. See `docs/porting-status.md`.
+   Missing workflows now include full AFQ/TrackQC numerical parity and
+   larger clinical DARTEL-grade parity. See `docs/porting-status.md`.
 
 8. The individualized target-mask path is exposed through `nm-tms seed-fc` and
    `nm-pipeline`, and T1-space target generation is now available in `nm-app`;
@@ -61,7 +61,7 @@
 13. Fixed: external-execution tests for FSL/MRtrix now pass 3/3 against the
     installed WSL binaries on 2026-08-04. FSL `eddy_correct` and BET pass on a
     realistic ellipsoid fixture, and MRtrix `tckgen` passes with the required
-    `-seed_image` source. ANTs execution tests pass 3/3 on Windows.
+    `-seed_image` source. ANTs execution tests pass 4/4 on Windows.
 
 ## Data Issues
 
@@ -73,5 +73,6 @@
 
 ## Recommended Next Work
 
-- Add validated DARTEL-compatible normalization integration.
-- Add an HTML or web report for target coordinates and QC images.
+- Extend DARTEL-compatible normalization parity to a larger clinical
+  multi-subject dataset.
+- Complete AFQ/TrackQC numerical parity and harden desktop GUI workflows.

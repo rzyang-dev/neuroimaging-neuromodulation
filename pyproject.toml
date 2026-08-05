@@ -25,6 +25,7 @@ dependencies = [
     "nilearn>=0.10",
     "dipy>=1.10",
     "dicom2nifti>=2.6",
+    "pydicom>=2.3",
 ]
 
 [project.optional-dependencies]
