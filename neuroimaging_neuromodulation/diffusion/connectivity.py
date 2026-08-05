@@ -13,19 +13,30 @@ def count_streamlines_between_masks(
 ) -> dict[str, object]:
     """Count streamlines connecting seed and target endpoint masks."""
 
-    from dipy.tracking import utils
-
     seed_mask = np.asarray(seed_mask, dtype=bool)
     target_mask = np.asarray(target_mask, dtype=bool)
-    labels = seed_mask.astype(int) + 2 * target_mask.astype(int)
-    matrix = utils.connectivity_matrix(
-        streamlines,
-        np.asarray(affine, dtype=float),
-        labels,
-        inclusive=True,
-        symmetric=False,
-    )
-    count = int(matrix[1, 2] + matrix[2, 1])
+    affine = np.asarray(affine, dtype=float)
+    inverse = np.linalg.inv(affine)
+    count = 0
+    for streamline in streamlines:
+        points = np.asarray(streamline, dtype=float)
+        if points.ndim != 2 or points.shape[1] != 3:
+            continue
+        homogeneous = np.column_stack([points, np.ones(len(points), dtype=float)])
+        voxels = (inverse @ homogeneous.T).T[:, :3]
+        voxel_indices = np.rint(voxels).astype(int)
+        in_bounds = np.all(
+            (voxel_indices >= 0)
+            & (voxel_indices < np.asarray(seed_mask.shape, dtype=int)),
+            axis=1,
+        )
+        if not np.any(in_bounds):
+            continue
+        indices = voxel_indices[in_bounds]
+        hits_seed = bool(seed_mask[indices[:, 0], indices[:, 1], indices[:, 2]].any())
+        hits_target = bool(target_mask[indices[:, 0], indices[:, 1], indices[:, 2]].any())
+        if hits_seed and hits_target:
+            count += 1
     return {
         "count": count,
         "seed_voxels": int(seed_mask.sum()),

@@ -45,8 +45,9 @@ noted limitations:
 - DICOM series selection by index in `nm-dicom` and `nm-pipeline`
 - NumPy/SciPy motion estimation and coregistration
 - NumPy/SciPy diffusion tensor fitting
-- Optional DIPY nonlinear deformation estimation and deterministic/
-  probabilistic tensor tractography through the `diffusion` extra
+- NumPy/SciPy deterministic tractography and connectivity
+- Optional DIPY nonlinear deformation estimation and probabilistic tensor
+  tractography through the `diffusion` extra
 - SPM25 standalone segmentation through `nm-preprocess spm-segment`, including
   native `c*` maps, imported `rc*` DARTEL maps, and warped `wc*` maps
 - SPM DARTEL template runner through `nm-preprocess dartel-template`
@@ -139,7 +140,7 @@ noted limitations:
 - ANTs execution tests that skip when binaries are not installed; first run
   against installed ANTs 2.6.5 on 2026-08-04: 4/4 pass, including real-template
   registration/apply and SyN streamline transformation tests
-- Local test suite: `177 tests collected` and passing
+- Local test suite: `178 tests collected` and passing
 - `pip check`: no broken requirements
 - Wheel: `dist/neuroimaging_neuromodulation-0.20.0-py3-none-any.whl`
 - CI claim: recorded in `docs/ci-validation.md`, but not independently

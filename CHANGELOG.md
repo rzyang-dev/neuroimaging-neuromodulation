@@ -16,6 +16,9 @@
   `diffusion` extra.
 - Replaced DIPY tensor fitting with an internal NumPy/SciPy weighted
   least-squares DTI implementation.
+- Replaced DIPY deterministic tractography and streamline connectivity with
+  NumPy/SciPy implementations; DIPY remains optional for probabilistic
+  tracking.
 - Added pipeline config validation before execution.
 - Added package-version/configuration metadata to reproducibility manifests.
 - Added desktop GUI launch smoke tests.

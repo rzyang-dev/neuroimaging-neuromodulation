@@ -65,7 +65,8 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - HTML tract QC reports combining profile statistics, plots, and segmentation
   counts
 - AFQ-style group profile plots and per-node profile statistics
-- Deterministic and probabilistic tensor tractography through `nm-diffusion`
+- NumPy/SciPy deterministic tensor tractography through `nm-diffusion`
+- Optional DIPY probabilistic tensor tractography through `nm-diffusion`
 - DICOM-to-NIfTI conversion through `nm-dicom`
 - DICOM inspection and single-series validation through `nm-dicom`
 - Real DICOM vendor coverage for generic, GE, Philips, Siemens, Hyperfine, and

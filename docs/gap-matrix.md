@@ -59,7 +59,7 @@ required by the Python implementation:
 | --- | --- | --- |
 | Full original GUI orchestration (`WhiteFun`, `WhiteMatter`, `WhiteMatterSF`, `TSA`, `TMStargetFC`) | core | Expose equivalent guided workflows in `nm-app`/`nm-gui`, not GUI clones |
 | Full AFQ/TrackQC numerical parity | core/diffusion | Add reference tests and complete subject-level pipeline |
-| DIPY-independent deformation and tractography paths | core | Replace optional diffusion extra with internal implementations |
+| DIPY-independent deformation and probabilistic-tractography paths | core | Replace optional diffusion extra with internal implementations |
 | DARTEL-grade normalization parity | external | Keep optional provider only; not required for normal use |
 | SimNIBS field simulation | external | Optional provider integration only |
 

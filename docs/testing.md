@@ -96,13 +96,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-177 tests collected and passing
+178 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-177 tests collected and passing
+178 tests collected and passing
 ```
 
 The test command is:
