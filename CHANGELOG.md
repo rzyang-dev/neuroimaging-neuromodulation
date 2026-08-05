@@ -23,6 +23,8 @@
 - Added pipeline config validation before execution.
 - Added optional `wm_analysis` pipeline support for homotopic connectivity and
   FC asymmetry outputs.
+- Added homotopic FC and FC asymmetry actions to the advanced `nm-gui`
+  desktop interface.
 - Added package-version/configuration metadata to reproducibility manifests.
 - Added desktop GUI launch smoke tests.
 - Added a minimal-install CI job that runs the core workflows without DIPY,

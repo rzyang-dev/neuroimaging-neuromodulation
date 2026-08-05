@@ -20,6 +20,10 @@ from ..targets.pipeline import seed_based_fc, target_site
 from ..targets.roi import deep_target, sphere_roi
 from ..targets.t1 import generate_t1_target
 from ..wm.alff import compute_alff
+from ..wm.connectivity import (
+    fc_asymmetry_index,
+    functional_homotopic_connectivity,
+)
 
 
 class ToolboxApp(tk.Tk):
@@ -158,6 +162,8 @@ class ToolboxApp(tk.Tk):
         frame = ttk.Frame(self.wm_tab)
         frame.pack(fill="x", padx=8, pady=8)
         ttk.Button(frame, text="Compute ALFF/fALFF", command=self._run_alff).pack(side="left")
+        ttk.Button(frame, text="Homotopic FC", command=self._run_conn_homo).pack(side="left", padx=8)
+        ttk.Button(frame, text="FC Asymmetry", command=self._run_fc_asym).pack(side="left")
 
     def _build_utility_tab(self) -> None:
         self.ref_var = tk.StringVar()
@@ -424,6 +430,28 @@ class ToolboxApp(tk.Tk):
                 low_cutoff=low,
                 high_cutoff=high,
             ),
+        )
+
+    def _run_conn_homo(self) -> None:
+        output_dir = Path(self.wm_out_var.get()) if self.wm_out_var.get() else Path.cwd()
+        output_path = output_dir / "conn_homo.nii"
+        self._run_worker(
+            lambda: functional_homotopic_connectivity(
+                self.wm_func_var.get(),
+                self.wm_mask_var.get(),
+                output_path,
+            )
+        )
+
+    def _run_fc_asym(self) -> None:
+        output_dir = Path(self.wm_out_var.get()) if self.wm_out_var.get() else Path.cwd()
+        output_path = output_dir / "fc_asym.nii"
+        self._run_worker(
+            lambda: fc_asymmetry_index(
+                self.wm_func_var.get(),
+                self.wm_mask_var.get(),
+                output_path,
+            )
         )
 
     def _run_sphere(self) -> None:

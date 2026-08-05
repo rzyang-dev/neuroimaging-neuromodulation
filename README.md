@@ -109,6 +109,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - CLI commands and an optional Tkinter desktop interface
 - Guided end-user desktop application via `nm-app`
 - Advanced desktop interface via `nm-gui`
+- Homotopic FC and FC asymmetry actions in the advanced desktop interface
 - Separate `nm-preprocess` program for deformation, slice timing, motion
   resampling, and smoothing
 - HTML target reports and SHA-256 output manifests for traceability
