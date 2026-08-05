@@ -75,7 +75,7 @@ not redistribute the vendored MATLAB/SPM/FSL directories. See
 - Compressed and enhanced multiframe DICOM conversion coverage
 - Atlas-guided GM/WM/CSF tissue probability estimation (approximate, not a
   validated SPM/DARTEL replacement)
-- Optional DIPY nonlinear deformation estimation with SPM world-coordinate
+- NumPy/SciPy nonlinear deformation estimation with SPM world-coordinate
   `y_`/`iy_` output
 - SPM25 standalone segmentation command through `nm-preprocess spm-segment`
 - SPM25-validated `y_`/`iy_` world-coordinate convention

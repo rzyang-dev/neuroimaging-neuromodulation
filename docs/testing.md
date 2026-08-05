@@ -26,7 +26,7 @@ Tests are grouped by responsibility:
   series.
 - `test_segmentation.py` verifies tissue estimation on a real Stanford T1.
 - `test_diffusion.py` also verifies probabilistic tensor tractography.
-- `test_deformations_estimate.py` verifies DIPY deformation estimation and
+- `test_deformations_estimate.py` verifies nonlinear deformation estimation and
   `y_`/`iy_` coordinate-field conversion on real data.
 - `test_spm_reference.py` verifies SPM world-coordinate `y_`/`iy_` handling
   against SPM25 standalone output when SPM is installed.
@@ -96,13 +96,13 @@ fMRI dataset. Geometry tests use real bundled templates and masks.
 ## Current Results
 
 ```text
-180 tests collected and passing
+181 tests collected and passing
 ```
 
 Python 3.10 also passes the full suite:
 
 ```text
-180 tests collected and passing
+181 tests collected and passing
 ```
 
 The test command is:

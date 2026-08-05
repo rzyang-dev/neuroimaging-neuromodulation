@@ -20,6 +20,9 @@
   NumPy/SciPy implementations, and replaced DIPY probabilistic tracking with a
   NumPy/SciPy tensor-perturbation tracker. DIPY remains optional only for
   nonlinear deformation estimation.
+- Added a NumPy/SciPy dense deformation engine as the default for nonlinear
+  deformation estimation; DIPY remains available as an optional compatibility
+  engine.
 - Added pipeline config validation before execution.
 - Added optional `wm_analysis` pipeline support for homotopic connectivity and
   FC asymmetry outputs.

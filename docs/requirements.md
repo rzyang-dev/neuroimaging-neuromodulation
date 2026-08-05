@@ -55,7 +55,8 @@ This release covers the analysis and target-selection layer plus application of
 existing deformation fields, slice timing, motion estimation, coregistration,
 DICOM conversion, approximate tissue probability estimation, DTI fitting,
 deterministic and probabilistic tensor tractography, and motion-parameter
-resampling. Nonlinear deformation estimation is available through DIPY, but
+resampling. Nonlinear deformation estimation is available through an internal
+NumPy/SciPy engine, but
 DARTEL-grade segmentation, SPM-compatible deformation conventions, and FSL
 BEDPOSTX tractography are outside this release because replacing SPM/FSL
 reliably is not feasible within the lightweight-dependency constraint.

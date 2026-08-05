@@ -147,8 +147,8 @@ about its accuracy boundary.
 
 ## ADR-010: Use DIPY for nonlinear deformation estimation
 
-Status: superseded by ADR-011 and ADR-013; DIPY is an optional extra, not a
-core requirement.
+Status: superseded by ADR-011 and ADR-013; the default is the NumPy/SciPy dense
+deformation engine, with DIPY available as an optional compatibility engine.
 
 Decision: Add DIPY-based nonlinear registration and a coordinate-field
 converter.

@@ -83,10 +83,10 @@ claimed to reproduce SPM/DARTEL.
 
 ## Deformation Estimation
 
-Nonlinear deformation estimation uses DIPY's symmetric diffeomorphic
-registration. The DIPY mapping is saved for reproducibility and also converted
-into SPM world-coordinate `y_ac_coT1.nii` and `iy_ac_coT1.nii` fields. This is
-an approximate Python-native normalization path, not an SPM DARTEL clone.
+Nonlinear deformation estimation uses an internal NumPy/SciPy dense Demons
+flow by default. The displacement field is converted into SPM world-coordinate
+`y_ac_coT1.nii` and `iy_ac_coT1.nii` fields. DIPY remains available as an
+optional compatibility engine.
 
 ## Config-Driven Pipeline
 

@@ -18,7 +18,7 @@ jobs:
       - name: Verify no optional runtime is required
         run: python -m neuroimaging_neuromodulation.cli.main doctor --json
       - name: Run minimal-core tests
-        run: python -m pytest tests/test_io.py tests/test_motion.py tests/test_coregister.py tests/test_runtime_diagnostics.py tests/test_packaging.py tests/test_dti_internal.py tests/test_tractography_internal.py -q
+        run: python -m pytest tests/test_io.py tests/test_motion.py tests/test_coregister.py tests/test_runtime_diagnostics.py tests/test_packaging.py tests/test_dti_internal.py tests/test_tractography_internal.py tests/test_deformation_internal.py -q
 
   test:
     strategy:

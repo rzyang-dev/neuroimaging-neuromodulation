@@ -26,6 +26,7 @@ required by the Python implementation:
 | `TMSfalff.m`, `dyALFF.m`, `WMSeedFC.m`, `WMMultiSeedFC.m` | `wm/alff.py`, `wm/dynamic.py`, `wm/seedfc.py` | core | `test_wm.py` |
 | `HMCalc.m`, `y_FD_Jenkinson.m`, `TMSmkC6.m` | `preprocess/motion_metrics.py`, `segmentation/c6.py` | core | `test_preprocess.py` |
 | `TMSwriteDTL.m`, deformation application | `io/deformations.py`, `deformations/estimate.py` | core | `test_deformations.py` |
+| Nonlinear deformation estimation | `deformations/estimate.py` | core | `test_deformation_internal.py` |
 | `TMSDicomConvert.m`, `DCM2NII` | `io/dicom.py` | dicom | `test_dicom.py` |
 | `TMSDTIFIT.sh` | `diffusion/dti.py` | core | `test_dti_internal.py`, `test_diffusion.py` |
 | `TMSProbTrack.sh`, `TMSTargetSC.m` | `diffusion/tracking.py`, `diffusion/connectivity.py` | diffusion | `test_diffusion.py` |
@@ -60,7 +61,7 @@ required by the Python implementation:
 | --- | --- | --- |
 | Full original GUI orchestration (`WhiteFun`, `WhiteMatter`, `WhiteMatterSF`, `TSA`, `TMStargetFC`) | core | Expose equivalent guided workflows in `nm-app`/`nm-gui`, not GUI clones |
 | Full AFQ/TrackQC numerical parity | core/diffusion | Add reference tests and complete subject-level pipeline |
-| DIPY-independent deformation path | core | Replace optional DIPY deformation estimation with an internal implementation |
+| DIPY deformation engine | optional | Compatibility engine for users who explicitly request `engine="dipy"` |
 | DARTEL-grade normalization parity | external | Keep optional provider only; not required for normal use |
 | SimNIBS field simulation | external | Optional provider integration only |
 
